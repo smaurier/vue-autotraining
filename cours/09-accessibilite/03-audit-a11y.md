@@ -1,131 +1,302 @@
-# 03 — Audit d'accessibilite
+# 03 — Audit d'accessibilité
 
-## Outils automatiques
+## C'est quoi un audit d'accessibilité ?
 
-### axe-core (dans le navigateur)
+Un **audit d'accessibilité**, c'est vérifier que ton site respecte les **règles d'accessibilité** (WCAG) qu'on a vues dans les chapitres précédents.
 
-1. Installe l'extension **axe DevTools** (Chrome/Firefox)
-2. Ouvre DevTools → onglet axe
-3. Scan la page → liste des problèmes avec sévérité et fix suggéré
+> 🏗️ **Analogie** : c'est comme l'inspection d'un bâtiment. Un inspecteur vient vérifier que les **normes de sécurité** sont respectées : les issues de secours fonctionnent, les rampes sont aux bonnes dimensions, les extincteurs sont en place... Pour un site web, on vérifie que les images ont un texte alternatif, que le contraste est bon, que tout marche au clavier, etc.
 
-### eslint-plugin-vuejs-accessibility
+**La bonne nouvelle** : il existe des **outils automatiques** qui font une partie du travail pour toi. La mauvaise nouvelle : ils ne détectent qu'environ **30%** des problèmes. Le reste nécessite des **tests manuels** (qu'on va aussi couvrir).
+
+## Partie 1 : Les outils automatiques
+
+### 🔍 axe DevTools (extension navigateur)
+
+C'est l'outil le plus populaire. Il scanne ta page et liste tous les problèmes d'accessibilité qu'il trouve.
+
+**Comment l'utiliser :**
+
+```
+1. Installe l'extension "axe DevTools" dans Chrome ou Firefox
+   → Cherche "axe DevTools" dans le store d'extensions de ton navigateur
+   → Clique "Ajouter" / "Installer"
+
+2. Ouvre ta page web (par exemple http://localhost:5173)
+
+3. Ouvre les DevTools (F12 ou Ctrl+Shift+I)
+
+4. Va dans l'onglet "axe" (tout à droite des onglets)
+
+5. Clique "Scan ALL of my page"
+
+6. Tu obtiens une liste de problèmes, par exemple :
+   🔴 Critical : "Images must have alternate text"
+      → Il manque un attribut alt sur une image
+   🟠 Serious : "Elements must have sufficient color contrast"
+      → Le texte n'est pas assez contrasté par rapport au fond
+   🟡 Minor : "Heading levels should only increase by one"
+      → Tu es passé de <h1> à <h3> sans <h2> entre les deux
+```
+
+> 💡 Chaque problème trouvé inclut une **explication** et une **suggestion de correction**. C'est très pédagogique !
+
+### 📝 eslint-plugin-vuejs-accessibility (détection dans le code)
+
+Cet outil vérifie ton code **pendant que tu l'écris** dans VS Code. Il souligne les erreurs d'accessibilité directement dans l'éditeur, comme les fautes d'orthographe.
+
+**Installation :**
 
 ```bash
+# On installe le plugin comme dépendance de développement
+# (-D = devDependency = pas inclus dans le site final)
 pnpm add -D eslint-plugin-vuejs-accessibility
 ```
 
+**Configuration :**
+
 ```js
-// eslint.config.js
-import vuejsAccessibility from "eslint-plugin-vuejs-accessibility";
+// eslint.config.js — le fichier de configuration d'ESLint
+// (ESLint = l'outil qui vérifie la qualité de ton code)
+
+// On importe le plugin d'accessibilité Vue.js
+import vuejsAccessibility from 'eslint-plugin-vuejs-accessibility'
 
 export default [
-  // ... autres configs
-  ...vuejsAccessibility.configs["flat/recommended"],
-];
+  // ... tes autres configurations ESLint existantes
+
+  // On active les règles d'accessibilité recommandées
+  ...vuejsAccessibility.configs['flat/recommended'],
+]
 ```
 
-Détecte dans le code :
+**Ce que ça détecte dans ton code :**
 
-- Images sans alt
-- Labels manquants
-- Handlers click sans equivalent clavier
-- Roles incorrects
+```vue
+<!-- ❌ ESLint te prévient : "img elements must have an alt prop" -->
+<!-- = "les images doivent avoir un attribut alt" -->
+<img src="photo.jpg" />
 
-### Storybook addon a11y
+<!-- ✅ Plus d'erreur ESLint -->
+<img src="photo.jpg" alt="Photo de profil de l'utilisateur" />
+
+<!-- ❌ ESLint te prévient : "A form label must be associated with a control" -->
+<!-- = "un label doit être associé à un champ de formulaire" -->
+<label>Nom</label>
+<input type="text" />
+
+<!-- ✅ Plus d'erreur — le label est lié au champ par for/id -->
+<label for="name">Nom</label>
+<input id="name" type="text" />
+
+<!-- ❌ ESLint te prévient : "click events must be accompanied by key events" -->
+<!-- = "un événement click doit aussi fonctionner au clavier" -->
+<div @click="doSomething">Cliquez ici</div>
+
+<!-- ✅ Mieux : utiliser un <button> (qui gère le clavier nativement) -->
+<button @click="doSomething">Cliquez ici</button>
+```
+
+### 📚 Storybook addon a11y (si tu utilises Storybook)
+
+> 📖 **C'est quoi Storybook ?** C'est un outil pour développer et tester tes composants Vue **isolément**, un par un. Si tu ne l'utilises pas, passe cette section.
 
 ```bash
+# Installation
 pnpm add -D @storybook/addon-a11y
 ```
 
 ```ts
-// .storybook/main.ts
-addons: ["@storybook/addon-a11y"];
+// .storybook/main.ts — configuration de Storybook
+addons: ['@storybook/addon-a11y']
 ```
 
-Chaque story affiche un onglet avec les violations d'accessibilite.
+Résultat : chaque composant dans Storybook affiche un **onglet "Accessibility"** avec les problèmes détectés. C'est pratique pour vérifier tes composants **un par un**.
 
-### vitest-axe (tests)
+### 🧪 vitest-axe (tests automatisés)
+
+C'est l'outil le plus puissant : il vérifie l'accessibilité **automatiquement** à chaque fois que tu lances tes tests. Si un problème apparaît, le test échoue.
 
 ```bash
+# Installation
 pnpm add -D vitest-axe
 ```
 
 ```ts
-import { describe, it, expect } from "vitest";
-import { mount } from "@vue/test-utils";
-import { axe } from "vitest-axe";
-import ContactForm from "@/components/ContactForm.vue";
+// tests/ContactForm.a11y.test.ts
+// Un fichier de test dédié à l'accessibilité
 
-describe("ContactForm a11y", () => {
-  it("ne contient pas de violation WCAG", async () => {
-    const wrapper = mount(ContactForm);
-    const results = await axe(wrapper.element);
-    expect(results.violations).toHaveLength(0);
-  });
-});
+// On importe les outils de test
+import { describe, it, expect } from 'vitest'
+// describe = "je décris un groupe de tests"
+// it = "un test individuel"
+// expect = "je m'attends à ce que..."
+
+import { mount } from '@vue/test-utils'
+// mount = "rendre un composant Vue dans un environnement de test"
+
+import { axe } from 'vitest-axe'
+// axe = l'outil qui scanne le HTML pour trouver les problèmes d'accessibilité
+
+import ContactForm from '@/components/ContactForm.vue'
+// Le composant qu'on veut tester
+
+// Groupe de tests pour l'accessibilité du formulaire de contact
+describe('ContactForm — accessibilité', () => {
+
+  // Test : le composant ne doit avoir AUCUNE violation WCAG
+  it('ne contient aucune violation WCAG', async () => {
+    // 1. On "monte" le composant (= on le rend dans un DOM virtuel)
+    const wrapper = mount(ContactForm)
+
+    // 2. On passe le HTML généré à axe pour analyse
+    //    async/await car l'analyse prend un peu de temps
+    const results = await axe(wrapper.element)
+
+    // 3. On vérifie qu'il y a ZÉRO violation
+    //    Si axe trouve un problème, le test ÉCHOUE
+    expect(results.violations).toHaveLength(0)
+    //    "je m'attends à ce que le tableau 'violations' ait 0 éléments"
+  })
+})
 ```
 
-## Audit manuel (checklist)
+> 💡 **Astuce** : nomme tes fichiers de test `*.a11y.test.ts` pour les retrouver facilement et les lancer séparément si besoin.
 
-Les outils automatiques détectent ~30% des problèmes. Le reste est manuel :
+## Partie 2 : Les tests manuels
 
-### Navigation clavier
+Les outils automatiques sont géniaux, mais ils ne détectent qu'une partie des problèmes. Voici ce que tu dois tester **toi-même**.
 
-- [ ] Tab parcourt tous les éléments interactifs dans l'ordre logique
-- [ ] Enter/Space active les boutons
-- [ ] Escape ferme les modals/dropdowns
-- [ ] Fleches navigent dans les tabs/menus
-- [ ] Pas de piege clavier (on peut toujours sortir)
-- [ ] Le focus est visible (outline)
+### ⌨️ Test de navigation clavier
 
-### Lecteur d'écran
+C'est le test le plus simple à faire et il détecte beaucoup de problèmes. **Pose ta souris et utilise uniquement le clavier** :
 
-Teste avec :
+```
+Comment tester :
 
-- **NVDA** (Windows, gratuit)
-- **VoiceOver** (macOS, integre)
-- **TalkBack** (Android)
+1. Ouvre ta page dans le navigateur
+2. Appuie sur Tab — le focus doit apparaître sur le premier élément interactif
+3. Continue à appuyer sur Tab — tu dois pouvoir atteindre TOUS les éléments :
+   ✅ Boutons
+   ✅ Liens
+   ✅ Champs de formulaire
+   ✅ Menus déroulants
+   ✅ etc.
 
-Verification :
+Vérifie à chaque étape :
+```
 
-- [ ] Les titres sont en hierarchie logique (h1 → h2 → h3)
-- [ ] Les images ont un alt pertinent (ou alt="" si decorative)
-- [ ] Les formulaires sont navigables et les erreurs annoncees
-- [ ] Les regions dynamiques sont annoncees (aria-live)
-- [ ] Les liens et boutons ont des labels comprehensibles
+**Checklist de navigation clavier :**
 
-### Visuel
+- [ ] **Tab** parcourt tous les éléments interactifs dans un **ordre logique** (de haut en bas, de gauche à droite)
+- [ ] **Enter** ou **Espace** active les boutons (ils font bien leur action)
+- [ ] **Escape** ferme les modals et menus déroulants
+- [ ] Les **flèches** permettent de naviguer dans les onglets et menus
+- [ ] **Pas de piège clavier** : tu peux toujours sortir d'un élément (Tab ou Escape fonctionnent toujours)
+- [ ] Le **focus est visible** : tu vois clairement quel élément est sélectionné (une bordure, un outline...)
 
-- [ ] Contraste suffisant (4.5:1 minimum)
-- [ ] Pas de dependance a la couleur seule (ajouter icone/texte)
-- [ ] Zoom 200% sans perte de contenu
-- [ ] Mode sombre respecte les contrastes
+> ⚠️ **Piège fréquent** : ne JAMAIS supprimer l'outline de focus en CSS (`outline: none`) sans le remplacer par un autre indicateur visuel. Sinon les utilisateurs clavier ne voient plus où ils sont !
 
-## Lighthouse
+### 🔊 Test avec un lecteur d'écran
+
+C'est le test le plus révélateur : **ferme les yeux** (ou éteins ton écran) et essaie de naviguer sur ton site uniquement en écoutant.
+
+**Lecteurs d'écran gratuits :**
+
+| Lecteur | Plateforme | Comment l'activer |
+| ------- | ---------- | ----------------- |
+| **NVDA** | Windows | Télécharger gratuitement sur nvaccess.org |
+| **VoiceOver** | macOS | Cmd + F5 (déjà installé !) |
+| **VoiceOver** | iPhone | Réglages → Accessibilité → VoiceOver |
+| **TalkBack** | Android | Réglages → Accessibilité → TalkBack |
+
+**Que vérifier avec un lecteur d'écran :**
+
+- [ ] Les **titres** sont en hiérarchie logique : h1 → h2 → h3 (pas de saut)
+- [ ] Les **images** ont un alt pertinent (ou `alt=""` si l'image est purement décorative)
+- [ ] Les **formulaires** sont navigables : chaque champ a un label qui est lu
+- [ ] Les **erreurs** de formulaire sont **annoncées** quand elles apparaissent
+- [ ] Les **zones dynamiques** sont annoncées (notifications, messages de chargement...)
+- [ ] Les **liens et boutons** ont des labels compréhensibles (pas de "Cliquez ici" tout seul)
+
+### 👁️ Tests visuels
+
+- [ ] **Contraste suffisant** : ratio 4.5:1 minimum (utilise Chrome DevTools ou un outil en ligne)
+- [ ] **Pas de dépendance à la couleur seule** : si un message est en rouge pour dire "erreur", ajoute aussi une icône ⚠️ ou un texte "Erreur"
+- [ ] **Zoom 200%** : zoome ta page à 200% (Ctrl +), le contenu doit rester lisible sans scroll horizontal
+- [ ] **Mode sombre** : si tu as un mode sombre, vérifie que les contrastes sont toujours bons
+
+## Partie 3 : Lighthouse — le scanner intégré à Chrome
+
+**Lighthouse** est un outil intégré à Chrome qui donne une **note sur 100** pour l'accessibilité de ta page. Pas besoin d'installer quoi que ce soit !
+
+```
+Comment l'utiliser :
+
+1. Ouvre ta page dans Chrome
+2. Ouvre DevTools (F12)
+3. Va dans l'onglet "Lighthouse"
+4. Coche "Accessibility" (décoche le reste si tu veux)
+5. Clique "Analyze page load"
+6. Attends quelques secondes...
+7. Tu obtiens un score et une liste de recommandations !
+```
+
+Tu peux aussi l'utiliser en **ligne de commande** :
 
 ```bash
-# CLI
+# Installation
 pnpm add -D lighthouse
+
+# Lance un audit sur ton site local
+# --only-categories=accessibility = on ne vérifie que l'accessibilité
 npx lighthouse http://localhost:5173 --only-categories=accessibility
 ```
 
-Ou directement dans Chrome DevTools → onglet Lighthouse.
+> 💡 Vise un score de **90+** pour commencer, puis essaie d'atteindre **100**.
 
-## Automatiser dans la CI
+## Partie 4 : Automatiser dans la CI (intégration continue)
+
+> 📖 **C'est quoi la CI ?** La CI (Continuous Integration = Intégration Continue), c'est quand ton code est **automatiquement testé** à chaque fois que tu le publies (par exemple sur GitHub). Si un test échoue, tu es prévenu avant de déployer un site cassé.
+
+Tu peux ajouter les tests d'accessibilité à ta CI pour qu'ils soient vérifiés **automatiquement** :
 
 ```yaml
 # .github/workflows/a11y.yml
-- name: A11y tests
-  run: pnpm test:run -- --grep "a11y"
+# Ce fichier dit à GitHub : "à chaque push, lance ces vérifications"
 
-- name: Lighthouse CI
+# Étape 1 : lancer les tests vitest qui contiennent "a11y" dans leur nom
+- name: Tests d'accessibilité (vitest-axe)
+  run: pnpm test:run -- --grep "a11y"
+  # --grep "a11y" = ne lance que les tests dont le nom contient "a11y"
+
+# Étape 2 : lancer Lighthouse sur les pages principales du site
+- name: Audit Lighthouse
   uses: treosh/lighthouse-ci-action@v11
+  # C'est une "action GitHub" pré-faite qui lance Lighthouse pour toi
   with:
     urls: |
       http://localhost:5173/
       http://localhost:5173/login
-    budgets: '[{"resourceSizes": [{"resourceType": "script", "budget": 200}]}]'
+    # On teste la page d'accueil et la page de connexion
 ```
+
+**Résultat** : à chaque fois que quelqu'un modifie le code, les tests d'accessibilité sont lancés automatiquement. Si une image sans `alt` est ajoutée, le test échoue et tout le monde est prévenu.
+
+## Résumé — Ta stratégie d'audit a11y
+
+```
+🔧 AUTOMATIQUE (fait le gros du travail pour toi) :
+  1. eslint-plugin-vuejs-accessibility → erreurs dans l'éditeur en temps réel
+  2. vitest-axe → tests automatisés qui échouent si problème
+  3. Lighthouse CI → audit à chaque déploiement
+
+🖐️ MANUEL (vérifie ce que les outils ne voient pas) :
+  4. Navigation clavier → Tab, Enter, Escape
+  5. Lecteur d'écran → NVDA / VoiceOver
+  6. Contraste et zoom → vérification visuelle
+```
+
+> 🎉 **Encouragement** : l'accessibilité, c'est un **processus continu**, pas un état parfait. Même vérifier UN seul point (par exemple "est-ce que mes images ont un alt ?") est déjà un progrès énorme. Commence petit, améliore progressivement, et rappelle-toi : **chaque amélioration aide de vraies personnes** à utiliser ton site.
 
 ## Exercice
 

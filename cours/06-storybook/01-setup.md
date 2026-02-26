@@ -1,96 +1,206 @@
-# 01 — Storybook : Setup avec Vue 3
+# 01 — Storybook : Installation et configuration
 
-## Qu'est-ce que Storybook ?
+## 🧠 C'est quoi Storybook ?
 
-Un outil pour **developper, tester et documenter des composants UI en isolation**.
+Imagine que tu construis des meubles pour une maison. Avant de tout assembler dans la maison, tu aimerais **voir chaque meuble individuellement** dans un showroom — un peu comme les pièces d'exposition chez IKEA.
 
-En ESN, Storybook sert a :
+**Storybook, c'est exactement ça pour tes composants Vue.**
 
-- Documenter le design system pour les developpeurs
-- Permettre aux PO/designers de valider les composants
-- Tester les états visuels sans lancer l'app complète
+C'est un outil qui te permet de :
 
-## Installation
+- **Voir chaque composant tout seul**, en dehors de ton application
+- **Tester différentes variantes** (bouton rouge, bouton bleu, bouton désactivé…)
+- **Documenter** tes composants pour que d'autres développeurs les comprennent
+
+> 💡 **Analogie :** Ton application Vue = la maison meublée. Storybook = le catalogue IKEA où tu vois chaque meuble sous tous les angles.
+
+### Pourquoi c'est utile ?
+
+Sans Storybook, pour voir ton bouton, tu dois :
+
+1. Lancer toute ton application
+2. Naviguer jusqu'à la page qui utilise ce bouton
+3. Espérer que les données soient dans le bon état
+
+Avec Storybook, tu ouvres **une seule page web** et tu vois **tous tes composants** classés et testables immédiatement.
+
+---
+
+## 📦 Installation pas à pas
+
+### Étape 1 : Se placer dans le projet
 
 ```bash
+# Ouvre un terminal et va dans le dossier de ton projet Vue
+cd mon-projet-vue
+```
+
+### Étape 2 : Lancer l'installation automatique
+
+```bash
+# Cette commande détecte que ton projet utilise Vue 3 + Vite
+# et installe tout ce qu'il faut automatiquement
 npx storybook@latest init
-# Detecte Vue 3 + Vite automatiquement
 ```
 
-Structure ajoutee :
+> 💡 **Rappel :** `npx` permet d'exécuter un package npm sans l'installer globalement. C'est comme dire "utilise cet outil juste pour cette commande".
+
+Cette commande va :
+
+- Installer les dépendances nécessaires
+- Créer un dossier `.storybook/` avec la configuration
+- Créer un dossier `src/stories/` avec des exemples
+
+### Étape 3 : Vérifier la structure créée
+
+Après l'installation, tu verras ces **nouveaux fichiers** dans ton projet :
 
 ```
-.storybook/
-  main.ts        ← config Storybook
-  preview.ts     ← config globale des stories
-src/
-  stories/       ← exemples (tu peux supprimer)
+mon-projet-vue/
+├── .storybook/          ← 📁 Dossier de configuration de Storybook
+│   ├── main.ts          ← ⚙️ Configuration principale (quoi afficher, quels plugins)
+│   └── preview.ts       ← 🎨 Configuration visuelle (styles globaux, réglages d'affichage)
+├── src/
+│   └── stories/         ← 📖 Exemples de stories (tu peux les supprimer plus tard)
+│       ├── Button.stories.ts
+│       └── ...
 ```
 
-## Configuration
+> 💡 **Un dossier qui commence par un point** (`.storybook`) est un dossier de configuration. C'est une convention courante dans le monde JavaScript.
+
+---
+
+## ⚙️ Comprendre la configuration
+
+### Le fichier principal : `.storybook/main.ts`
+
+Ce fichier dit à Storybook **comment fonctionne ton projet** :
 
 ```ts
 // .storybook/main.ts
+// C'est le fichier de configuration PRINCIPAL de Storybook
+
+// On importe le type pour avoir l'autocomplétion
 import type { StorybookConfig } from "@storybook/vue3-vite";
 
+// On crée un objet de configuration
 const config: StorybookConfig = {
+  // stories : OÙ trouver les fichiers de stories dans ton projet
+  // "../src/**/*.stories.@(ts|tsx)" signifie :
+  //   ../src/     → dans le dossier src
+  //   **/         → dans n'importe quel sous-dossier
+  //   *.stories.  → les fichiers qui finissent par ".stories."
+  //   @(ts|tsx)   → avec l'extension .ts ou .tsx
   stories: ["../src/**/*.stories.@(ts|tsx)"],
+
+  // framework : quel framework on utilise (Vue 3 avec Vite)
   framework: "@storybook/vue3-vite",
-  addons: ["@storybook/addon-essentials", "@storybook/addon-a11y"],
+
+  // addons : les plugins qui ajoutent des fonctionnalités
+  addons: [
+    "@storybook/addon-essentials", // Boutons de contrôle, documentation, etc.
+    "@storybook/addon-a11y",       // Vérification d'accessibilité (pour les malvoyants, etc.)
+  ],
 };
 
+// On exporte la configuration pour que Storybook puisse la lire
 export default config;
 ```
 
+### Le fichier d'aperçu : `.storybook/preview.ts`
+
+Ce fichier configure **l'apparence globale** des stories (styles, réglages visuels) :
+
 ```ts
 // .storybook/preview.ts
+// Ce fichier configure comment les stories s'AFFICHENT
+
+// On importe le type Preview pour l'autocomplétion
 import type { Preview } from "@storybook/vue3";
-import "../src/style.css"; // Importe tes styles globaux
+
+// On importe les styles CSS de notre application
+// Comme ça, les composants dans Storybook auront les mêmes styles
+// que dans l'application réelle
+import "../src/style.css";
 
 const preview: Preview = {
   parameters: {
-    controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
+    controls: {
+      matchers: {
+        // Si une prop contient "color" ou "background" → affiche un sélecteur de couleur
+        color: /(background|color)$/i,
+        // Si une prop contient "Date" → affiche un sélecteur de date
+        date: /Date$/i,
+      },
+    },
   },
 };
 
+// On exporte pour que Storybook utilise ces réglages
 export default preview;
 ```
 
-## Addons essentiels
+> 💡 **En résumé :** `main.ts` = "quoi et comment", `preview.ts` = "l'apparence".
+
+---
+
+## 🧩 Les addons (plugins)
+
+Les **addons** sont des extensions qui ajoutent des fonctionnalités à Storybook. C'est comme des plugins pour un navigateur.
+
+### Installation des addons recommandés
 
 ```bash
+# On installe 4 addons utiles
+# -D signifie "dépendance de développement" (pas besoin en production)
 pnpm add -D @storybook/addon-essentials @storybook/addon-a11y @storybook/addon-interactions @storybook/test
 ```
 
-| Addon          | Role                                               |
-| -------------- | -------------------------------------------------- |
-| `essentials`   | Controls, Actions, Viewport, Docs (inclus de base) |
-| `a11y`         | Audit accessibilite automatique par story          |
-| `interactions` | Play functions pour tester les interactions        |
-| `test`         | Utilitaires de test dans les stories               |
+### À quoi sert chaque addon ?
 
-## Alias et imports
+| Addon          | Ce qu'il fait                                                        | Analogie                                      |
+| -------------- | -------------------------------------------------------------------- | --------------------------------------------- |
+| `essentials`   | Panneau de contrôle pour modifier les props, voir les événements     | Les boutons de réglage d'une machine à laver  |
+| `a11y`         | Vérifie que ton composant est accessible (lisible, navigable, etc.)  | Un correcteur d'accessibilité, comme un correcteur orthographique |
+| `interactions` | Permet de simuler des clics et interactions dans les stories         | Un robot qui teste les boutons à ta place     |
+| `test`         | Outils pour écrire des mini-tests dans les stories                   | Une checklist de vérification                 |
 
-Si ton projet utilise des alias (`@/`), configure-les dans Storybook :
+---
+
+## 🔗 Configurer les alias (chemins raccourcis)
+
+> 💡 **Rappel :** Dans un projet Vue, on utilise souvent `@/` comme raccourci pour le dossier `src/`. Au lieu d'écrire `../../components/AppButton.vue`, on écrit `@/components/AppButton.vue`. C'est plus court et plus lisible.
+
+Storybook ne connaît pas ces raccourcis par défaut. Il faut les lui expliquer :
 
 ```ts
-// .storybook/main.ts
+// .storybook/main.ts (version complète avec les alias)
 import type { StorybookConfig } from "@storybook/vue3-vite";
-import { mergeConfig } from "vite";
-import path from "path";
+import { mergeConfig } from "vite";   // Outil de Vite pour fusionner des configurations
+import path from "path";              // Module Node.js pour manipuler les chemins de fichiers
 
 const config: StorybookConfig = {
+  // Où chercher les fichiers de stories
   stories: ["../src/**/*.stories.@(ts|tsx)"],
+
+  // On utilise Vue 3 avec Vite
   framework: "@storybook/vue3-vite",
+
+  // Nos plugins
   addons: [
     "@storybook/addon-essentials",
     "@storybook/addon-a11y",
     "@storybook/addon-interactions",
   ],
+
+  // viteFinal : permet de MODIFIER la configuration Vite utilisée par Storybook
   viteFinal(config) {
     return mergeConfig(config, {
       resolve: {
         alias: {
+          // On dit à Storybook : quand tu vois "@/", remplace par le dossier "src/"
+          // __dirname = le dossier où se trouve CE fichier (.storybook/)
+          // "../src" = on remonte d'un niveau puis on va dans src/
           "@": path.resolve(__dirname, "../src"),
         },
       },
@@ -101,39 +211,76 @@ const config: StorybookConfig = {
 export default config;
 ```
 
-## Storybook dans le CI
+---
+
+## 🚀 Lancer Storybook
+
+### En mode développement (pour travailler)
+
+```bash
+# Lance Storybook en mode développement
+# Il s'ouvre automatiquement dans ton navigateur
+pnpm storybook
+
+# Tu verras s'afficher :
+#   Local: http://localhost:6006
+# → C'est l'adresse pour voir ton Storybook dans le navigateur
+```
+
+### Construire une version statique (pour partager)
+
+```bash
+# Génère un site web statique dans le dossier storybook-static/
+# Tu peux ensuite mettre ce dossier sur un serveur web
+pnpm storybook build
+```
+
+> 💡 **Site statique** = des fichiers HTML/CSS/JS que n'importe quel serveur web peut afficher, sans avoir besoin de Node.js.
+
+---
+
+## 🏗️ Storybook dans l'intégration continue (CI)
+
+> 💡 **Rappel :** L'intégration continue (CI) est un système qui exécute automatiquement des vérifications à chaque fois que tu envoies du code. C'est comme un contrôle qualité automatique en usine.
 
 ```yaml
 # .github/workflows/ci.yml — job Storybook
+# Ce fichier dit à GitHub : "à chaque push, fais ces étapes"
+
 storybook:
-  runs-on: ubuntu-latest
+  runs-on: ubuntu-latest          # Utilise un serveur Linux
   steps:
-    - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v4
-    - run: pnpm install --frozen-lockfile
-    - run: pnpm storybook build
-    # Optionnel : deployer sur Chromatic pour review visuel
+    - uses: actions/checkout@v4   # Récupère le code du projet
+    - uses: pnpm/action-setup@v4  # Installe pnpm
+    - run: pnpm install --frozen-lockfile  # Installe les dépendances
+    - run: pnpm storybook build   # Construit Storybook
+    # Si ça réussit → les composants sont documentables
+    # Si ça échoue → il y a un problème dans les stories
 ```
 
-## Lancer Storybook
+---
 
-```bash
-pnpm storybook
-# Ouvre http://localhost:6006
+## 🏢 Pourquoi Storybook est utile en entreprise (ESN)
 
-pnpm storybook build
-# Genere un site statique dans storybook-static/
-```
+| Situation                     | Ce que Storybook apporte                        |
+| ----------------------------- | ----------------------------------------------- |
+| Équipe de plus de 3 devs      | Tout le monde voit les composants disponibles    |
+| Un designer valide le travail | Il peut voir les composants sans installer le code |
+| Nouveau dev dans l'équipe     | Il découvre tous les composants rapidement       |
+| Design system partagé         | Un catalogue interactif des composants UI        |
+| Vérifier les régressions      | On voit immédiatement si un composant a changé   |
 
-## En contexte ESN
+---
 
-| Situation                    | Valeur Storybook                       |
-| ---------------------------- | -------------------------------------- |
-| Équipe front > 3 devs        | Documentation vivante des composants   |
-| PO / designer dans la boucle | Validation visuelle sans lancer l'app  |
-| Design system partage        | Catalogue interactif des composants UI |
-| Onboarding nouveau dev       | Decouverte rapide des composants dispo |
-| Regression visuelle          | Chromatic / tests visuels automatises  |
+## ✅ Résumé
+
+| Concept          | C'est quoi                                                  |
+| ---------------- | ----------------------------------------------------------- |
+| **Storybook**    | Un showroom pour voir tes composants Vue un par un          |
+| **main.ts**      | La configuration : où sont les stories, quels plugins       |
+| **preview.ts**   | L'apparence : styles globaux, réglages d'affichage          |
+| **Addon**        | Un plugin qui ajoute des fonctionnalités à Storybook        |
+| **Alias @/**     | Un raccourci de chemin qu'il faut configurer dans Storybook |
 
 ## Suite
 
