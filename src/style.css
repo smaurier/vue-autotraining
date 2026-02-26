@@ -1,0 +1,70 @@
+﻿:root {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.4;
+  color: #1f2937;
+  background: #f8fafc;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+#app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+h1, h2, h3 {
+  margin-top: 0;
+}
+
+.card {
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: white;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+button {
+  border: 1px solid #9ca3af;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.nav button.active {
+  background: #111827;
+  color: white;
+  border-color: #111827;
+}
+
+code {
+  background: #f3f4f6;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
