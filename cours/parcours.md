@@ -224,7 +224,7 @@ Imprime ou copie ce tableau. Coche après chaque révision.
 
 | Cours | Date J | J+1 | J+7 | J+30 |
 |-------|--------|-----|-----|------|
-| 00-01 Types de base | ___ | ☐ | ☐ | ☐ |
+| 00-01 Types de base | 27/02 | ☐ | ☐ | ☐ |
 | 00-02 Interfaces | ___ | ☐ | ☐ | ☐ |
 | 00-03 Generics | ___ | ☐ | ☐ | ☐ |
 | 00-04 Typer Vue 3 | ___ | ☐ | ☐ | ☐ |
