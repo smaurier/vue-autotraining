@@ -6,6 +6,20 @@
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelle est la différence principale entre REST et GraphQL ?
+> 2. Comment s'appellent les opérations de lecture et d'écriture en GraphQL ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. REST retourne des données fixées par endpoint, GraphQL permet de choisir exactement les champs voulus
+> 2. `query` pour lire des données, `mutation` pour les modifier
+> </details>
+
+---
+
 ## 📻 L'analogie : le talkie-walkie
 
 Imagine que ton **frontend** (l'interface utilisateur) et ton **backend** (le serveur) communiquent par talkie-walkie :

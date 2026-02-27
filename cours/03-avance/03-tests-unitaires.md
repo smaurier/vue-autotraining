@@ -1,5 +1,21 @@
 # 03 — Tests unitaires (Vitest)
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelles sont les 3 parties principales d'un store Pinia ?
+> 2. Comment accède-t-on à un store Pinia dans un composant ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. `state` (données), `actions` (méthodes), `getters` (valeurs dérivées)
+> 2. En appelant le store comme une fonction : `const store = useMyStore()`
+> </details>
+
+---
+
 ## C'est quoi un test unitaire ? 🧪
 
 Imagine que tu construis une calculatrice. Avant de la vendre, tu vérifies que :

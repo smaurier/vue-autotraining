@@ -2,6 +2,20 @@
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelle est la convention de nommage pour un composable ?
+> 2. Que doit retourner un composable pour être utilisé dans un composant ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Le préfixe `use` (ex: `useCounter`, `useFetch`)
+> 2. Un objet contenant les refs, fonctions et computed qu'on veut exposer
+> </details>
+
+---
+
 ## 🔁 Rappel JavaScript : c'est quoi l'asynchrone ?
 
 ### L'analogie du restaurant

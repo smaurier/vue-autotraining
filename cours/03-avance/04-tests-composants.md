@@ -1,5 +1,21 @@
 # 04 — Tests de composants (Vue Test Utils)
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelle fonction utilise-t-on pour regrouper plusieurs tests liés ?
+> 2. Comment crée-t-on une fonction mock (simulée) avec Vitest ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. `describe('nom du groupe', () => { ... })`
+> 2. `vi.fn()` — on peut ensuite vérifier ses appels avec `toHaveBeenCalled()`
+> </details>
+
+---
+
 ## C'est quoi un test de composant ?
 
 Dans le chapitre précédent, on a testé des **fonctions** (comme `clamp` ou `formatPrice`). Maintenant, on va tester des **composants Vue** — c'est-à-dire les blocs visuels de notre application (boutons, formulaires, cartes...).

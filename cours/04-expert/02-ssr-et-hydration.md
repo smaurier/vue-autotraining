@@ -6,6 +6,20 @@
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelle fonction utilise-t-on pour éviter de rendre réactif l'intérieur d'un objet volumineux ?
+> 2. À quoi sert la directive `v-memo` ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. `shallowRef()` ou `shallowReactive()` — seule la référence de premier niveau est réactive
+> 2. Elle met en cache le rendu d'un élément tant que ses dépendances ne changent pas
+> </details>
+
+---
+
 ## C'est quoi le "rendu" d'une page web ?
 
 Avant de parler de SSR, il faut comprendre comment une page web arrive sur ton écran.

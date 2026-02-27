@@ -1,5 +1,21 @@
 # 03 — Monitoring et suivi des erreurs
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quels sont les deux hébergeurs gratuits les plus simples pour déployer une app Vue ?
+> 2. Comment configure-t-on les variables d'environnement en production ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Vercel et Netlify
+> 2. Via le dashboard de l'hébergeur ou dans les secrets GitHub Actions pour le CI/CD
+> </details>
+
+---
+
 ## 📹 C'est quoi le monitoring ?
 
 ### Explication simple

@@ -1,5 +1,21 @@
 # 06 — Tests E2E avec Playwright
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Qu'est-ce qu'un test d'intégration par rapport à un test unitaire ?
+> 2. Comment mock-t-on la fonction `fetch` globale dans un test ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Un test d'intégration vérifie que plusieurs parties fonctionnent ensemble (composant + store par ex.)
+> 2. `global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(data) })`
+> </details>
+
+---
+
 ## C'est quoi un test E2E ? 🤔
 
 **E2E** signifie **End-to-End** (de bout en bout).

@@ -1,5 +1,21 @@
 # 02 — ARIA et Vue
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Que signifie WCAG et quel est son rôle ?
+> 2. Quels sont les 4 principes POUR de l'accessibilité web ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Web Content Accessibility Guidelines — les règles internationales pour l'accessibilité web
+> 2. Perceivable (perceptible), Operable (utilisable), Understandable (compréhensible), Robust (robuste)
+> </details>
+
+---
+
 ## C'est quoi ARIA ?
 
 **ARIA** = **Accessible Rich Internet Applications**. C'est un ensemble d'**attributs HTML spéciaux** qui aident les **lecteurs d'écran** (logiciels qui lisent le contenu de l'écran à voix haute) à mieux comprendre ton interface.

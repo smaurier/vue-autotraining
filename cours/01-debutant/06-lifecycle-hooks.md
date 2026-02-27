@@ -7,6 +7,20 @@ et comment **exécuter du code** à chacun de ces moments.
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Comment déclare-t-on des props dans un composant avec `<script setup>` ?
+> 2. Comment un composant enfant peut-il envoyer un événement au parent ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Avec `defineProps<{ maProps: string }>()`
+> 2. Avec `defineEmits()` puis `emit('nomEvent', payload)`
+> </details>
+
+---
+
 ## L'analogie : la vie d'un être humain 🧑
 
 Un composant Vue traverse des **étapes de vie**, exactement comme une personne :

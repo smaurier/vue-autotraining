@@ -2,6 +2,20 @@
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quels sont les 3 types primitifs les plus courants en TypeScript ?
+> 2. Quelle est la différence entre `any` et `unknown` ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. `string`, `number`, `boolean`
+> 2. `any` désactive les vérifications de type, `unknown` oblige à vérifier le type avant utilisation
+> </details>
+
+---
+
 ## Rappel JavaScript : les objets
 
 En JavaScript, un **objet** est comme une fiche d'identité : il regroupe plusieurs informations dans un seul conteneur.

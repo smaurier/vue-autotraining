@@ -1,5 +1,21 @@
 # 02 — Déploiement (mettre son app en ligne)
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Qu'est-ce qu'un pipeline CI/CD ?
+> 2. Où place-t-on le fichier de configuration GitHub Actions ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Une série d'étapes automatiques (lint, tests, build, deploy) déclenchées à chaque push
+> 2. Dans `.github/workflows/` (ex: `.github/workflows/ci.yml`)
+> </details>
+
+---
+
 ## 🌍 C'est quoi le déploiement ?
 
 ### Explication simple

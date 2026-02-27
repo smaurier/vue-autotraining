@@ -1,5 +1,21 @@
 # 03 — Data Fetching (récupérer des données)
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Où place-t-on les fichiers de pages dans un projet Nuxt ?
+> 2. Quel composant utilise-t-on dans un layout pour afficher le contenu de la page ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Dans le dossier `pages/` à la racine du projet
+> 2. `<NuxtPage />` (ou `<slot />` dans les layouts)
+> </details>
+
+---
+
 ## C'est quoi le "Data Fetching" ?
 
 Le **data fetching**, c'est le fait d'aller **chercher des données sur un serveur** pour les afficher sur ta page.

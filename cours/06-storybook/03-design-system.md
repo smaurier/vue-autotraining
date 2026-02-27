@@ -1,5 +1,21 @@
 # 03 — Design System : le guide de style de ton application
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelle est la structure de base d'un fichier `.stories.ts` ?
+> 2. À quoi servent les `args` dans une story Storybook ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Un objet `meta` (config générale) + des exports nommés pour chaque story
+> 2. Les `args` définissent les props passées au composant, modifiables dans le panneau Controls
+> </details>
+
+---
+
 ## 🧠 C'est quoi un design system ?
 
 Imagine que tu travailles pour une grande marque (comme McDonald's ou Apple). Cette marque a un **guide de style** qui dit :

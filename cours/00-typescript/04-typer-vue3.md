@@ -2,6 +2,22 @@
 
 > **Pour les débutants :** Ce chapitre explique comment typer les concepts principaux de Vue 3. Si vous ne connaissez pas encore Vue, ces concepts peuvent sembler étranges, mais c'est normal !
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Comment déclare-t-on un type générique dans une fonction (ex: `premier<T>()`) ?
+> 2. À quoi sert le mot-clé `extends` dans les génériques ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. On met `<T>` après le nom de la fonction : `function nom<T>(param: T): T`
+> 2. Il pose une contrainte sur le type : `<T extends string>` signifie que T doit être un string ou un sous-type
+> </details>
+
+---
+
 ## Qu'est-ce que Vue 3 ? (rappel rapide)
 
 Vue 3 est un framework JavaScript pour créer des interfaces utilisateur. Il utilise des **composants** (comme des morceaux d'interface réutilisables) et de la **réactivité** (quand une donnée change, l'interface se met à jour automatiquement).

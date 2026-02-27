@@ -4,6 +4,20 @@
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelle est la différence entre `interface` et `type` en TypeScript ?
+> 2. Comment rend-on une propriété optionnelle dans une interface ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. `interface` peut être étendue/fusionnée, `type` est plus flexible (unions, tuples)
+> 2. En ajoutant `?` après le nom de la propriété : `name?: string`
+> </details>
+
+---
+
 ## 🧠 Rappel JavaScript : les fonctions qui marchent avec plusieurs types
 
 Avant de parler de TypeScript, rappelons un truc en JavaScript.

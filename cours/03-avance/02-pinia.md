@@ -5,6 +5,20 @@
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Comment définit-on une route avec un paramètre dynamique dans Vue Router ?
+> 2. À quoi sert un navigation guard comme `beforeEach` ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Avec `:param` dans le path : `{ path: '/users/:id', component: UserView }`
+> 2. Il permet d'exécuter du code avant chaque navigation (ex: vérifier l'authentification)
+> </details>
+
+---
+
 ## C'est quoi le "state management" ?
 
 Imagine une **colocation** de 5 personnes. Chacun est un composant Vue.

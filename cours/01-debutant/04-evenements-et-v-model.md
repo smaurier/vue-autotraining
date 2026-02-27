@@ -2,6 +2,20 @@
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelle est la différence entre `ref()` et `reactive()` ?
+> 2. À quoi sert `computed()` et quand l'utiliser ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. `ref()` pour les valeurs simples (accès via `.value`), `reactive()` pour les objets (accès direct)
+> 2. `computed()` crée une valeur dérivée qui se recalcule automatiquement quand ses dépendances changent
+> </details>
+
+---
+
 ## 🧠 Rappel JavaScript : c'est quoi un "événement" ?
 
 Un **événement**, c'est **quelque chose qui se passe** sur ta page web.

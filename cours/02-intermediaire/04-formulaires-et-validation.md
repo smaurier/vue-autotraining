@@ -2,6 +2,20 @@
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Pourquoi utilise-t-on `async/await` dans un composable de fetch ?
+> 2. Quels 3 états gère-t-on généralement lors d'un appel API ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Pour attendre la réponse du serveur avant de continuer l'exécution
+> 2. `isLoading` (chargement), `data` (résultat), `error` (erreur)
+> </details>
+
+---
+
 ## 📝 Rappel HTML : comment fonctionne un formulaire ?
 
 Avant Vue, les formulaires étaient gérés **entièrement par HTML**. Petit rappel :

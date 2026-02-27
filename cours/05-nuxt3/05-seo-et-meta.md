@@ -1,5 +1,21 @@
 # 05 — SEO et meta (être trouvé sur Google)
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Où place-t-on les server routes dans un projet Nuxt 3 ?
+> 2. Quelle fonction utilise-t-on pour définir un handler d'API serveur ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Dans le dossier `server/api/` (ex: `server/api/users.ts` crée `/api/users`)
+> 2. `defineEventHandler((event) => { ... })` qui reçoit l'événement HTTP
+> </details>
+
+---
+
 ## C'est quoi le SEO ?
 
 **SEO** = **S**earch **E**ngine **O**ptimization (Optimisation pour les Moteurs de Recherche).

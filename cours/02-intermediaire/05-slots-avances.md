@@ -1,5 +1,21 @@
 # 05 — Slots avancés : laisser le parent décider du contenu
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelle librairie utilise-t-on pour valider des formulaires en Vue 3 ?
+> 2. Comment définir un schéma de validation avec Zod ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. `vee-validate` (avec `@vee-validate/zod` pour intégrer Zod)
+> 2. `z.object({ name: z.string().min(2), email: z.string().email() })`
+> </details>
+
+---
+
 ## C'est quoi un slot ? (Rappel rapide)
 
 Imagine un **cadre photo**. Le cadre, c'est ton composant. Mais la photo à l'intérieur ? C'est le **parent** qui la choisit.

@@ -1,5 +1,21 @@
 # 03 — La réactivité (ref, reactive, computed)
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelle directive utilise-t-on pour afficher un élément conditionnellement ?
+> 2. Quelle est la syntaxe pour boucler sur un tableau dans le template ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. `v-if` (ou `v-show` pour cacher sans retirer du DOM)
+> 2. `v-for="item in items"` avec un `:key` unique
+> </details>
+
+---
+
 ## C'est quoi la réactivité ? 🤔
 
 ### L'analogie du tableur Excel

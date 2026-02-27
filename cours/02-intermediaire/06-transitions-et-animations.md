@@ -4,6 +4,20 @@
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelle est la différence entre un slot par défaut et un slot nommé ?
+> 2. Comment accède-t-on aux données exposées par un scoped slot ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Slot par défaut : `<slot>`, slot nommé : `<slot name="header">` utilisé avec `#header`
+> 2. Via `#default="{ item }"` ou `v-slot:default="{ item }"` pour déstructurer les props
+> </details>
+
+---
+
 ## 📝 Rappel CSS : les propriétés qu'on va utiliser
 
 Avant de commencer, rappelons quelques propriétés CSS importantes :

@@ -1,5 +1,21 @@
 # 04 — Server routes (les routes serveur)
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelle est la différence entre `useFetch` et `useAsyncData` dans Nuxt ?
+> 2. Que retourne `useFetch` en plus des données ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. `useFetch` est un wrapper autour de `useAsyncData` + `$fetch`, plus simple pour les appels HTTP
+> 2. `{ data, pending, error, refresh }` — l'état de chargement, l'erreur et une fonction pour recharger
+> </details>
+
+---
+
 ## C'est quoi une "server route" ?
 
 ### L'analogie du restaurant 🍽️

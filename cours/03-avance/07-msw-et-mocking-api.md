@@ -1,5 +1,21 @@
 # 07 — MSW (Mock Service Worker) — Simuler une API
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelle méthode Playwright utilise-t-on pour naviguer vers une URL ?
+> 2. Comment sélectionne-t-on un élément par son texte dans Playwright ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. `await page.goto('/ma-page')`
+> 2. `page.getByText('Mon texte')` ou `page.locator('text=Mon texte')`
+> </details>
+
+---
+
 ## C'est quoi le « mocking » d'API ? 🎬
 
 ### Analogie : le décor de cinéma

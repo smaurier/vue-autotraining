@@ -12,6 +12,20 @@ dans ce parcours.
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quel hook utilise-t-on pour exécuter du code quand un composant apparaît dans le DOM ?
+> 2. Dans quel hook doit-on nettoyer un `setInterval` ou un event listener ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. `onMounted()`
+> 2. `onUnmounted()` (pour éviter les fuites de mémoire)
+> </details>
+
+---
+
 ## L'analogie de la cuisine 🍳
 
 Imagine que tu prépares un repas avec **une salade** et **une soupe**.  

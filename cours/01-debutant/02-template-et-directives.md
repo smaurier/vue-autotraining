@@ -4,6 +4,20 @@
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Que signifie SFC et quelles sont les 3 sections d'un fichier `.vue` ?
+> 2. À quoi sert `<script setup>` par rapport à `<script>` classique ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Single File Component — `<template>`, `<script>`, `<style>`
+> 2. `<script setup>` simplifie la syntaxe : tout ce qui est déclaré est automatiquement disponible dans le template
+> </details>
+
+---
+
 ## 1. Qu'est-ce qu'une directive ?
 
 ### L'analogie 🏷️

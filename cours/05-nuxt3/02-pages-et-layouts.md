@@ -1,5 +1,21 @@
 # 02 — Pages et Layouts
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Qu'est-ce que l'auto-import dans Nuxt 3 ?
+> 2. Comment fonctionnent les routes automatiques (file-based routing) ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Les composables Vue (`ref`, `computed`) et les composants sont importés automatiquement sans `import`
+> 2. Chaque fichier `.vue` dans `pages/` crée automatiquement une route correspondante
+> </details>
+
+---
+
 ## Comprendre le concept : Pages et Layouts
 
 Avant de coder, comprenons ce que sont les **pages** et les **layouts** avec une analogie simple :

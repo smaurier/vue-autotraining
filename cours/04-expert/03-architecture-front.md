@@ -7,6 +7,20 @@
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelle est la différence entre SSR (Server-Side Rendering) et CSR (Client-Side Rendering) ?
+> 2. Qu'est-ce que l'hydration dans le contexte du SSR ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. SSR : le serveur génère le HTML complet. CSR : le navigateur construit la page via JavaScript
+> 2. L'hydration "réactive" le HTML statique envoyé par le serveur en attachant les event listeners Vue
+> </details>
+
+---
+
 ## C'est quoi, l'« architecture » d'un projet ?
 
 ### 🏠 L'analogie de la maison

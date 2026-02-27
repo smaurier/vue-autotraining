@@ -2,6 +2,20 @@
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelle syntaxe utilise-t-on pour écouter un événement clic dans le template ?
+> 2. Que fait `v-model` sur un `<input>` ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. `@click="maFonction"` (raccourci de `v-on:click`)
+> 2. Il crée une liaison bidirectionnelle entre la valeur de l'input et une variable réactive
+> </details>
+
+---
+
 ## L'analogie LEGO 🧱
 
 Imagine que tu construis une maison en LEGO :

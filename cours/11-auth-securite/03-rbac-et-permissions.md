@@ -1,5 +1,21 @@
 # 03 — RBAC et permissions
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Qu'est-ce qu'une attaque XSS et comment s'en protéger en Vue ?
+> 2. Qu'est-ce qu'une attaque CSRF ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Injection de code JavaScript malveillant — Vue échappe automatiquement, mais attention à `v-html` !
+> 2. Cross-Site Request Forgery — un site malveillant envoie des requêtes en se faisant passer pour l'utilisateur
+> </details>
+
+---
+
 ## 🏢 C'est quoi le RBAC ?
 
 **RBAC** = **Role-Based Access Control** = Contrôle d'accès basé sur les rôles

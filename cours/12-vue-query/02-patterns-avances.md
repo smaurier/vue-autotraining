@@ -6,6 +6,20 @@
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. À quoi sert la `queryKey` dans `useQuery` ?
+> 2. Quelle est la différence entre `useQuery` et `useMutation` ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Elle identifie la requête de manière unique pour le cache et l'invalidation
+> 2. `useQuery` est pour lire des données (GET), `useMutation` pour les modifier (POST, PUT, DELETE)
+> </details>
+
+---
+
 ## 1. Optimistic Updates (mises à jour optimistes)
 
 ### C'est quoi ?

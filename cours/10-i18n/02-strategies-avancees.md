@@ -4,6 +4,20 @@
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelle fonction utilise-t-on pour afficher un texte traduit dans le template ?
+> 2. Comment gère-t-on la pluralisation avec vue-i18n ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. `$t('cle.traduction')` dans le template ou `t('cle')` avec `useI18n()` dans le script
+> 2. Avec le pipe `|` dans les traductions : `"item": "0 items | 1 item | {count} items"`
+> </details>
+
+---
+
 ## Lazy loading des traductions (chargement à la demande)
 
 ### C'est quoi le problème ?

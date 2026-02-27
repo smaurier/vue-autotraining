@@ -1,5 +1,21 @@
 # 03 — Audit d'accessibilité
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. À quoi sert l'attribut `aria-label` ?
+> 2. Quelle est la règle n°1 d'ARIA ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Il fournit un libellé accessible pour les lecteurs d'écran quand le texte visible ne suffit pas
+> 2. Éviter ARIA si du HTML sémantique natif fait le travail (ex: `<button>` plutôt que `<div role="button">`)
+> </details>
+
+---
+
 ## C'est quoi un audit d'accessibilité ?
 
 Un **audit d'accessibilité**, c'est vérifier que ton site respecte les **règles d'accessibilité** (WCAG) qu'on a vues dans les chapitres précédents.

@@ -1,5 +1,21 @@
 # 05 — Tests d'intégration
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Quelle est la différence entre `mount` et `shallowMount` ?
+> 2. Comment vérifie-t-on qu'un composant a émis un événement ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. `mount` rend tous les composants enfants, `shallowMount` remplace les enfants par des stubs
+> 2. Avec `wrapper.emitted('eventName')` qui retourne un tableau des émissions
+> </details>
+
+---
+
 ## C'est quoi un test d'intégration ?
 
 Dans les chapitres précédents, on a appris à tester :

@@ -1,5 +1,21 @@
 # 02 — Écrire des stories
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Où se trouve la configuration principale de Storybook ?
+> 2. À quoi sert le fichier `preview.ts` dans `.storybook/` ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Dans le dossier `.storybook/` à la racine du projet
+> 2. Il configure les décorateurs globaux, les paramètres par défaut et les addons pour toutes les stories
+> </details>
+
+---
+
 ## 🧠 C'est quoi une "story" ?
 
 Une **story**, c'est **un exemple concret** de comment un composant peut s'afficher.

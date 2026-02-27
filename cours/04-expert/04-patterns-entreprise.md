@@ -9,6 +9,20 @@
 
 ---
 
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Qu'est-ce qu'une structure "feature-based" (par fonctionnalité) ?
+> 2. À quoi sert un fichier `index.ts` (barrel export) dans un dossier ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. Organiser le code par fonctionnalité métier (users/, products/) plutôt que par type technique (components/, stores/)
+> 2. Il centralise et ré-exporte les éléments du dossier pour simplifier les imports
+> </details>
+
+---
+
 ## C'est quoi un "pattern d'entreprise" ?
 
 ### 🍔 L'analogie de la franchise de restaurants

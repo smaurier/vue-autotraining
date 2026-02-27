@@ -1,5 +1,21 @@
 # 02 — Sécurité front-end
 
+---
+
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifie que tu peux répondre à ces questions :
+> 1. Qu'est-ce qu'un JWT et à quoi sert-il ?
+> 2. Quelle est la différence entre access token et refresh token ?
+> 
+> <details>
+> <summary>Vérifier mes réponses</summary>
+>
+> 1. JSON Web Token — un jeton signé contenant les infos utilisateur, utilisé pour l'authentification
+> 2. L'access token est courte durée pour les requêtes API, le refresh token permet d'obtenir un nouvel access token
+> </details>
+
+---
+
 ## 🏠 L'analogie de la maison
 
 Tout au long de ce chapitre, on va comparer ton application à **une maison** :
