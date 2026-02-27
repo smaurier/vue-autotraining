@@ -182,6 +182,58 @@ const messageVisible = ref<boolean>(true)
 
 > 💡 **Astuce simple :** si l'utilisateur clique souvent pour montrer/cacher → `v-show`. Si c'est une condition qui change rarement → `v-if`.
 
+### 🎯 Pratique — v-if / v-show
+
+Crée un fichier `.vue` et implémente :
+
+```vue
+<!-- Exercice D.1 : Affiche un message différent selon le score -->
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const score = ref(75)
+</script>
+
+<template>
+  <!-- Si score >= 80 : "🏆 Excellent !"
+       Si score >= 50 : "✅ Passé"
+       Sinon : "❌ Raté" -->
+  <!-- ??? complète avec v-if / v-else-if / v-else -->
+</template>
+```
+
+```vue
+<!-- Exercice D.2 : Menu déroulant avec v-show -->
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const menuOuvert = ref(false)
+</script>
+
+<template>
+  <button @click="???">Menu</button>
+  <ul v-show="???">
+    <li>Option 1</li>
+    <li>Option 2</li>
+  </ul>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<!-- D.1 -->
+<p v-if="score >= 80">🏆 Excellent !</p>
+<p v-else-if="score >= 50">✅ Passé</p>
+<p v-else>❌ Raté</p>
+
+<!-- D.2 -->
+<button @click="menuOuvert = !menuOuvert">Menu</button>
+<ul v-show="menuOuvert">...</ul>
+```
+</details>
+
 ---
 
 ## 4. `v-for` — répéter des éléments (boucles)
@@ -371,6 +423,60 @@ const personne: Record<string, string | number> = {
 </template>
 ```
 
+### 🎯 Pratique — v-for
+
+Crée un composant Vue :
+
+```vue
+<!-- Exercice D.3 : Affiche une liste de produits -->
+<script setup lang="ts">
+import { ref } from 'vue'
+
+interface Product {
+  id: number
+  name: string
+  price: number
+}
+
+const produits = ref<Product[]>([
+  { id: 1, name: 'T-shirt', price: 29 },
+  { id: 2, name: 'Jean', price: 59 },
+  { id: 3, name: 'Baskets', price: 89 },
+])
+</script>
+
+<template>
+  <!-- Affiche chaque produit avec son nom et prix -->
+  <!-- Format : "T-shirt - 29€" -->
+  <ul>
+    <li v-for="???" :key="???">
+      {{ ??? }}
+    </li>
+  </ul>
+</template>
+```
+
+```vue
+<!-- Exercice D.4 : Affiche une liste numérotée -->
+<!-- Utilise l'index pour afficher : "1. T-shirt", "2. Jean", etc. -->
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<!-- D.3 -->
+<li v-for="produit in produits" :key="produit.id">
+  {{ produit.name }} - {{ produit.price }}€
+</li>
+
+<!-- D.4 -->
+<li v-for="(produit, index) in produits" :key="produit.id">
+  {{ index + 1 }}. {{ produit.name }}
+</li>
+```
+</details>
+
 ---
 
 ## 5. `v-bind` — connecter des attributs HTML à des variables (raccourci `:`)
@@ -524,6 +630,71 @@ const taille = ref<number>(20)              // La taille en pixels
   <!-- Résultat HTML : <p style="color: blue; font-size: 20px;">...</p> -->
 </template>
 ```
+
+### 🎯 Pratique — v-bind
+
+```vue
+<!-- Exercice D.5 : Image dynamique -->
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const imageUrl = ref('/images/chat.jpg')
+const imageAlt = ref('Photo de chat')
+</script>
+
+<template>
+  <!-- Lie src et alt à tes variables avec :src et :alt -->
+  <img ??? />
+</template>
+```
+
+```vue
+<!-- Exercice D.6 : Bouton désactivé conditionnellement -->
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const formulaireValide = ref(false)
+</script>
+
+<template>
+  <!-- Le bouton est désactivé si le formulaire n'est pas valide -->
+  <button :disabled="???">
+    Envoyer
+  </button>
+</template>
+```
+
+```vue
+<!-- Exercice D.7 : Classes conditionnelles -->
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const estSelectionne = ref(true)
+const aErreur = ref(false)
+</script>
+
+<template>
+  <!-- Ajoute la classe 'selected' si estSelectionne, 'error' si aErreur -->
+  <div :class="{ ??? }">
+    Carte
+  </div>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<!-- D.5 -->
+<img :src="imageUrl" :alt="imageAlt" />
+
+<!-- D.6 -->
+<button :disabled="!formulaireValide">Envoyer</button>
+
+<!-- D.7 -->
+<div :class="{ selected: estSelectionne, error: aErreur }">
+```
+</details>
 
 ---
 
@@ -689,6 +860,82 @@ function annuler(): void {
 | `.once`      | L'événement ne se déclenche qu'une seule fois       | Bouton d'initialisation             |
 | `.enter`     | Réagit uniquement à la touche Entrée                | Champ de recherche                  |
 | `.escape`    | Réagit uniquement à la touche Échap                 | Fermer un popup                     |
+
+### 🎯 Pratique — v-on / @
+
+```vue
+<!-- Exercice D.8 : Compteur avec boutons + et - -->
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const compteur = ref(0)
+</script>
+
+<template>
+  <button @click="???">-</button>
+  <span>{{ compteur }}</span>
+  <button @click="???">+</button>
+</template>
+```
+
+```vue
+<!-- Exercice D.9 : Formulaire sans rechargement -->
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const email = ref('')
+
+function envoyerFormulaire() {
+  console.log('Email envoyé :', email.value)
+}
+</script>
+
+<template>
+  <form @submit.???="envoyerFormulaire">
+    <input v-model="email" type="email" />
+    <button type="submit">Envoyer</button>
+  </form>
+</template>
+```
+
+```vue
+<!-- Exercice D.10 : Recherche au clavier -->
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const recherche = ref('')
+
+function lancerRecherche() {
+  console.log('Recherche :', recherche.value)
+}
+</script>
+
+<template>
+  <!-- Lance la recherche quand on appuie sur Entrée -->
+  <input 
+    v-model="recherche" 
+    placeholder="Rechercher..." 
+    @keyup.???="lancerRecherche"
+  />
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<!-- D.8 -->
+<button @click="compteur--">-</button>
+<span>{{ compteur }}</span>
+<button @click="compteur++">+</button>
+
+<!-- D.9 -->
+<form @submit.prevent="envoyerFormulaire">
+
+<!-- D.10 -->
+<input ... @keyup.enter="lancerRecherche" />
+```
+</details>
 
 ---
 

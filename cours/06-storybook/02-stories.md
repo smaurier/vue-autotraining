@@ -308,6 +308,152 @@ src/
 | **fn()**        | Une fausse fonction pour capturer et voir les événements            |
 | **decorators**  | Un cadre visuel ajouté autour de chaque story                       |
 
+---
+
+## 🎯 Pratique
+
+### Exercice ST.1 — Première story
+
+Crée une story pour ce composant `Badge` :
+
+```vue
+<!-- Badge.vue -->
+<script setup lang="ts">
+defineProps<{
+  label: string
+  variant?: 'success' | 'warning' | 'error'
+}>()
+</script>
+
+<template>
+  <span :class="['badge', variant]">{{ label }}</span>
+</template>
+```
+
+```ts
+// Badge.stories.ts
+import type { Meta, StoryObj } from '@storybook/vue3'
+import Badge from './Badge.vue'
+
+const meta: Meta<typeof Badge> = {
+  // ???
+}
+
+export default meta
+type Story = StoryObj<typeof Badge>
+
+// Story "Success"
+export const Success: Story = {
+  // ???
+}
+
+// Story "Warning" et "Error"
+// ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import type { Meta, StoryObj } from '@storybook/vue3'
+import Badge from './Badge.vue'
+
+const meta: Meta<typeof Badge> = {
+  title: 'Components/Badge',
+  component: Badge,
+  tags: ['autodocs']
+}
+
+export default meta
+type Story = StoryObj<typeof Badge>
+
+export const Success: Story = {
+  args: {
+    label: 'Succès',
+    variant: 'success'
+  }
+}
+
+export const Warning: Story = {
+  args: {
+    label: 'Attention',
+    variant: 'warning'
+  }
+}
+
+export const Error: Story = {
+  args: {
+    label: 'Erreur',
+    variant: 'error'
+  }
+}
+```
+</details>
+
+---
+
+### Exercice ST.2 — argTypes
+
+Ajoute des contrôles interactifs pour tester les props :
+
+```ts
+const meta: Meta<typeof Badge> = {
+  component: Badge,
+  argTypes: {
+    // label : champ texte
+    // variant : sélecteur avec les 3 options
+    // ???
+  }
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+argTypes: {
+  label: {
+    control: 'text',
+    description: 'Le texte du badge'
+  },
+  variant: {
+    control: 'select',
+    options: ['success', 'warning', 'error'],
+    description: 'Le style du badge'
+  }
+}
+```
+</details>
+
+---
+
+### Exercice ST.3 — Decorator
+
+Ajoute un decorator pour afficher les stories sur fond sombre :
+
+```ts
+const meta: Meta<typeof Badge> = {
+  component: Badge,
+  decorators: [
+    // ???
+  ]
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+decorators: [
+  () => ({
+    template: '<div style="padding: 20px; background: #1a1a1a"><story /></div>'
+  })
+]
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/06-storybook/03-design-system.md`

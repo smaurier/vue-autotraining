@@ -298,6 +298,83 @@ Tu peux ajouter les tests d'accessibilité à ta CI pour qu'ils soient vérifié
 
 > 🎉 **Encouragement** : l'accessibilité, c'est un **processus continu**, pas un état parfait. Même vérifier UN seul point (par exemple "est-ce que mes images ont un alt ?") est déjà un progrès énorme. Commence petit, améliore progressivement, et rappelle-toi : **chaque amélioration aide de vraies personnes** à utiliser ton site.
 
+---
+
+## 🎯 Pratique
+
+### Exercice AUDIT.1 — Test vitest-axe
+
+Écris un test d'accessibilité pour un composant Button :
+
+```ts
+import { render } from '@testing-library/vue'
+import { axe, toHaveNoViolations } from 'vitest-axe'
+import Button from './Button.vue'
+
+expect.extend(toHaveNoViolations)
+
+describe('Button a11y', () => {
+  it('n\'a pas de violations d\'accessibilité', async () => {
+    // ???
+  })
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+describe('Button a11y', () => {
+  it('n\'a pas de violations d\'accessibilité', async () => {
+    const { container } = render(Button, {
+      props: { label: 'Cliquez ici' }
+    })
+    const results = await axe(container)
+    expect(results).toHaveNoViolations()
+  })
+})
+```
+</details>
+
+---
+
+### Exercice AUDIT.2 — Test clavier
+
+Quelles vérifications manuelles dois-tu faire pour ce composant Modal ?
+
+<details>
+<summary>Solution</summary>
+
+1. **Focus initial** : le focus va-t-il automatiquement dans la modal à l'ouverture ?
+2. **Tab** : le focus reste-t-il piégé dans la modal (ne sort pas derrière) ?
+3. **Escape** : la modal se ferme-t-elle avec Escape ?
+4. **Focus de retour** : après fermeture, le focus revient-il sur le bouton qui a ouvert la modal ?
+</details>
+
+---
+
+### Exercice AUDIT.3 — Checklist rapide
+
+Pour chaque élément, indique la vérification a11y prioritaire :
+
+1. Image
+2. Formulaire
+3. Bouton icône
+4. Modal
+5. Notification dynamique
+
+<details>
+<summary>Solution</summary>
+
+1. **Image** → Vérifier l'attribut `alt` (vide si décorative, descriptif si informative)
+2. **Formulaire** → Vérifier les `<label>` associés aux inputs
+3. **Bouton icône** → Vérifier `aria-label`
+4. **Modal** → Vérifier focus trap et fermeture avec Escape
+5. **Notification** → Vérifier `aria-live="polite"` ou `role="alert"`
+</details>
+
+---
+
 ## Exercice
 
 → `exercices/16-a11y-audit/ENONCE.md`

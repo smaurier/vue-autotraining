@@ -535,6 +535,200 @@ function handleSubmit(): void {
 
 ---
 
+## 🎯 Pratique
+
+### Exercice FV.1 — Validation simple
+
+Complète ce code pour valider que le champ `email` contient un "@" :
+
+```vue
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+
+const email = ref('')
+
+// Retourne un message d'erreur si l'email est invalide, sinon undefined
+const emailError = computed(() => {
+  // ???
+})
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+
+const email = ref('')
+
+const emailError = computed(() => {
+  if (!email.value) return 'Email requis'
+  if (!email.value.includes('@')) return 'Email invalide'
+  return undefined
+})
+</script>
+```
+</details>
+
+---
+
+### Exercice FV.2 — Formulaire complet
+
+Complète ce formulaire de contact avec validation :
+
+```vue
+<script setup lang="ts">
+import { reactive, computed } from 'vue'
+
+const form = reactive({
+  name: '',
+  email: '',
+  message: ''
+})
+
+// Crée un computed "errors" qui retourne un objet { name?, email?, message? }
+// - name: requis, min 2 caractères
+// - email: requis, doit contenir @
+// - message: requis, min 10 caractères
+const errors = computed(() => {
+  // ???
+})
+
+// Le formulaire est valide si aucune erreur
+const isValid = computed(() => {
+  // ???
+})
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<script setup lang="ts">
+import { reactive, computed } from 'vue'
+
+const form = reactive({
+  name: '',
+  email: '',
+  message: ''
+})
+
+const errors = computed(() => {
+  const errs: { name?: string; email?: string; message?: string } = {}
+
+  if (!form.name) errs.name = 'Nom requis'
+  else if (form.name.length < 2) errs.name = 'Minimum 2 caractères'
+
+  if (!form.email) errs.email = 'Email requis'
+  else if (!form.email.includes('@')) errs.email = 'Email invalide'
+
+  if (!form.message) errs.message = 'Message requis'
+  else if (form.message.length < 10) errs.message = 'Minimum 10 caractères'
+
+  return errs
+})
+
+const isValid = computed(() => {
+  return Object.keys(errors.value).length === 0
+})
+</script>
+```
+</details>
+
+---
+
+### Exercice FV.3 — Règle de validation réutilisable
+
+Crée des fonctions de validation réutilisables :
+
+```ts
+// Une règle retourne un message d'erreur ou undefined si valide
+type ValidationRule = (value: string) => string | undefined
+
+// Crée une règle "required" qui vérifie que le champ n'est pas vide
+export function required(message = 'Champ requis'): ValidationRule {
+  // ???
+}
+
+// Crée une règle "minLength" qui vérifie la longueur minimum
+export function minLength(min: number): ValidationRule {
+  // ???
+}
+
+// Crée une règle "email" qui vérifie le format email
+export function email(): ValidationRule {
+  // ???
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+type ValidationRule = (value: string) => string | undefined
+
+export function required(message = 'Champ requis'): ValidationRule {
+  return (value) => value.trim() ? undefined : message
+}
+
+export function minLength(min: number): ValidationRule {
+  return (value) => value.length >= min
+    ? undefined
+    : `Minimum ${min} caractères`
+}
+
+export function email(): ValidationRule {
+  return (value) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return regex.test(value) ? undefined : 'Email invalide'
+  }
+}
+```
+</details>
+
+---
+
+### Exercice FV.4 — Afficher les erreurs
+
+Complète le template pour afficher les erreurs sous chaque champ :
+
+```vue
+<template>
+  <form @submit.prevent="handleSubmit">
+    <div>
+      <input v-model="form.email" placeholder="Email" />
+      <!-- Affiche l'erreur email si elle existe, en rouge -->
+      <!-- ??? -->
+    </div>
+
+    <!-- Bouton désactivé si le formulaire n'est pas valide -->
+    <button ???>Envoyer</button>
+  </form>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<template>
+  <form @submit.prevent="handleSubmit">
+    <div>
+      <input v-model="form.email" placeholder="Email" />
+      <p v-if="errors.email" class="error">{{ errors.email }}</p>
+    </div>
+
+    <button :disabled="!isValid">Envoyer</button>
+  </form>
+</template>
+```
+</details>
+
+---
+
 ## Exercice
 
 → `exercices/08-formulaire-multi-etapes/ENONCE.md`

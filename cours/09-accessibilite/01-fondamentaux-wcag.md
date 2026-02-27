@@ -242,6 +242,101 @@ Voici la différence entre du HTML "à la div" et du HTML sémantique :
 ✅ Teste avec le clavier (Tab, Enter, Escape)
 ```
 
+---
+
+## 🎯 Pratique
+
+### Exercice A11Y.1 — HTML sémantique
+
+Transforme ce code pour utiliser des balises sémantiques :
+
+```html
+<!-- À transformer -->
+<div class="header">
+  <div class="logo">Mon Site</div>
+  <div class="nav">
+    <div onclick="goto('/')">Accueil</div>
+    <div onclick="goto('/about')">About</div>
+  </div>
+</div>
+<div class="content">...</div>
+<div class="footer">Copyright 2024</div>
+```
+
+<details>
+<summary>Solution</summary>
+
+```html
+<header>
+  <span class="logo">Mon Site</span>
+  <nav>
+    <a href="/">Accueil</a>
+    <a href="/about">About</a>
+  </nav>
+</header>
+<main>...</main>
+<footer>Copyright 2024</footer>
+```
+</details>
+
+---
+
+### Exercice A11Y.2 — Images accessibles
+
+Ajoute les attributs manquants pour rendre ces images accessibles :
+
+```html
+<!-- Image décorative -->
+<img src="decoration.png">
+
+<!-- Image informative -->
+<img src="chart-sales.png">
+
+<!-- Image-bouton -->
+<button>
+  <img src="icon-close.svg">
+</button>
+```
+
+<details>
+<summary>Solution</summary>
+
+```html
+<!-- Image décorative : alt vide -->
+<img src="decoration.png" alt="">
+
+<!-- Image informative : alt descriptif -->
+<img src="chart-sales.png" alt="Graphique des ventes : +20% en janvier">
+
+<!-- Image-bouton : aria-label sur le bouton -->
+<button aria-label="Fermer">
+  <img src="icon-close.svg" alt="">
+</button>
+```
+</details>
+
+---
+
+### Exercice A11Y.3 — Contraste
+
+Ces combinaisons de couleurs sont-elles accessibles (ratio AA minimum 4.5:1) ?
+
+1. Texte gris clair (#999) sur fond blanc (#fff)
+2. Texte blanc (#fff) sur fond bleu (#3b82f6)
+3. Texte noir (#000) sur fond jaune (#fef08a)
+
+<details>
+<summary>Solution</summary>
+
+1. ❌ #999 sur #fff = ratio ~2.8:1 → **NON** (trop faible)
+2. ✅ #fff sur #3b82f6 = ratio ~4.5:1 → **OUI** (juste suffisant)
+3. ✅ #000 sur #fef08a = ratio ~18:1 → **OUI** (excellent)
+
+Outil de vérification : https://webaim.org/resources/contrastchecker/
+</details>
+
+---
+
 ## Suite
 
 → `cours/09-accessibilite/02-aria-et-vue.md`

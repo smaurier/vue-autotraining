@@ -503,6 +503,172 @@ const searchQuery = useRouteQuery('q')
 
 ---
 
+## 🎯 Pratique
+
+### Exercice VR.1 — Définir des routes
+
+Complète la configuration du routeur :
+
+```ts
+// router/index.ts
+import { createRouter, createWebHistory } from 'vue-router'
+import Home from '@/views/Home.vue'
+import About from '@/views/About.vue'
+import Contact from '@/views/Contact.vue'
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    // Route "/" → Home
+    // ???
+    
+    // Route "/about" → About
+    // ???
+    
+    // Route "/contact" → Contact
+    // ???
+  ]
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    { path: '/', component: Home },
+    { path: '/about', component: About },
+    { path: '/contact', component: Contact }
+  ]
+})
+```
+</details>
+
+---
+
+### Exercice VR.2 — Route avec paramètre
+
+Crée une route pour afficher les détails d'un produit :
+
+```ts
+// La route doit être : /products/42 (42 = l'id du produit)
+// ???
+```
+
+Et récupère le paramètre dans le composant :
+
+```vue
+<!-- ProductDetail.vue -->
+<script setup lang="ts">
+// Récupère l'id du produit depuis l'URL
+const productId = ???
+</script>
+
+<template>
+  <h1>Produit n°{{ productId }}</h1>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+// Dans le routeur
+{ path: '/products/:id', component: ProductDetail }
+```
+
+```vue
+<!-- ProductDetail.vue -->
+<script setup lang="ts">
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const productId = route.params.id
+</script>
+
+<template>
+  <h1>Produit n°{{ productId }}</h1>
+</template>
+```
+</details>
+
+---
+
+### Exercice VR.3 — Navigation programmatique
+
+Complète ce composant pour naviguer vers la page de détails au clic :
+
+```vue
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+
+const router = ???
+
+function goToProduct(id: number) {
+  // Navigue vers /products/{id}
+  // ???
+}
+</script>
+
+<template>
+  <button @click="goToProduct(42)">Voir le produit 42</button>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+function goToProduct(id: number) {
+  router.push(`/products/${id}`)
+}
+</script>
+
+<template>
+  <button @click="goToProduct(42)">Voir le produit 42</button>
+</template>
+```
+</details>
+
+---
+
+### Exercice VR.4 — Guard de navigation
+
+Crée un guard qui empêche l'accès à `/admin` si l'utilisateur n'est pas connecté :
+
+```ts
+// Suppose que isLoggedIn() retourne true/false
+function isLoggedIn(): boolean {
+  return localStorage.getItem('token') !== null
+}
+
+router.beforeEach((to, from) => {
+  // Si on va vers /admin et qu'on n'est pas connecté → redirige vers /login
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+router.beforeEach((to, from) => {
+  if (to.path === '/admin' && !isLoggedIn()) {
+    return '/login'
+  }
+})
+```
+</details>
+
+---
+
 ## Exercice
 
 → `exercices/10-app-multi-pages/ENONCE.md`

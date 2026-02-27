@@ -342,6 +342,145 @@ const { data: users, isLoading, error } = useTrpcQuery(
 
 ---
 
+## 🎯 Pratique
+
+### Exercice TRPC.1 — Définir une procédure
+
+Crée un router tRPC avec une procédure `getAll` qui retourne une liste d'utilisateurs :
+
+```ts
+// server/routers/user.ts
+import { router, publicProcedure } from '../trpc'
+
+export const userRouter = router({
+  // getAll : retourne tous les utilisateurs
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { router, publicProcedure } from '../trpc'
+
+export const userRouter = router({
+  getAll: publicProcedure.query(async () => {
+    // En vrai : appel à la base de données
+    return [
+      { id: 1, name: 'Alice', email: 'alice@test.com' },
+      { id: 2, name: 'Bob', email: 'bob@test.com' }
+    ]
+  })
+})
+```
+</details>
+
+---
+
+### Exercice TRPC.2 — Procédure avec input
+
+Ajoute une procédure `getById` qui prend un ID en paramètre :
+
+```ts
+import { z } from 'zod'
+
+getById: publicProcedure
+  // Définis le schéma de validation
+  // ???
+  // Puis la query
+  // ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { z } from 'zod'
+
+getById: publicProcedure
+  .input(z.object({ id: z.number() }))
+  .query(async ({ input }) => {
+    const user = users.find(u => u.id === input.id)
+    if (!user) throw new Error('User not found')
+    return user
+  })
+```
+</details>
+
+---
+
+### Exercice TRPC.3 — Mutation
+
+Crée une mutation `create` pour ajouter un utilisateur :
+
+```ts
+create: publicProcedure
+  // ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+create: publicProcedure
+  .input(z.object({
+    name: z.string().min(2),
+    email: z.string().email()
+  }))
+  .mutation(async ({ input }) => {
+    const newUser = {
+      id: Date.now(),
+      name: input.name,
+      email: input.email
+    }
+    users.push(newUser)
+    return newUser
+  })
+```
+</details>
+
+---
+
+### Exercice TRPC.4 — Appeler depuis Vue
+
+Utilise tRPC dans un composant Vue :
+
+```vue
+<script setup lang="ts">
+import { trpc } from '@/utils/trpc'
+
+// Charge les utilisateurs
+const users = await ???
+
+// Crée un nouvel utilisateur
+async function createUser() {
+  await ???
+}
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<script setup lang="ts">
+import { trpc } from '@/utils/trpc'
+
+const users = await trpc.user.getAll.query()
+
+async function createUser() {
+  await trpc.user.create.mutate({
+    name: 'Charlie',
+    email: 'charlie@test.com'
+  })
+}
+</script>
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/09-accessibilite/01-fondamentaux-wcag.md`

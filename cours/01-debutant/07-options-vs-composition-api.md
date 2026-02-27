@@ -339,6 +339,100 @@ export default defineComponent({      import { ref, computed } from 'vue'
 
 ---
 
+## 🎯 Exercice pratique — Conversion
+
+### Exercice O.1 — Convertis ce composant Options API en Composition API
+
+```vue
+<!-- Options API (à convertir) -->
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  data() {
+    return {
+      count: 0,
+      name: 'Vue'
+    }
+  },
+  computed: {
+    greeting(): string {
+      return `Hello ${this.name}!`
+    },
+    doubleCount(): number {
+      return this.count * 2
+    }
+  },
+  methods: {
+    increment(): void {
+      this.count++
+    },
+    reset(): void {
+      this.count = 0
+    }
+  },
+  mounted() {
+    console.log('Component mounted!')
+  }
+})
+</script>
+
+<template>
+  <p>{{ greeting }}</p>
+  <p>Count: {{ count }} (double: {{ doubleCount }})</p>
+  <button @click="increment">+1</button>
+  <button @click="reset">Reset</button>
+</template>
+```
+
+Réécris-le en Composition API (`<script setup lang="ts">`) :
+
+```vue
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+
+// ??? Convertis data en refs
+// ??? Convertis computed
+// ??? Convertis methods en functions
+// ??? Convertis mounted en onMounted
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+
+// data → refs
+const count = ref(0)
+const name = ref('Vue')
+
+// computed
+const greeting = computed(() => `Hello ${name.value}!`)
+const doubleCount = computed(() => count.value * 2)
+
+// methods → functions
+function increment(): void {
+  count.value++
+}
+
+function reset(): void {
+  count.value = 0
+}
+
+// mounted → onMounted
+onMounted(() => {
+  console.log('Component mounted!')
+})
+</script>
+```
+
+</details>
+
+---
+
 ## Suite
 
 → Module 02 : `cours/02-intermediaire/01-composition-api-avancee.md`

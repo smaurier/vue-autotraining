@@ -406,6 +406,137 @@ export default defineNuxtPlugin((nuxtApp) => {
 
 ---
 
+## 🎯 Pratique
+
+### Exercice NXF.1 — useFetch basique
+
+Charge une liste de produits depuis `/api/products` :
+
+```vue
+<script setup lang="ts">
+interface Product {
+  id: number
+  name: string
+  price: number
+}
+
+// Charge les produits
+const { data: products, status } = ???
+</script>
+
+<template>
+  <div v-if="status === 'pending'">Chargement...</div>
+  <ul v-else>
+    <li v-for="p in products" :key="p.id">{{ p.name }}</li>
+  </ul>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<script setup lang="ts">
+interface Product {
+  id: number
+  name: string
+  price: number
+}
+
+const { data: products, status } = await useFetch<Product[]>('/api/products')
+</script>
+```
+</details>
+
+---
+
+### Exercice NXF.2 — Fetch avec paramètre
+
+Charge un produit spécifique selon l'ID dans l'URL :
+
+```vue
+<!-- pages/products/[id].vue -->
+<script setup lang="ts">
+// Récupère l'id depuis l'URL et charge le produit
+// ???
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<script setup lang="ts">
+const route = useRoute()
+const { data: product } = await useFetch<Product>(`/api/products/${route.params.id}`)
+</script>
+```
+</details>
+
+---
+
+### Exercice NXF.3 — $fetch pour une action
+
+Crée une fonction pour ajouter un produit au panier :
+
+```vue
+<script setup lang="ts">
+async function addToCart(productId: number) {
+  // Envoie une requête POST à /api/cart avec le productId
+  // ???
+}
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<script setup lang="ts">
+async function addToCart(productId: number) {
+  await $fetch('/api/cart', {
+    method: 'POST',
+    body: { productId }
+  })
+}
+</script>
+```
+</details>
+
+---
+
+### Exercice NXF.4 — Refresh après action
+
+Après avoir supprimé un produit, rafraîchis la liste :
+
+```vue
+<script setup lang="ts">
+const { data: products, refresh } = await useFetch<Product[]>('/api/products')
+
+async function deleteProduct(id: number) {
+  // Supprime le produit et rafraîchit la liste
+  // ???
+}
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<script setup lang="ts">
+const { data: products, refresh } = await useFetch<Product[]>('/api/products')
+
+async function deleteProduct(id: number) {
+  await $fetch(`/api/products/${id}`, { method: 'DELETE' })
+  await refresh()
+}
+</script>
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/05-nuxt3/04-server-routes.md`

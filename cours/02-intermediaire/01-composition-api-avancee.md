@@ -471,6 +471,211 @@ scope.stop(); // Arrête TOUS les watchers/effets/computed du groupe en une seul
 | `nextTick`     | Attend que Vue ait fini de mettre à jour le DOM        | 🖌️ Attendre que le peintre ait fini    |
 | `effectScope`  | Regroupe plusieurs effets pour les nettoyer ensemble   | 👷 Chef d'équipe qui gère les caméras   |
 
+---
+
+## 🎯 Pratique
+
+### Exercice CA.1 — Watch simple
+
+Complète ce code pour afficher un message quand `count` change :
+
+```ts
+import { ref, watch } from 'vue'
+
+const count = ref(0)
+
+// Affiche "count: ancienne valeur → nouvelle valeur" quand count change
+// ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { ref, watch } from 'vue'
+
+const count = ref(0)
+
+watch(count, (newVal, oldVal) => {
+  console.log(`count: ${oldVal} → ${newVal}`)
+})
+```
+</details>
+
+---
+
+### Exercice CA.2 — Watch avec options
+
+Complète ce code pour que la recherche soit lancée :
+1. **Immédiatement** au chargement (pas besoin d'attendre un changement)
+2. À chaque changement ultérieur de `search`
+
+```ts
+import { ref, watch } from 'vue'
+
+const search = ref('')
+
+function doSearch(term: string) {
+  console.log('Recherche:', term)
+}
+
+// ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { ref, watch } from 'vue'
+
+const search = ref('')
+
+function doSearch(term: string) {
+  console.log('Recherche:', term)
+}
+
+watch(search, (val) => {
+  doSearch(val)
+}, { immediate: true })
+```
+</details>
+
+---
+
+### Exercice CA.3 — watchEffect
+
+Réécris ce code en utilisant `watchEffect` au lieu de `watch` :
+
+```ts
+import { ref, watch } from 'vue'
+
+const firstName = ref('Jean')
+const lastName = ref('Dupont')
+
+watch([firstName, lastName], ([first, last]) => {
+  document.title = `${first} ${last}`
+}, { immediate: true })
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { ref, watchEffect } from 'vue'
+
+const firstName = ref('Jean')
+const lastName = ref('Dupont')
+
+// watchEffect s'exécute immédiatement et détecte automatiquement les dépendances
+watchEffect(() => {
+  document.title = `${firstName.value} ${lastName.value}`
+})
+```
+</details>
+
+---
+
+### Exercice CA.4 — provide/inject
+
+Complète les composants suivants pour que `Child` affiche le thème fourni par `Parent` :
+
+```vue
+<!-- Parent.vue -->
+<script setup lang="ts">
+import { ref, ??? } from 'vue'
+import Child from './Child.vue'
+
+const theme = ref<'light' | 'dark'>('dark')
+
+// Fournis "theme" à tous les descendants sous la clé "theme"
+// ???
+</script>
+```
+
+```vue
+<!-- Child.vue -->
+<script setup lang="ts">
+import { ??? } from 'vue'
+
+// Récupère la valeur fournie par l'ancêtre, ou 'light' par défaut
+const theme = ???
+</script>
+
+<template>
+  <p>Thème actuel : {{ theme }}</p>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<!-- Parent.vue -->
+<script setup lang="ts">
+import { ref, provide } from 'vue'
+import Child from './Child.vue'
+
+const theme = ref<'light' | 'dark'>('dark')
+
+provide('theme', theme)
+</script>
+```
+
+```vue
+<!-- Child.vue -->
+<script setup lang="ts">
+import { inject, type Ref } from 'vue'
+
+const theme = inject<Ref<'light' | 'dark'>>('theme', ref('light'))
+</script>
+
+<template>
+  <p>Thème actuel : {{ theme }}</p>
+</template>
+```
+</details>
+
+---
+
+### Exercice CA.5 — Arrêter un watcher
+
+Complète ce code pour arrêter le watcher après 5 secondes :
+
+```ts
+import { ref, watchEffect } from 'vue'
+
+const count = ref(0)
+
+// ???
+
+// Arrête le watcher après 5 secondes
+setTimeout(() => {
+  // ???
+  console.log('Watcher arrêté')
+}, 5000)
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { ref, watchEffect } from 'vue'
+
+const count = ref(0)
+
+const stopWatcher = watchEffect(() => {
+  console.log('count =', count.value)
+})
+
+setTimeout(() => {
+  stopWatcher()
+  console.log('Watcher arrêté')
+}, 5000)
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/02-intermediaire/02-composables.md`

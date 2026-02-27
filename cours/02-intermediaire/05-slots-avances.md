@@ -423,6 +423,255 @@ export default defineComponent({
 
 ---
 
+## 🎯 Pratique
+
+### Exercice SL.1 — Slot avec fallback
+
+Crée un composant `AlertBox` avec un contenu par défaut :
+
+```vue
+<!-- AlertBox.vue -->
+<template>
+  <div class="alert">
+    <!-- Si le parent ne passe rien, affiche "Une alerte s'est produite" -->
+    <!-- ??? -->
+  </div>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<!-- AlertBox.vue -->
+<template>
+  <div class="alert">
+    <slot>Une alerte s'est produite</slot>
+  </div>
+</template>
+```
+</details>
+
+---
+
+### Exercice SL.2 — Slots nommés
+
+Crée un composant `Modal` avec un header, un body et un footer :
+
+```vue
+<!-- Modal.vue -->
+<template>
+  <div class="modal">
+    <div class="modal-header">
+      <!-- Slot nommé "header" -->
+      <!-- ??? -->
+    </div>
+    <div class="modal-body">
+      <!-- Slot par défaut -->
+      <!-- ??? -->
+    </div>
+    <div class="modal-footer">
+      <!-- Slot nommé "footer" avec un bouton par défaut -->
+      <!-- ??? -->
+    </div>
+  </div>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<!-- Modal.vue -->
+<template>
+  <div class="modal">
+    <div class="modal-header">
+      <slot name="header"></slot>
+    </div>
+    <div class="modal-body">
+      <slot></slot>
+    </div>
+    <div class="modal-footer">
+      <slot name="footer">
+        <button>Fermer</button>
+      </slot>
+    </div>
+  </div>
+</template>
+```
+</details>
+
+---
+
+### Exercice SL.3 — Utiliser des slots nommés
+
+Utilise le composant `Modal` précédent :
+
+```vue
+<!-- Parent.vue -->
+<template>
+  <Modal>
+    <!-- Mets "Confirmation" dans le header -->
+    <!-- ??? -->
+
+    <!-- Mets "Voulez-vous continuer ?" dans le body -->
+    <!-- ??? -->
+
+    <!-- Mets deux boutons "Annuler" et "Confirmer" dans le footer -->
+    <!-- ??? -->
+  </Modal>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<!-- Parent.vue -->
+<template>
+  <Modal>
+    <template #header>
+      <h2>Confirmation</h2>
+    </template>
+
+    <p>Voulez-vous continuer ?</p>
+
+    <template #footer>
+      <button @click="cancel">Annuler</button>
+      <button @click="confirm">Confirmer</button>
+    </template>
+  </Modal>
+</template>
+```
+</details>
+
+---
+
+### Exercice SL.4 — Scoped slot simple
+
+Crée un composant `UserCard` qui expose les données de l'utilisateur au parent :
+
+```vue
+<!-- UserCard.vue -->
+<script setup lang="ts">
+defineProps<{
+  name: string
+  email: string
+}>()
+</script>
+
+<template>
+  <div class="card">
+    <!-- Passe name et email au parent via le slot -->
+    <slot ???></slot>
+  </div>
+</template>
+```
+
+Et utilise-le :
+
+```vue
+<!-- Parent.vue -->
+<template>
+  <UserCard name="Alice" email="alice@test.com">
+    <!-- Récupère les données et affiche-les -->
+    <template ???>
+      <h3>{{ ??? }}</h3>
+      <p>{{ ??? }}</p>
+    </template>
+  </UserCard>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<!-- UserCard.vue -->
+<script setup lang="ts">
+defineProps<{
+  name: string
+  email: string
+}>()
+</script>
+
+<template>
+  <div class="card">
+    <slot :name="name" :email="email"></slot>
+  </div>
+</template>
+```
+
+```vue
+<!-- Parent.vue -->
+<template>
+  <UserCard name="Alice" email="alice@test.com">
+    <template #default="{ name, email }">
+      <h3>{{ name }}</h3>
+      <p>{{ email }}</p>
+    </template>
+  </UserCard>
+</template>
+```
+</details>
+
+---
+
+### Exercice SL.5 — Scoped slot avec liste
+
+Crée un composant `DataList` qui affiche une liste et laisse le parent décider du rendu de chaque élément :
+
+```vue
+<!-- DataList.vue -->
+<script setup lang="ts" generic="T">
+defineProps<{
+  items: T[]
+}>()
+</script>
+
+<template>
+  <ul>
+    <!-- Pour chaque item, passe l'item et son index au slot -->
+    <li v-for="(item, index) in items" :key="index">
+      <!-- ??? -->
+    </li>
+  </ul>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<!-- DataList.vue -->
+<script setup lang="ts" generic="T">
+defineProps<{
+  items: T[]
+}>()
+</script>
+
+<template>
+  <ul>
+    <li v-for="(item, index) in items" :key="index">
+      <slot :item="item" :index="index"></slot>
+    </li>
+  </ul>
+</template>
+```
+
+Utilisation :
+
+```vue
+<DataList :items="users">
+  <template #default="{ item, index }">
+    {{ index + 1 }}. {{ item.name }}
+  </template>
+</DataList>
+```
+</details>
+
+---
+
 ## Exercice
 
 → `exercices/09-tableau-reutilisable/ENONCE.md`

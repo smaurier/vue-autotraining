@@ -320,6 +320,209 @@ describe("Protection des routes", () => {
 | **Guard de route** | Protection qui empêche l'accès à une page sans connexion |
 | **Wrapper factory** | Fonction utilitaire pour simplifier le setup des tests |
 
+---
+
+## 🎯 Pratique
+
+### Exercice TI.1 — Mocker une API
+
+Complète ce test d'intégration qui mock un appel API :
+
+```ts
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { mount, flushPromises } from '@vue/test-utils'
+import UserList from '../UserList.vue'
+
+// Mock global.fetch
+global.fetch = vi.fn()
+
+describe('UserList', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('affiche la liste des utilisateurs', async () => {
+    // Configure le mock pour retourner 2 utilisateurs
+    // ???
+
+    const wrapper = mount(UserList)
+    await flushPromises()
+
+    // Vérifie que les 2 utilisateurs sont affichés
+    // ???
+  })
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+it('affiche la liste des utilisateurs', async () => {
+  vi.mocked(fetch).mockResolvedValue({
+    ok: true,
+    json: () => Promise.resolve([
+      { id: 1, name: 'Alice' },
+      { id: 2, name: 'Bob' }
+    ])
+  } as Response)
+
+  const wrapper = mount(UserList)
+  await flushPromises()
+
+  expect(wrapper.text()).toContain('Alice')
+  expect(wrapper.text()).toContain('Bob')
+})
+```
+</details>
+
+---
+
+### Exercice TI.2 — Tester une erreur API
+
+Ajoute un test pour vérifier que le composant gère bien les erreurs :
+
+```ts
+it('affiche un message d\'erreur si l\'API échoue', async () => {
+  // Configure le mock pour simuler une erreur
+  // ???
+
+  const wrapper = mount(UserList)
+  await flushPromises()
+
+  // Vérifie qu'un message d'erreur est affiché
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+it('affiche un message d\'erreur si l\'API échoue', async () => {
+  vi.mocked(fetch).mockRejectedValue(new Error('Erreur réseau'))
+
+  const wrapper = mount(UserList)
+  await flushPromises()
+
+  expect(wrapper.text()).toContain('Erreur')
+})
+```
+</details>
+
+---
+
+### Exercice TI.3 — Test avec router
+
+Complète ce test d'intégration avec Vue Router :
+
+```ts
+import { createRouter, createMemoryHistory } from 'vue-router'
+
+function createTestRouter() {
+  return createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      { path: '/', name: 'home', component: { template: '<div>Home</div>' } },
+      { path: '/about', name: 'about', component: { template: '<div>About</div>' } }
+    ]
+  })
+}
+
+describe('Navigation', () => {
+  it('navigue vers la page About', async () => {
+    const router = createTestRouter()
+    const wrapper = mount(App, {
+      global: {
+        plugins: [router]
+      }
+    })
+
+    await router.isReady()
+
+    // Navigue vers /about
+    // ???
+
+    // Vérifie qu'on est sur la bonne route
+    // ???
+  })
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+it('navigue vers la page About', async () => {
+  const router = createTestRouter()
+  const wrapper = mount(App, {
+    global: {
+      plugins: [router]
+    }
+  })
+
+  await router.isReady()
+
+  await router.push('/about')
+  await flushPromises()
+
+  expect(router.currentRoute.value.name).toBe('about')
+  expect(wrapper.html()).toContain('About')
+})
+```
+</details>
+
+---
+
+### Exercice TI.4 — Wrapper factory
+
+Crée une fonction factory pour simplifier le setup de tes tests :
+
+```ts
+// Crée une factory qui monte UserList avec le store et le router
+function mountUserList(options = {}) {
+  // ???
+}
+
+describe('UserList', () => {
+  it('utilise la factory', async () => {
+    const wrapper = mountUserList()
+    // ...
+  })
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { createPinia, setActivePinia } from 'pinia'
+import { createRouter, createMemoryHistory } from 'vue-router'
+
+function mountUserList(options: { initialRoute?: string } = {}) {
+  const pinia = createPinia()
+  setActivePinia(pinia)
+
+  const router = createRouter({
+    history: createMemoryHistory(),
+    routes: [{ path: '/', component: UserList }]
+  })
+
+  if (options.initialRoute) {
+    router.push(options.initialRoute)
+  }
+
+  return mount(UserList, {
+    global: {
+      plugins: [pinia, router]
+    }
+  })
+}
+```
+</details>
+
+---
+
 ## Suite
 
 → Module 04 : `cours/04-expert/01-performance.md`

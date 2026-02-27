@@ -346,6 +346,133 @@ jobs:
 | **Staging** | Environnement de test avant la mise en production |
 | **Production** | L'environnement des vrais utilisateurs |
 
+---
+
+## 🎯 Pratique
+
+### Exercice DEPLOY.1 — Dockerfile
+
+Complète ce Dockerfile pour une app Vue :
+
+```dockerfile
+# Étape 1 : Build
+FROM node:20-alpine AS build
+WORKDIR /app
+
+# Copier les fichiers de config et installer les dépendances
+# ???
+
+# Copier le code source et builder
+# ???
+
+# Étape 2 : Servir
+FROM nginx:alpine
+# Copier le build dans nginx
+# ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```dockerfile
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN npm install -g pnpm && pnpm install
+COPY . .
+RUN pnpm build
+
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+</details>
+
+---
+
+### Exercice DEPLOY.2 — Variables d'environnement
+
+Comment configures-tu l'URL de l'API différemment en staging et production ?
+
+```ts
+// vite.config.ts
+// ???
+```
+
+Et dans le workflow GitHub Actions :
+
+```yaml
+# ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+// vite.config.ts - utilise les variables VITE_*
+export default defineConfig({
+  define: {
+    'import.meta.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL)
+  }
+})
+```
+
+```yaml
+# Dans le workflow
+jobs:
+  deploy-staging:
+    environment: staging
+    env:
+      VITE_API_URL: https://api.staging.example.com
+    # ...
+
+  deploy-production:
+    environment: production
+    env:
+      VITE_API_URL: https://api.example.com
+    # ...
+```
+</details>
+
+---
+
+### Exercice DEPLOY.3 — Workflow conditionnel
+
+Crée un workflow qui déploie sur staging si on push sur `develop`, et en production si on push sur `main` :
+
+```yaml
+jobs:
+  deploy-staging:
+    if: ???
+    # ...
+  
+  deploy-production:
+    if: ???
+    # ...
+```
+
+<details>
+<summary>Solution</summary>
+
+```yaml
+jobs:
+  deploy-staging:
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    environment: staging
+    # ...
+
+  deploy-production:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    # ...
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/07-cicd/03-monitoring.md`

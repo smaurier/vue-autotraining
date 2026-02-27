@@ -523,6 +523,118 @@ const age = ref<number>(0)
 
 ---
 
+## 🎯 Exercices pratiques
+
+### Exercice E.1 — Formulaire de contact
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const nom = ref('')
+const email = ref('')
+const message = ref('')
+const newsletter = ref(false)
+
+function envoyerFormulaire(): void {
+  // Affiche les données dans la console
+  // ???
+}
+</script>
+
+<template>
+  <form @submit.prevent="???">
+    <input v-model="???" placeholder="Votre nom" />
+    <input v-model.???="email" type="email" placeholder="Email" />
+    <textarea v-model="???" placeholder="Message"></textarea>
+    <label>
+      <input type="checkbox" v-model="???" />
+      S'inscrire à la newsletter
+    </label>
+    <button type="submit">Envoyer</button>
+  </form>
+</template>
+```
+
+### Exercice E.2 — Sélecteur de quantité avec limites
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const quantite = ref(1)
+
+function incrementer(): void {
+  // Max 10
+  // ???
+}
+
+function decrementer(): void {
+  // Min 1
+  // ???
+}
+</script>
+
+<template>
+  <button @click="???" :disabled="quantite <= 1">-</button>
+  <span>{{ quantite }}</span>
+  <button @click="???" :disabled="quantite >= 10">+</button>
+</template>
+```
+
+### Exercice E.3 — Champ de recherche avec Entrée
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const recherche = ref('')
+const resultats = ref<string[]>([])
+
+function lancerRecherche(): void {
+  console.log('Recherche:', recherche.value)
+  // Simuler des résultats
+  resultats.value = ['Résultat 1', 'Résultat 2']
+}
+</script>
+
+<template>
+  <!-- Active la recherche avec Entrée ET avec le bouton -->
+  <input 
+    v-model="recherche" 
+    @keyup.???="lancerRecherche"
+    placeholder="Rechercher..."
+  />
+  <button @click="lancerRecherche">🔍</button>
+</template>
+```
+
+<details>
+<summary>Solutions</summary>
+
+```vue
+<!-- E.1 -->
+<form @submit.prevent="envoyerFormulaire">
+  <input v-model.trim="nom" placeholder="Votre nom" />
+  <input v-model.trim="email" type="email" placeholder="Email" />
+  <textarea v-model="message"></textarea>
+  <input type="checkbox" v-model="newsletter" />
+</form>
+
+<!-- E.2 -->
+function incrementer() { if (quantite.value < 10) quantite.value++ }
+function decrementer() { if (quantite.value > 1) quantite.value-- }
+<button @click="decrementer" :disabled="quantite <= 1">-</button>
+<button @click="incrementer" :disabled="quantite >= 10">+</button>
+
+<!-- E.3 -->
+<input v-model="recherche" @keyup.enter="lancerRecherche" />
+```
+
+</details>
+
+---
+
 ## Suite
 
 → `cours/01-debutant/05-composants-props-emits.md`

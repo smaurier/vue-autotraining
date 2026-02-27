@@ -402,6 +402,123 @@ onUpdated(() => {
 
 ---
 
+## 🎯 Exercices pratiques
+
+### Exercice L.1 — Chargement de données au montage
+
+```vue
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+
+interface User {
+  id: number
+  name: string
+}
+
+const users = ref<User[]>([])
+const loading = ref(true)
+
+// Simule un appel API qui prend 1 seconde
+async function fetchUsers(): Promise<User[]> {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve([
+        { id: 1, name: 'Alice' },
+        { id: 2, name: 'Bob' },
+      ])
+    }, 1000)
+  })
+}
+
+// Charge les utilisateurs au montage du composant
+onMounted(async () => {
+  // ???
+})
+</script>
+
+<template>
+  <p v-if="loading">Chargement...</p>
+  <ul v-else>
+    <li v-for="user in users" :key="user.id">{{ user.name }}</li>
+  </ul>
+</template>
+```
+
+### Exercice L.2 — Timer avec nettoyage
+
+```vue
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
+
+const secondes = ref(0)
+let intervalId: number | null = null
+
+onMounted(() => {
+  // Démarre un compteur qui incrémente chaque seconde
+  // ???
+})
+
+onUnmounted(() => {
+  // Nettoie le timer pour éviter les fuites mémoire
+  // ???
+})
+</script>
+
+<template>
+  <p>⏱️ {{ secondes }} secondes</p>
+</template>
+```
+
+### Exercice L.3 — Focus automatique sur un input
+
+```vue
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+
+const inputRef = ref<HTMLInputElement | null>(null)
+
+onMounted(() => {
+  // Met le focus sur l'input au chargement
+  // ???
+})
+</script>
+
+<template>
+  <input ref="inputRef" placeholder="Je reçois le focus automatiquement" />
+</template>
+```
+
+<details>
+<summary>Solutions</summary>
+
+```ts
+// L.1
+onMounted(async () => {
+  users.value = await fetchUsers()
+  loading.value = false
+})
+
+// L.2
+onMounted(() => {
+  intervalId = setInterval(() => {
+    secondes.value++
+  }, 1000)
+})
+
+onUnmounted(() => {
+  if (intervalId) clearInterval(intervalId)
+})
+
+// L.3
+onMounted(() => {
+  inputRef.value?.focus()
+})
+```
+
+</details>
+
+---
+
 ## Suite
 
 → `cours/01-debutant/07-options-vs-composition-api.md`

@@ -492,6 +492,102 @@ const { mutate: createUser, isPending } = useCreateUserMutation()
 
 ---
 
+## 🎯 Pratique
+
+### Exercice VQ.1 — Premier useQuery
+
+Crée une query pour récupérer une liste de produits :
+
+```ts
+import { useQuery } from '@tanstack/vue-query'
+
+export function useProducts() {
+  return useQuery({
+    queryKey: ???,
+    queryFn: ???
+  })
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+export function useProducts() {
+  return useQuery({
+    queryKey: ['products'],
+    queryFn: () => fetch('/api/products').then(r => r.json())
+  })
+}
+```
+</details>
+
+---
+
+### Exercice VQ.2 — Query avec paramètre
+
+Crée une query pour récupérer un produit par son ID :
+
+```ts
+export function useProduct(id: Ref<number>) {
+  return useQuery({
+    queryKey: ???,
+    queryFn: ???
+  })
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+export function useProduct(id: Ref<number>) {
+  return useQuery({
+    queryKey: ['product', id],
+    queryFn: () => fetch(`/api/products/${id.value}`).then(r => r.json())
+  })
+}
+```
+</details>
+
+---
+
+### Exercice VQ.3 — Mutation avec invalidation
+
+Crée une mutation pour supprimer un produit et invalider le cache :
+
+```ts
+export function useDeleteProduct() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: ???,
+    onSuccess: () => {
+      ???
+    }
+  })
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+export function useDeleteProduct() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: (id: number) => fetch(`/api/products/${id}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] })
+    }
+  })
+}
+```
+</details>
+
+---
+
 ## Suite
 
 → [cours/12-vue-query/02-patterns-avances.md](../12-vue-query/02-patterns-avances.md)

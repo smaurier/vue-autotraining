@@ -366,6 +366,195 @@ function onLeave(el: Element, done: () => void): void {
 
 ---
 
+## 🎯 Pratique
+
+### Exercice TR.1 — Fade simple
+
+Complète le CSS pour créer un effet de fondu :
+
+```vue
+<template>
+  <button @click="show = !show">Toggle</button>
+  <Transition name="fade">
+    <p v-if="show">Contenu visible</p>
+  </Transition>
+</template>
+
+<style scoped>
+/* Complète les classes pour un fondu de 0.3s */
+.fade-enter-active,
+.fade-leave-active {
+  /* ??? */
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  /* ??? */
+}
+</style>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
+```
+</details>
+
+---
+
+### Exercice TR.2 — Slide
+
+Crée une transition "slide" qui fait glisser l'élément depuis la droite :
+
+```vue
+<style scoped>
+/* L'élément arrive de 20px à droite et devient visible */
+/* L'élément part vers 20px à droite en devenant invisible */
+/* Animation de 0.3s */
+
+.slide-enter-active,
+.slide-leave-active {
+  /* ??? */
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  /* ??? */
+}
+</style>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<style scoped>
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
+}
+</style>
+```
+</details>
+
+---
+
+### Exercice TR.3 — TransitionGroup
+
+Complète ce code pour animer une liste d'éléments :
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const items = ref([1, 2, 3])
+
+function addItem() {
+  items.value.push(items.value.length + 1)
+}
+
+function removeItem(index: number) {
+  items.value.splice(index, 1)
+}
+</script>
+
+<template>
+  <button @click="addItem">Ajouter</button>
+
+  <!-- Utilise TransitionGroup avec le nom "list" -->
+  <!-- ??? -->
+    <div v-for="item in items" :key="item" @click="removeItem(items.indexOf(item))">
+      Item {{ item }}
+    </div>
+  <!-- ??? -->
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<template>
+  <button @click="addItem">Ajouter</button>
+
+  <TransitionGroup name="list" tag="div">
+    <div v-for="item in items" :key="item" @click="removeItem(items.indexOf(item))">
+      Item {{ item }}
+    </div>
+  </TransitionGroup>
+</template>
+
+<style scoped>
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.3s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.list-move {
+  transition: transform 0.3s ease;
+}
+</style>
+```
+</details>
+
+---
+
+### Exercice TR.4 — Mode out-in
+
+Corrige ce code pour que l'ancien élément disparaisse AVANT que le nouveau apparaisse :
+
+```vue
+<template>
+  <button @click="current = current === 'A' ? 'B' : 'A'">Switch</button>
+
+  <Transition name="fade">
+    <p v-if="current === 'A'" key="a">Contenu A</p>
+    <p v-else key="b">Contenu B</p>
+  </Transition>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<template>
+  <button @click="current = current === 'A' ? 'B' : 'A'">Switch</button>
+
+  <Transition name="fade" mode="out-in">
+    <p v-if="current === 'A'" key="a">Contenu A</p>
+    <p v-else key="b">Contenu B</p>
+  </Transition>
+</template>
+```
+</details>
+
+---
+
 ## Suite
 
 → Module 03 : `cours/03-avance/01-vue-router.md`

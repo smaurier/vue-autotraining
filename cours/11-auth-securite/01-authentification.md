@@ -477,6 +477,110 @@ declare module 'vue-router' {
 
 ---
 
+## 🎯 Pratique
+
+### Exercice AUTH.1 — Composable useAuth
+
+Complète ce composable d'authentification :
+
+```ts
+export function useAuth() {
+  const user = ref<User | null>(null)
+  const isAuthenticated = computed(() => ???)
+  
+  async function login(email: string, password: string) {
+    const response = await fetch('/api/login', {
+      method: '???',
+      headers: { 'Content-Type': 'application/json' },
+      body: ???
+    })
+    const data = await response.json()
+    user.value = ???
+  }
+  
+  function logout() {
+    ???
+  }
+  
+  return { user, isAuthenticated, login, logout }
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+export function useAuth() {
+  const user = ref<User | null>(null)
+  const isAuthenticated = computed(() => !!user.value)
+  
+  async function login(email: string, password: string) {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    })
+    const data = await response.json()
+    user.value = data.user
+  }
+  
+  function logout() {
+    user.value = null
+  }
+  
+  return { user, isAuthenticated, login, logout }
+}
+```
+</details>
+
+---
+
+### Exercice AUTH.2 — Guard de route
+
+Crée un guard qui redirige vers /login si non connecté :
+
+```ts
+router.beforeEach((to, from) => {
+  const { isAuthenticated } = useAuth()
+  
+  if (to.meta.requiresAuth && ???) {
+    return ???
+  }
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+router.beforeEach((to, from) => {
+  const { isAuthenticated } = useAuth()
+  
+  if (to.meta.requiresAuth && !isAuthenticated.value) {
+    return { name: 'login', query: { redirect: to.fullPath } }
+  }
+})
+```
+</details>
+
+---
+
+### Exercice AUTH.3 — Refresh token
+
+Où stocker chaque token et pourquoi ?
+
+- accessToken : ???
+- refreshToken : ???
+
+<details>
+<summary>Solution</summary>
+
+- **accessToken** : En **mémoire** (ref/state) → courte durée, disparaît au refresh de page, inaccessible aux scripts malveillants
+- **refreshToken** : En **cookie HttpOnly** → inaccessible au JavaScript, envoyé automatiquement par le navigateur, protégé contre XSS
+</details>
+
+---
+
 ## Suite
 
 → `cours/11-auth-securite/02-securite-front.md`

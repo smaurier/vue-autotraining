@@ -425,6 +425,140 @@ Navigateur (la salle du restaurant)
 
 ---
 
+## 🎯 Pratique
+
+### Exercice NXS.1 — Route GET simple
+
+Crée une route qui retourne une liste de contacts :
+
+```ts
+// server/api/contacts.get.ts
+export default defineEventHandler(() => {
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+export default defineEventHandler(() => {
+  return [
+    { id: 1, name: 'Alice', email: 'alice@test.com' },
+    { id: 2, name: 'Bob', email: 'bob@test.com' }
+  ]
+})
+```
+</details>
+
+---
+
+### Exercice NXS.2 — Route POST
+
+Crée une route pour ajouter un contact :
+
+```ts
+// server/api/contacts.post.ts
+export default defineEventHandler(async (event) => {
+  // Récupère le body et retourne le nouveau contact avec un id
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+export default defineEventHandler(async (event) => {
+  const body = await readBody(event)
+
+  const newContact = {
+    id: Date.now(),
+    name: body.name,
+    email: body.email
+  }
+
+  return newContact
+})
+```
+</details>
+
+---
+
+### Exercice NXS.3 — Route dynamique
+
+Crée une route pour récupérer un contact par son ID :
+
+```ts
+// server/api/contacts/[id].get.ts
+export default defineEventHandler((event) => {
+  // Récupère l'id et retourne le contact correspondant
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+const contacts = [
+  { id: 1, name: 'Alice', email: 'alice@test.com' },
+  { id: 2, name: 'Bob', email: 'bob@test.com' }
+]
+
+export default defineEventHandler((event) => {
+  const id = Number(event.context.params?.id)
+  const contact = contacts.find(c => c.id === id)
+
+  if (!contact) {
+    throw createError({ statusCode: 404, message: 'Contact non trouvé' })
+  }
+
+  return contact
+})
+```
+</details>
+
+---
+
+### Exercice NXS.4 — Gestion d'erreur
+
+Ajoute une validation et une gestion d'erreur :
+
+```ts
+// server/api/contacts.post.ts
+export default defineEventHandler(async (event) => {
+  const body = await readBody(event)
+
+  // Vérifie que name et email sont présents
+  // Sinon, lève une erreur 400
+  // ???
+
+  return { id: Date.now(), ...body }
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+export default defineEventHandler(async (event) => {
+  const body = await readBody(event)
+
+  if (!body.name || !body.email) {
+    throw createError({
+      statusCode: 400,
+      message: 'Nom et email requis'
+    })
+  }
+
+  return { id: Date.now(), ...body }
+})
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/05-nuxt3/05-seo-et-meta.md`

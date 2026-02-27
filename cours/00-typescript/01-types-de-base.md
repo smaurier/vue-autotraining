@@ -127,6 +127,33 @@ let age: number = 30;   // age est un nombre
 
 > **C'est le super-pouvoir de TypeScript** : il empêche de mélanger les types par accident.
 
+### 🎯 Pratique — Types primitifs
+
+Ouvre `01-playground.ts` et écris :
+
+```ts
+// Exercice 1.1 : Déclare ces variables avec leur type
+const nomProduit: ??? = "iPhone 15";
+const prix: ??? = 999.99;
+const enStock: ??? = true;
+
+// Exercice 1.2 : Corrige cette erreur
+let score: number = 100;
+score = "cent"; // ❌ Que dit TypeScript ?
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+const nomProduit: string = "iPhone 15";
+const prix: number = 999.99;
+const enStock: boolean = true;
+
+// L'erreur : Type 'string' is not assignable to type 'number'
+```
+</details>
+
 ---
 
 ## L'inférence de type (TypeScript devine tout seul)
@@ -163,6 +190,36 @@ function saluer(nom: string) {
 ```
 
 > **Règle simple** : Laisse TypeScript deviner quand il peut. Aide-le quand il ne peut pas.
+
+### 🎯 Pratique — Inférence
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 1.3 : Sans exécuter, devine le type inféré par TypeScript
+const ville = "Paris";              // Type inféré : ???
+const temperature = -5;              // Type inféré : ???
+const estGele = temperature < 0;    // Type inféré : ???
+
+// Exercice 1.4 : Écris une fonction qui calcule le double d'un nombre
+function double(n: ???): ??? {
+  return n * 2;
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+const ville = "Paris";              // string
+const temperature = -5;              // number
+const estGele = temperature < 0;    // boolean
+
+function double(n: number): number {
+  return n * 2;
+}
+```
+</details>
 
 ---
 
@@ -204,6 +261,32 @@ const melange: (string | number)[] = ["Alice", 30];
 
 > **Le symbole `|`** : c'est comme dire "type A **ou** type B". On appelle ça une **union de types**.
 
+### 🎯 Pratique — Tableaux
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 1.5 : Crée un tableau de prix (nombres uniquement)
+const prixProduits: ??? = [29.99, 49.99, 99.99];
+
+// Exercice 1.6 : Crée un tableau qui accepte texte OU nombre
+const donneesMixtes: ??? = ["Alice", 25, "Bob", 30];
+
+// Exercice 1.7 : Que se passe-t-il si tu fais ça ?
+prixProduits.push("gratuit"); // ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+const prixProduits: number[] = [29.99, 49.99, 99.99];
+const donneesMixtes: (string | number)[] = ["Alice", 25, "Bob", 30];
+
+// Erreur : Argument of type 'string' is not assignable to parameter of type 'number'
+```
+</details>
+
 ---
 
 ## Les Tuples (tableaux à taille fixe)
@@ -234,6 +317,33 @@ console.log(personne[1]); // 30      → TypeScript sait que c'est un number
 const tableau: string[] = ["Alice", "Bob", "Charlie"]; // Longueur libre, tout est string
 const tuple: [string, number] = ["Alice", 30];          // Exactement 2 éléments, types fixés
 ```
+
+### 🎯 Pratique — Tuples
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 1.8 : Crée un tuple pour une coordonnée GPS [latitude, longitude]
+const paris: ??? = [48.8566, 2.3522];
+
+// Exercice 1.9 : Crée un tuple pour [nom, age, estMembre]
+const membre: ??? = ["Alice", 28, true];
+
+// Exercice 1.10 : Ceci est-il valide ? Pourquoi ?
+const test: [string, number] = [42, "oups"];
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+const paris: [number, number] = [48.8566, 2.3522];
+const membre: [string, number, boolean] = ["Alice", 28, true];
+
+// Non valide : l'ordre des types ne correspond pas
+// Type 'number' is not assignable to type 'string'
+```
+</details>
 
 ---
 
@@ -272,6 +382,34 @@ const monStatut: Statut = "actif";       // ✅ OK
 
 > **Analogie** : C'est comme un menu déroulant dans un formulaire.
 > Tu ne peux choisir QUE parmi les options proposées, pas taper n'importe quoi.
+
+### 🎯 Pratique — Union Literals
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 1.11 : Crée un type pour les tailles de vêtements
+type Taille = ???; // "XS", "S", "M", "L", "XL"
+
+let maTaille: Taille = "M";    // ✅ doit marcher
+maTaille = "XXL";               // ❌ doit échouer
+
+// Exercice 1.12 : Crée un type pour les modes d'un lecteur vidéo
+type ModeVideo = ???; // "play", "pause", "stop"
+
+function changerMode(mode: ModeVideo) {
+  console.log("Mode:", mode);
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+type Taille = "XS" | "S" | "M" | "L" | "XL";
+type ModeVideo = "play" | "pause" | "stop";
+```
+</details>
 
 ---
 
@@ -312,6 +450,49 @@ if (typeof donnee === "number") {
 > `unknown` c'est un colis sans étiquette qu'on **inspecte d'abord** avant de l'ouvrir.
 
 > **🔒 Règle du parcours : zéro `any` sauf justification explicite.** Utilise `unknown` et vérifie le type.
+
+### 🎯 Pratique — unknown vs any
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 1.13 : Corrige cette fonction pour qu'elle soit sûre
+function afficherLongueur(valeur: any) {
+  console.log(valeur.length); // 💥 Peut crasher !
+}
+
+// Réécris avec unknown + vérification typeof
+function afficherLongueurSafe(valeur: ???) {
+  // ???
+}
+
+// Exercice 1.14 : Cette donnée vient d'une API, traite-la proprement
+const reponseAPI: unknown = JSON.parse('{"nom": "Alice"}');
+// Comment accéder à reponseAPI.nom en toute sécurité ?
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+function afficherLongueurSafe(valeur: unknown) {
+  if (typeof valeur === "string") {
+    console.log(valeur.length);
+  } else {
+    console.log("Pas un string !");
+  }
+}
+
+// Pour l'API : vérifier la structure
+if (
+  typeof reponseAPI === "object" &&
+  reponseAPI !== null &&
+  "nom" in reponseAPI
+) {
+  console.log((reponseAPI as { nom: string }).nom);
+}
+```
+</details>
 
 ---
 

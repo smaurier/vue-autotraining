@@ -455,6 +455,189 @@ const { data: products, error, isLoading, refetch } = useFetch<Product[]>("/api/
 
 ---
 
+## 🎯 Pratique
+
+### Exercice AS.1 — Fetch basique
+
+Complète ce composant pour charger et afficher une liste d'utilisateurs :
+
+```vue
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+
+interface User {
+  id: number
+  name: string
+}
+
+const users = ref<User[]>([])
+const isLoading = ref(false)
+const error = ref<string | null>(null)
+
+// Charge les utilisateurs depuis /api/users
+async function fetchUsers() {
+  // ???
+}
+
+onMounted(() => {
+  fetchUsers()
+})
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+
+interface User {
+  id: number
+  name: string
+}
+
+const users = ref<User[]>([])
+const isLoading = ref(false)
+const error = ref<string | null>(null)
+
+async function fetchUsers() {
+  isLoading.value = true
+  error.value = null
+
+  try {
+    const response = await fetch('/api/users')
+    if (!response.ok) throw new Error(`HTTP ${response.status}`)
+    users.value = await response.json()
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Erreur'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchUsers()
+})
+</script>
+```
+</details>
+
+---
+
+### Exercice AS.2 — Les 3 états de l'interface
+
+Complète le template pour afficher les 3 états possibles :
+
+```vue
+<template>
+  <!-- Affiche "Chargement..." si isLoading est true -->
+  <!-- ??? -->
+
+  <!-- Affiche l'erreur si error n'est pas null -->
+  <!-- ??? -->
+
+  <!-- Affiche la liste si tout va bien -->
+  <!-- ??? -->
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<template>
+  <div v-if="isLoading">Chargement...</div>
+
+  <div v-else-if="error" class="error">{{ error }}</div>
+
+  <ul v-else>
+    <li v-for="user in users" :key="user.id">{{ user.name }}</li>
+  </ul>
+</template>
+```
+</details>
+
+---
+
+### Exercice AS.3 — AbortController
+
+Complète ce code pour annuler les requêtes précédentes quand `search` change :
+
+```ts
+import { ref, watchEffect } from 'vue'
+
+const search = ref('')
+const results = ref<string[]>([])
+
+watchEffect((onCleanup) => {
+  // Crée un AbortController
+  // ???
+
+  // Lance la requête avec le signal
+  fetch(`/api/search?q=${search.value}`, {
+    // ???
+  }).then(r => r.json()).then(data => {
+    results.value = data
+  })
+
+  // Annule la requête si search change avant qu'elle finisse
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { ref, watchEffect } from 'vue'
+
+const search = ref('')
+const results = ref<string[]>([])
+
+watchEffect((onCleanup) => {
+  const controller = new AbortController()
+
+  fetch(`/api/search?q=${search.value}`, {
+    signal: controller.signal
+  }).then(r => r.json()).then(data => {
+    results.value = data
+  }).catch(() => {
+    // Ignorer l'erreur d'abort
+  })
+
+  onCleanup(() => {
+    controller.abort()
+  })
+})
+```
+</details>
+
+---
+
+### Exercice AS.4 — Type AsyncState
+
+Définis un type `AsyncState` pour représenter les 4 états possibles d'un appel réseau :
+
+```ts
+// idle, loading, error (avec message), success (avec données)
+type AsyncState<T> = ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+type AsyncState<T> =
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'error'; error: string }
+  | { status: 'success'; data: T }
+```
+</details>
+
+---
+
 ## Exercice
 
 → `exercices/07-crud-api/ENONCE.md`

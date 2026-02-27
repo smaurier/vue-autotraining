@@ -372,6 +372,134 @@ Dans les paramètres de ton dépôt GitHub, tu peux configurer des **règles de 
 | **Prettier** | Formateur automatique du code |
 | **Husky** | Vigile qui vérifie le code avant chaque commit |
 
+---
+
+## 🎯 Pratique
+
+### Exercice CI.1 — Créer un workflow
+
+Crée un workflow qui s'exécute à chaque push et lance les tests :
+
+```yaml
+# .github/workflows/ci.yml
+name: CI
+
+# Déclencheur : à chaque push
+# ???
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # Récupérer le code
+      # ???
+      
+      # Installer pnpm
+      # ???
+      
+      # Installer les dépendances
+      # ???
+      
+      # Lancer les tests
+      # ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```yaml
+name: CI
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+```
+</details>
+
+---
+
+### Exercice CI.2 — Jobs parallèles
+
+Ajoute un job de lint qui s'exécute en parallèle des tests :
+
+```yaml
+jobs:
+  test:
+    # ... (comme avant)
+  
+  lint:
+    # ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```yaml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+```
+</details>
+
+---
+
+### Exercice CI.3 — Configurer la couverture
+
+Configure Vitest pour exiger 80% de couverture de code :
+
+```ts
+// vitest.config.ts
+export default defineConfig({
+  test: {
+    coverage: {
+      // ???
+    }
+  }
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+export default defineConfig({
+  test: {
+    coverage: {
+      provider: 'v8',
+      thresholds: {
+        statements: 80,
+        branches: 80,
+        functions: 80,
+        lines: 80
+      }
+    }
+  }
+})
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/07-cicd/02-deploiement.md`

@@ -157,6 +157,57 @@ function increment(): void {
 
 👉 En gros, **utilise `ref` pour TOUT**. C'est le choix par défaut.
 
+### 🎯 Pratique — ref
+
+```vue
+<!-- Exercice R.1 : Crée un compteur de likes -->
+<script setup lang="ts">
+import { ref } from 'vue'
+
+// Déclare une ref "likes" qui commence à 0
+const likes = ???
+
+function ajouterLike(): void {
+  // Incrémente likes
+  ???
+}
+</script>
+
+<template>
+  <p>❤️ {{ likes }} likes</p>
+  <button @click="ajouterLike">J'aime</button>
+</template>
+```
+
+```ts
+// Exercice R.2 : Déclare ces refs avec les bons types
+const nom = ref<???>("Alice")
+const estConnecte = ref<???>(false)
+const utilisateur = ref<??? | null>(null)  // User ou null
+const produits = ref<???[]>([])            // tableau de Product
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<!-- R.1 -->
+const likes = ref<number>(0)
+
+function ajouterLike(): void {
+  likes.value++
+}
+```
+
+```ts
+// R.2
+const nom = ref<string>("Alice")
+const estConnecte = ref<boolean>(false)
+const utilisateur = ref<User | null>(null)
+const produits = ref<Product[]>([])
+```
+</details>
+
 ---
 
 ## `reactive` — Rendre un objet entier réactif
@@ -295,6 +346,69 @@ state.compteur++  // le chien de garde voit le changement → Vue réagit
 | `state.compteur = 5` | ✅ Réactif — le Proxy voit le changement |
 | `state = { compteur: 5 }` | ❌ Cassé — on a remplacé l'objet surveillé |
 | `const { compteur } = state` puis `compteur++` | ❌ Cassé — c'est une copie déconnectée |
+
+### 🎯 Pratique — reactive
+
+```vue
+<!-- Exercice R.3 : Formulaire avec reactive -->
+<script setup lang="ts">
+import { reactive } from 'vue'
+
+interface LoginForm {
+  email: string
+  password: string
+  rememberMe: boolean
+}
+
+const form = reactive<LoginForm>({
+  // ??? complète les valeurs initiales
+})
+
+function submit(): void {
+  console.log('Email:', form.email)
+  console.log('Password:', form.password)
+}
+</script>
+
+<template>
+  <input v-model="form.email" type="email" />
+  <input v-model="form.password" type="password" />
+  <label>
+    <input type="checkbox" v-model="form.rememberMe" />
+    Se souvenir de moi
+  </label>
+  <button @click="submit">Connexion</button>
+</template>
+```
+
+```ts
+// Exercice R.4 : Trouve l'erreur dans ce code
+const state = reactive({ count: 0 })
+
+function reset() {
+  state = { count: 0 }  // ❌ Pourquoi ça ne marche pas ?
+}
+
+// Comment corriger ?
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+// R.3
+const form = reactive<LoginForm>({
+  email: '',
+  password: '',
+  rememberMe: false,
+})
+
+// R.4 - On ne peut pas réassigner un reactive !
+function reset() {
+  state.count = 0  // ✅ Modifier la propriété, pas l'objet
+}
+```
+</details>
 
 ---
 
@@ -463,6 +577,66 @@ nomComplet.value = 'Marie Martin'
 ```
 
 > 💡 **Tu n'utiliseras quasiment jamais ça au début.** Retiens juste que ça existe.
+
+### 🎯 Pratique — computed
+
+```vue
+<!-- Exercice R.5 : Calcul du prix total -->
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+
+const prixUnitaire = ref(25)
+const quantite = ref(3)
+const codePromo = ref(false)  // 10% de réduction si true
+
+// Crée un computed "total" qui calcule :
+// prixUnitaire * quantite, avec -10% si codePromo est activé
+const total = computed(() => {
+  // ???
+})
+</script>
+```
+
+```vue
+<!-- Exercice R.6 : Filtrage avec computed -->
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+
+interface Task {
+  id: number
+  title: string
+  done: boolean
+}
+
+const tasks = ref<Task[]>([
+  { id: 1, title: 'Apprendre Vue', done: true },
+  { id: 2, title: 'Faire les exos', done: false },
+  { id: 3, title: 'Pratiquer', done: false },
+])
+
+// Crée un computed qui retourne seulement les tâches non terminées
+const tachesRestantes = computed(() => {
+  // ???
+})
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+// R.5
+const total = computed(() => {
+  const sousTotal = prixUnitaire.value * quantite.value
+  return codePromo.value ? sousTotal * 0.9 : sousTotal
+})
+
+// R.6
+const tachesRestantes = computed(() => {
+  return tasks.value.filter(t => !t.done)
+})
+```
+</details>
 
 ---
 

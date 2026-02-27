@@ -440,6 +440,145 @@ Avec ce typage, `t('cle.inexistante')` provoque une **erreur TypeScript** avant 
 
 ---
 
+## 🎯 Pratique
+
+### Exercice I18N.1 — Première traduction
+
+Crée un fichier de traductions et affiche un message localisé :
+
+```ts
+// locales/fr.json
+{
+  "welcome": "???"
+}
+
+// locales/en.json
+{
+  "welcome": "???"
+}
+```
+
+```vue
+<template>
+  <!-- Affiche le message welcome -->
+  <h1>???</h1>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```json
+// locales/fr.json
+{ "welcome": "Bienvenue sur notre site !" }
+
+// locales/en.json
+{ "welcome": "Welcome to our site!" }
+```
+
+```vue
+<template>
+  <h1>{{ t('welcome') }}</h1>
+</template>
+
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
+</script>
+```
+</details>
+
+---
+
+### Exercice I18N.2 — Interpolation
+
+Crée une traduction avec une variable dynamique :
+
+```json
+// Clé de traduction pour "Bonjour, {name} !" et "Hello, {name}!"
+```
+
+```vue
+<template>
+  <p>???</p>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```json
+// fr.json
+{ "greeting": "Bonjour, {name} !" }
+// en.json
+{ "greeting": "Hello, {name}!" }
+```
+
+```vue
+<template>
+  <p>{{ t('greeting', { name: userName }) }}</p>
+</template>
+```
+</details>
+
+---
+
+### Exercice I18N.3 — Pluralisation
+
+Crée une clé qui gère le singulier et le pluriel :
+
+```json
+// Pour : "Aucun article", "1 article", "5 articles"
+{ "cart.items": "???" }
+```
+
+<details>
+<summary>Solution</summary>
+
+```json
+{ "cart.items": "Aucun article | 1 article | {count} articles" }
+```
+
+```vue
+{{ t('cart.items', itemCount) }}
+```
+</details>
+
+---
+
+### Exercice I18N.4 — Sélecteur de langue
+
+Crée un composant de changement de langue :
+
+```vue
+<template>
+  <select ???>
+    <option value="fr">Français</option>
+    <option value="en">English</option>
+  </select>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<template>
+  <select v-model="locale">
+    <option value="fr">Français</option>
+    <option value="en">English</option>
+  </select>
+</template>
+
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+const { locale } = useI18n()
+</script>
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/10-i18n/02-strategies-avancees.md`

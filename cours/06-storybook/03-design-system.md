@@ -336,6 +336,105 @@ import "@monrepo/ui/tokens.css";                      // Les tokens CSS
 | **Barrel export**    | Un fichier index.ts qui réexporte tout le contenu d'un package     |
 | **Monorepo**         | Un seul dépôt Git avec plusieurs projets qui partagent du code     |
 
+---
+
+## 🎯 Pratique
+
+### Exercice DS.1 — Design tokens
+
+Crée des design tokens CSS pour les couleurs principales :
+
+```css
+/* tokens.css */
+:root {
+  /* Couleurs primaires : bleu #3b82f6, hover #2563eb */
+  /* ???
+  
+  /* Couleurs de succès : vert #22c55e */
+  /* ???
+  
+  /* Couleurs d'erreur : rouge #ef4444 */
+  /* ???
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```css
+:root {
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  
+  --color-success: #22c55e;
+  
+  --color-error: #ef4444;
+}
+```
+</details>
+
+---
+
+### Exercice DS.2 — Atomic Design
+
+Classe ces composants selon la méthodologie Atomic Design :
+
+1. `SearchInput.vue` (input + icône loupe)
+2. `Button.vue`
+3. `ProductCard.vue` (image + titre + prix + bouton)
+4. `Header.vue` (logo + nav + search + avatar)
+5. `Icon.vue`
+
+<details>
+<summary>Solution</summary>
+
+```
+Atomes (les plus petits) :
+  - Button.vue
+  - Icon.vue
+
+Molécules (assemblage d'atomes) :
+  - SearchInput.vue (input + Icon)
+
+Organismes (assemblage de molécules) :
+  - ProductCard.vue (image + texte + Button)
+  - Header.vue (logo + nav + SearchInput + avatar)
+```
+</details>
+
+---
+
+### Exercice DS.3 — Barrel export
+
+Crée un barrel file pour exporter ces composants :
+
+```
+components/
+  ui/
+    Button.vue
+    Input.vue
+    Badge.vue
+    index.ts    ← à créer
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+// components/ui/index.ts
+export { default as Button } from './Button.vue'
+export { default as Input } from './Input.vue'
+export { default as Badge } from './Badge.vue'
+```
+
+Utilisation :
+```ts
+import { Button, Input, Badge } from '@/components/ui'
+```
+</details>
+
+---
+
 ## Exercice
 
 → `exercices/15-storybook-ui/ENONCE.md`

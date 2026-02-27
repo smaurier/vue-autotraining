@@ -562,6 +562,184 @@ En Vue 2, pour partager de la logique entre composants, on utilisait les **mixin
 | Composition              | Un composable peut utiliser d'autres composables                            |
 | Avantage vs mixins       | Clarté, typage, pas de conflits de noms, testable                           |
 
+---
+
+## 🎯 Pratique
+
+### Exercice CP.1 — Premier composable
+
+Crée un composable `useToggle` qui gère un état booleen (on/off) :
+
+```ts
+// composables/useToggle.ts
+import { ref } from 'vue'
+
+export function useToggle(initial = false) {
+  // Crée une ref avec la valeur initiale
+  // ???
+
+  // Fonction pour inverser la valeur
+  // ???
+
+  // Fonction pour mettre à true
+  // ???
+
+  // Fonction pour mettre à false
+  // ???
+
+  return { ??? }
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { ref } from 'vue'
+
+export function useToggle(initial = false) {
+  const isActive = ref(initial)
+
+  function toggle() {
+    isActive.value = !isActive.value
+  }
+
+  function setTrue() {
+    isActive.value = true
+  }
+
+  function setFalse() {
+    isActive.value = false
+  }
+
+  return { isActive, toggle, setTrue, setFalse }
+}
+```
+</details>
+
+---
+
+### Exercice CP.2 — Composable avec computed
+
+Crée un composable `useFullName` qui combine prénom et nom :
+
+```ts
+// composables/useFullName.ts
+import { ref, computed, type Ref } from 'vue'
+
+export function useFullName(firstName: Ref<string>, lastName: Ref<string>) {
+  // Crée un computed qui retourne "Prénom Nom"
+  // ???
+
+  // Crée un computed qui retourne les initiales "P.N."
+  // ???
+
+  return { ??? }
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { computed, type Ref } from 'vue'
+
+export function useFullName(firstName: Ref<string>, lastName: Ref<string>) {
+  const fullName = computed(() => `${firstName.value} ${lastName.value}`)
+
+  const initials = computed(() => {
+    const f = firstName.value.charAt(0).toUpperCase()
+    const l = lastName.value.charAt(0).toUpperCase()
+    return `${f}.${l}.`
+  })
+
+  return { fullName, initials }
+}
+```
+</details>
+
+---
+
+### Exercice CP.3 — Composable avec cleanup
+
+Complète ce composable `useInterval` qui exécute une fonction régulièrement :
+
+```ts
+// composables/useInterval.ts
+import { onUnmounted } from 'vue'
+
+export function useInterval(callback: () => void, delay: number) {
+  // Lance l'intervalle
+  // ???
+
+  // Arrête l'intervalle quand le composant est détruit
+  // ???
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { onUnmounted } from 'vue'
+
+export function useInterval(callback: () => void, delay: number) {
+  const intervalId = setInterval(callback, delay)
+
+  onUnmounted(() => {
+    clearInterval(intervalId)
+  })
+}
+```
+</details>
+
+---
+
+### Exercice CP.4 — Composable avec watch
+
+Crée un composable `useLocalStorage` qui synchronise une ref avec le localStorage :
+
+```ts
+// composables/useLocalStorage.ts
+import { ref, watch, type Ref } from 'vue'
+
+export function useLocalStorage<T>(key: string, defaultValue: T): Ref<T> {
+  // 1. Lis la valeur du localStorage (ou utilise la valeur par défaut)
+  // ???
+
+  // 2. Crée une ref avec cette valeur
+  // ???
+
+  // 3. Quand la ref change, sauvegarde dans localStorage
+  // ???
+
+  return ???
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { ref, watch, type Ref } from 'vue'
+
+export function useLocalStorage<T>(key: string, defaultValue: T): Ref<T> {
+  const stored = localStorage.getItem(key)
+  const initial = stored ? JSON.parse(stored) : defaultValue
+
+  const data = ref<T>(initial) as Ref<T>
+
+  watch(data, (newVal) => {
+    localStorage.setItem(key, JSON.stringify(newVal))
+  }, { deep: true })
+
+  return data
+}
+```
+</details>
+
+---
+
 ## Exercice
 
 → `exercices/06-dashboard-filtres/ENONCE.md`

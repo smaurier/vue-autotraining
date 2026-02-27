@@ -349,6 +349,125 @@ pnpm graphql-codegen
 
 ---
 
+## 🎯 Pratique
+
+### Exercice GQL.1 — Écrire une query
+
+Écris une query GraphQL pour récupérer les utilisateurs avec leur nom et email :
+
+```graphql
+# ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```graphql
+query GetUsers {
+  users {
+    id
+    name
+    email
+  }
+}
+```
+</details>
+
+---
+
+### Exercice GQL.2 — Query avec paramètre
+
+Écris une query pour récupérer un utilisateur spécifique par son ID :
+
+```graphql
+# ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```graphql
+query GetUser($id: ID!) {
+  user(id: $id) {
+    id
+    name
+    email
+    posts {
+      title
+    }
+  }
+}
+```
+</details>
+
+---
+
+### Exercice GQL.3 — Mutation
+
+Écris une mutation pour créer un utilisateur :
+
+```graphql
+# ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```graphql
+mutation CreateUser($input: CreateUserInput!) {
+  createUser(input: $input) {
+    id
+    name
+    email
+  }
+}
+```
+</details>
+
+---
+
+### Exercice GQL.4 — Utiliser useQuery
+
+Complète ce composant pour charger et afficher les utilisateurs :
+
+```vue
+<script setup lang="ts">
+import { useQuery } from '@vue/apollo-composable'
+import gql from 'graphql-tag'
+
+const GET_USERS = gql`
+  # ???
+`
+
+const { result, loading, error } = ???
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<script setup lang="ts">
+import { useQuery } from '@vue/apollo-composable'
+import gql from 'graphql-tag'
+
+const GET_USERS = gql`
+  query GetUsers {
+    users {
+      id
+      name
+      email
+    }
+  }
+`
+
+const { result, loading, error } = useQuery(GET_USERS)
+</script>
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/08-api-typees/02-trpc.md`

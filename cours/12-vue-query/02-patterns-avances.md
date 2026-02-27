@@ -534,6 +534,117 @@ import { VueQueryDevtools } from '@tanstack/vue-query-devtools'
 
 ---
 
+## 🎯 Pratique
+
+### Exercice VQ.4 — Optimistic update
+
+Ajoute une mise à jour optimiste pour cette mutation de like :
+
+```ts
+export function useLikePost() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: (postId: number) => fetch(`/api/posts/${postId}/like`, { method: 'POST' }),
+    onMutate: async (postId) => {
+      // 1. Annuler les requêtes en cours
+      // 2. Sauvegarder l'ancien état
+      // 3. Mettre à jour le cache de façon optimiste
+      ???
+    },
+    onError: (err, postId, context) => {
+      // 4. Rollback en cas d'erreur
+      ???
+    }
+  })
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+onMutate: async (postId) => {
+  await queryClient.cancelQueries({ queryKey: ['posts'] })
+  const previousPosts = queryClient.getQueryData(['posts'])
+  queryClient.setQueryData(['posts'], (old: Post[]) =>
+    old.map(p => p.id === postId ? { ...p, likes: p.likes + 1 } : p)
+  )
+  return { previousPosts }
+},
+onError: (err, postId, context) => {
+  queryClient.setQueryData(['posts'], context?.previousPosts)
+}
+```
+</details>
+
+---
+
+### Exercice VQ.5 — Pagination
+
+Crée une query paginée :
+
+```ts
+const page = ref(1)
+
+const { data } = useQuery({
+  queryKey: ???,
+  queryFn: ???,
+  placeholderData: ???  // Garder les anciennes données pendant le chargement
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { keepPreviousData } from '@tanstack/vue-query'
+
+const page = ref(1)
+
+const { data } = useQuery({
+  queryKey: ['products', page],
+  queryFn: () => fetch(`/api/products?page=${page.value}`).then(r => r.json()),
+  placeholderData: keepPreviousData
+})
+```
+</details>
+
+---
+
+### Exercice VQ.6 — Dependent query
+
+Crée une query qui dépend du résultat d'une autre :
+
+```ts
+// D'abord : récupérer l'utilisateur
+const { data: user } = useQuery({
+  queryKey: ['user'],
+  queryFn: fetchCurrentUser
+})
+
+// Puis : récupérer ses commandes (seulement si user existe)
+const { data: orders } = useQuery({
+  queryKey: ???,
+  queryFn: ???,
+  enabled: ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+const { data: orders } = useQuery({
+  queryKey: ['orders', user.value?.id],
+  queryFn: () => fetch(`/api/users/${user.value!.id}/orders`).then(r => r.json()),
+  enabled: !!user.value
+})
+```
+</details>
+
+---
+
 ## Suite
 
 → [cours/09-accessibilite/01-fondamentaux-wcag.md](../09-accessibilite/01-fondamentaux-wcag.md) (ou module suivant selon le parcours)

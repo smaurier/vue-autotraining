@@ -416,6 +416,105 @@ it("affiche le texte en anglais", () => {
 
 ---
 
+## 🎯 Pratique
+
+### Exercice I18N.5 — Lazy loading
+
+Configure le chargement différé des locales :
+
+```ts
+// i18n.ts
+export const loadLocaleMessages = async (locale: string) => {
+  // Charge dynamiquement le fichier de traduction
+  // ???
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+export const loadLocaleMessages = async (locale: string) => {
+  const messages = await import(`./locales/${locale}.json`)
+  i18n.global.setLocaleMessage(locale, messages.default)
+  return messages
+}
+```
+</details>
+
+---
+
+### Exercice I18N.6 — Composant i18n-t
+
+Utilise `<i18n-t>` pour une traduction avec un lien :
+
+```json
+{ "terms": "En cliquant, vous acceptez nos {link}" }
+```
+
+```vue
+<template>
+  <!-- Affiche avec un lien cliquable sur "conditions" -->
+  ???
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<template>
+  <i18n-t keypath="terms" tag="p">
+    <template #link>
+      <router-link to="/terms">conditions d'utilisation</router-link>
+    </template>
+  </i18n-t>
+</template>
+```
+</details>
+
+---
+
+### Exercice I18N.7 — Formatage nombre et date
+
+Formate un prix et une date :
+
+```vue
+<template>
+  <p>Prix : ???</p>
+  <p>Date de livraison : ???</p>
+</template>
+
+<script setup lang="ts">
+const price = 1234.50
+const deliveryDate = new Date('2024-12-25')
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<template>
+  <p>Prix : {{ n(price, 'currency') }}</p>
+  <p>Date de livraison : {{ d(deliveryDate, 'long') }}</p>
+</template>
+
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+const { n, d } = useI18n()
+const price = 1234.50
+const deliveryDate = new Date('2024-12-25')
+</script>
+```
+
+Avec config numberFormats/datetimeFormats :
+- `n(1234.50, 'currency')` → "1 234,50 €"
+- `d(date, 'long')` → "25 décembre 2024"
+</details>
+
+---
+
 ## Suite
 
 → `cours/11-auth-securite/01-authentification.md`

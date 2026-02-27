@@ -351,6 +351,222 @@ it("affiche la barre de navigation avec les bons liens", async () => {
 | `.setValue("...")` | Simule la saisie dans un champ |
 | `wrapper.emitted()` | Vérifie les événements émis par le composant |
 
+---
+
+## 🎯 Pratique
+
+### Exercice TC.1 — Monter un composant
+
+Écris un test pour vérifier que ce composant affiche bien le message :
+
+```vue
+<!-- HelloWorld.vue -->
+<script setup lang="ts">
+defineProps<{ msg: string }>()
+</script>
+
+<template>
+  <h1>{{ msg }}</h1>
+</template>
+```
+
+```ts
+// __tests__/HelloWorld.spec.ts
+import { describe, it, expect } from 'vitest'
+import { mount } from '@vue/test-utils'
+import HelloWorld from '../HelloWorld.vue'
+
+describe('HelloWorld', () => {
+  it('affiche le message passé en prop', () => {
+    // Monte le composant avec msg="Hello Vue"
+    // ???
+
+    // Vérifie que le texte contient "Hello Vue"
+    // ???
+  })
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+describe('HelloWorld', () => {
+  it('affiche le message passé en prop', () => {
+    const wrapper = mount(HelloWorld, {
+      props: { msg: 'Hello Vue' }
+    })
+
+    expect(wrapper.text()).toContain('Hello Vue')
+  })
+})
+```
+</details>
+
+---
+
+### Exercice TC.2 — Simuler un clic
+
+Écris un test pour ce composant compteur :
+
+```vue
+<!-- Counter.vue -->
+<script setup lang="ts">
+import { ref } from 'vue'
+const count = ref(0)
+</script>
+
+<template>
+  <p data-test="count">{{ count }}</p>
+  <button data-test="increment" @click="count++">+1</button>
+</template>
+```
+
+```ts
+describe('Counter', () => {
+  it('incrémente le compteur au clic', async () => {
+    // Monte le composant
+    // ???
+
+    // Vérifie que count = 0 au début
+    // ???
+
+    // Clique sur le bouton
+    // ???
+
+    // Vérifie que count = 1
+    // ???
+  })
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+describe('Counter', () => {
+  it('incrémente le compteur au clic', async () => {
+    const wrapper = mount(Counter)
+
+    expect(wrapper.find('[data-test="count"]').text()).toBe('0')
+
+    await wrapper.find('[data-test="increment"]').trigger('click')
+
+    expect(wrapper.find('[data-test="count"]').text()).toBe('1')
+  })
+})
+```
+</details>
+
+---
+
+### Exercice TC.3 — Tester les emits
+
+Écris un test pour vérifier que ce composant émet un événement :
+
+```vue
+<!-- SearchInput.vue -->
+<script setup lang="ts">
+const emit = defineEmits<{ search: [query: string] }>()
+</script>
+
+<template>
+  <input @keyup.enter="emit('search', ($event.target as HTMLInputElement).value)" />
+</template>
+```
+
+```ts
+describe('SearchInput', () => {
+  it('émet "search" avec la valeur quand on appuie sur Entrée', async () => {
+    // ???
+  })
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+describe('SearchInput', () => {
+  it('émet "search" avec la valeur quand on appuie sur Entrée', async () => {
+    const wrapper = mount(SearchInput)
+
+    const input = wrapper.find('input')
+    await input.setValue('vue 3')
+    await input.trigger('keyup.enter')
+
+    expect(wrapper.emitted('search')).toBeTruthy()
+    expect(wrapper.emitted('search')![0]).toEqual(['vue 3'])
+  })
+})
+```
+</details>
+
+---
+
+### Exercice TC.4 — Tester avec un store
+
+Complète ce test qui utilise un store Pinia :
+
+```vue
+<!-- CartTotal.vue -->
+<script setup lang="ts">
+import { useCartStore } from '@/stores/cart'
+const cart = useCartStore()
+</script>
+
+<template>
+  <p>Total : {{ cart.total }} €</p>
+</template>
+```
+
+```ts
+import { setActivePinia, createPinia } from 'pinia'
+
+describe('CartTotal', () => {
+  beforeEach(() => {
+    // Crée une nouvelle instance Pinia pour chaque test
+    // ???
+  })
+
+  it('affiche le total du panier', () => {
+    // Configure le store avec des items
+    // ???
+
+    const wrapper = mount(CartTotal)
+    expect(wrapper.text()).toContain('30') // 10 * 2 + 5 * 2 = 30
+  })
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { setActivePinia, createPinia } from 'pinia'
+import { useCartStore } from '@/stores/cart'
+
+describe('CartTotal', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+
+  it('affiche le total du panier', () => {
+    const cart = useCartStore()
+    cart.items = [
+      { id: 1, name: 'Item 1', price: 10, quantity: 2 },
+      { id: 2, name: 'Item 2', price: 5, quantity: 2 }
+    ]
+
+    const wrapper = mount(CartTotal)
+    expect(wrapper.text()).toContain('30')
+  })
+})
+```
+</details>
+
+---
+
 ## Exercice
 
 → `exercices/12-tests-complets/ENONCE.md`

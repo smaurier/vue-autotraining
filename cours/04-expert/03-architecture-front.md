@@ -467,6 +467,146 @@ Voici des indicateurs que ton code a besoin d'être réorganisé :
 
 ---
 
+## 🎯 Pratique
+
+### Exercice ARCH.1 — Organiser les fichiers
+
+Où placerais-tu ces fichiers dans une architecture par feature ?
+
+1. `LoginForm.vue` — Formulaire de connexion
+2. `useAuth.ts` — Composable d'authentification
+3. `Button.vue` — Bouton réutilisable partout
+4. `authService.ts` — Appels API pour l'auth
+5. `User.ts` — Type TypeScript pour un utilisateur
+
+<details>
+<summary>Solution</summary>
+
+```
+src/
+  features/
+    auth/
+      components/
+        LoginForm.vue      ← 1
+      composables/
+        useAuth.ts         ← 2
+      services/
+        authService.ts     ← 4
+      types/
+        User.ts            ← 5
+  shared/
+    components/
+      Button.vue           ← 3 (réutilisable = shared)
+```
+</details>
+
+---
+
+### Exercice ARCH.2 — Barrel file
+
+Crée un barrel file (index.ts) pour ce dossier :
+
+```
+composables/
+  useCounter.ts
+  useToggle.ts
+  useLocalStorage.ts
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+// composables/index.ts
+export { useCounter } from './useCounter'
+export { useToggle } from './useToggle'
+export { useLocalStorage } from './useLocalStorage'
+```
+
+Utilisation :
+```ts
+// Au lieu de 3 imports séparés
+import { useCounter, useToggle, useLocalStorage } from '@/composables'
+```
+</details>
+
+---
+
+### Exercice ARCH.3 — Séparation des responsabilités
+
+Ce composant fait trop de choses. Identifie ce qu'il faut extraire :
+
+```vue
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+
+const users = ref<User[]>([])
+const isLoading = ref(false)
+const search = ref('')
+
+async function fetchUsers() {
+  isLoading.value = true
+  const res = await fetch('/api/users')
+  users.value = await res.json()
+  isLoading.value = false
+}
+
+const filteredUsers = computed(() =>
+  users.value.filter(u => u.name.includes(search.value))
+)
+
+onMounted(fetchUsers)
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+Extraire :
+1. **Service** : `userService.ts` → `fetchUsers()`
+2. **Composable** : `useUsers.ts` → logique de chargement + filtre
+
+```ts
+// services/userService.ts
+export async function getUsers(): Promise<User[]> {
+  const res = await fetch('/api/users')
+  return res.json()
+}
+
+// composables/useUsers.ts
+export function useUsers() {
+  const users = ref<User[]>([])
+  const isLoading = ref(false)
+  const search = ref('')
+
+  const filteredUsers = computed(() =>
+    users.value.filter(u => u.name.includes(search.value))
+  )
+
+  async function load() {
+    isLoading.value = true
+    users.value = await getUsers()
+    isLoading.value = false
+  }
+
+  return { users, filteredUsers, isLoading, search, load }
+}
+```
+
+Le composant devient :
+```vue
+<script setup lang="ts">
+import { useUsers } from '@/composables/useUsers'
+import { onMounted } from 'vue'
+
+const { filteredUsers, isLoading, search, load } = useUsers()
+onMounted(load)
+</script>
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/04-expert/04-patterns-entreprise.md`

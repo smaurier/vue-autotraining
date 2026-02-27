@@ -54,6 +54,38 @@ count.value = 10; // Modification
 
 **Annotez `ref` seulement si la valeur initiale ne suffit pas à TypeScript pour comprendre le type final.**
 
+### 🎯 Pratique — ref
+
+Dans `01-playground.ts` (syntaxe TS, sans Vue) :
+
+```ts
+// Exercice 4.1 : Quel est le type inféré par TypeScript ?
+interface Ref<T> { value: T; } // simulation
+
+const compteur = { value: 0 };              // Type : Ref<???>
+const message = { value: "Bonjour" };       // Type : Ref<???>
+const estVisible = { value: false };        // Type : Ref<???>
+
+// Exercice 4.2 : Comment typer ces refs pour qu'elles puissent être null ?
+const utilisateur: Ref<???> = { value: null };     // User ou null
+const produits: Ref<???> = { value: [] };          // tableau de Product
+const erreur: Ref<???> = { value: null };          // string ou null
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+const compteur = { value: 0 };              // Ref<number>
+const message = { value: "Bonjour" };       // Ref<string>
+const estVisible = { value: false };        // Ref<boolean>
+
+const utilisateur: Ref<User | null> = { value: null };
+const produits: Ref<Product[]> = { value: [] };
+const erreur: Ref<string | null> = { value: null };
+```
+</details>
+
 ## 2. Typer `reactive` - Pour les objets complexes
 
 ### Qu'est-ce que `reactive` ?
@@ -98,6 +130,59 @@ form.age = null;         // ✅ null aussi
 // form.age = "30";      // ❌ string refusé !
 ```
 
+### 🎯 Pratique — reactive
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 4.3 : Définis l'interface pour un formulaire de contact
+interface ContactForm {
+  // nom : obligatoire (string)
+  // email : obligatoire (string)
+  // telephone : optionnel (string ou undefined)
+  // message : obligatoire (string)
+  // newsletter : obligatoire (boolean)
+}
+
+const formContact: ContactForm = {
+  // ??? complète les valeurs initiales
+};
+
+// Exercice 4.4 : Définis l'interface pour un panier d'achat
+interface CartState {
+  // items : tableau de Product
+  // total : nombre
+  // couponCode : string ou null
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+interface ContactForm {
+  nom: string;
+  email: string;
+  telephone?: string;
+  message: string;
+  newsletter: boolean;
+}
+
+const formContact: ContactForm = {
+  nom: "",
+  email: "",
+  message: "",
+  newsletter: false,
+};
+
+interface CartState {
+  items: Product[];
+  total: number;
+  couponCode: string | null;
+}
+```
+</details>
+
 ## 3. Typer `computed` - Les données calculées
 
 ### Qu'est-ce que `computed` ?
@@ -141,6 +226,54 @@ const status = computed<"idle" | "loading" | "done">(() => {
 });
 ```
 
+### 🎯 Pratique — computed
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 4.5 : Quel type retourne chaque computed ?
+const prix = { value: 29.99 };
+const quantite = { value: 3 };
+const reduction = { value: 10 }; // en %
+
+// Type de retour : ???
+const sousTotal = prix.value * quantite.value;
+const montantReduction = sousTotal * (reduction.value / 100);
+const total = sousTotal - montantReduction;
+
+// Exercice 4.6 : Annote le type de ce computed complexe
+const panierVide = { value: true };
+const paiementEnCours = { value: false };
+const paiementTermine = { value: false };
+
+type EtatPaiement = ???;  // "vide" | "prêt" | "en_cours" | "terminé"
+
+// fonction qui retourne l'état
+function getEtatPaiement(): EtatPaiement {
+  // ??? implémente la logique
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+// Tous retournent number
+const sousTotal: number = prix.value * quantite.value;
+const montantReduction: number = sousTotal * (reduction.value / 100);
+const total: number = sousTotal - montantReduction;
+
+type EtatPaiement = "vide" | "prêt" | "en_cours" | "terminé";
+
+function getEtatPaiement(): EtatPaiement {
+  if (panierVide.value) return "vide";
+  if (paiementEnCours.value) return "en_cours";
+  if (paiementTermine.value) return "terminé";
+  return "prêt";
+}
+```
+</details>
+
 ## 4. Typer `watch` - Observer les changements
 
 ### Qu'est-ce que `watch` ?
@@ -181,6 +314,53 @@ watch([count, name], ([newCount, newName], [oldCount, oldName]) => {
   console.log(`Name: ${oldName} → ${newName}`);
 });
 ```
+
+### 🎯 Pratique — watch
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 4.7 : Type les callbacks de watch
+const utilisateur = { value: { id: 1, name: "Alice" } as User | null };
+const panier = { value: [] as Product[] };
+
+// Quels sont les types de newVal et oldVal ?
+function onUserChange(newVal: ???, oldVal: ???) {
+  console.log("User changé");
+}
+
+function onPanierChange(newVal: ???, oldVal: ???) {
+  console.log(`Panier: ${oldVal.length} → ${newVal.length} produits`);
+}
+
+// Exercice 4.8 : Écris une fonction qui réagit au changement de prix
+const prix = { value: 0 };
+
+function onPrixChange(nouveau: number, ancien: number): void {
+  // Affiche "Prix augmenté" ou "Prix diminué" ou "Prix inchangé"
+  // ???
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+function onUserChange(newVal: User | null, oldVal: User | null) {
+  console.log("User changé");
+}
+
+function onPanierChange(newVal: Product[], oldVal: Product[]) {
+  console.log(`Panier: ${oldVal.length} → ${newVal.length} produits`);
+}
+
+function onPrixChange(nouveau: number, ancien: number): void {
+  if (nouveau > ancien) console.log("Prix augmenté");
+  else if (nouveau < ancien) console.log("Prix diminué");
+  else console.log("Prix inchangé");
+}
+```
+</details>
 
 ## 5. Typer les `props` - Recevoir des données
 
@@ -240,6 +420,56 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 ```
 
+### 🎯 Pratique — props
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 4.9 : Définis l'interface des props pour une Card
+interface CardProps {
+  // title : obligatoire (string)
+  // subtitle : optionnel (string)
+  // image : optionnel (string - URL)
+  // variant : optionnel, "default" | "highlighted" | "compact"
+  // onClick : optionnel, fonction sans paramètre qui ne retourne rien
+}
+
+// Exercice 4.10 : Définis les props avec valeurs par défaut
+interface ButtonProps {
+  label: string;
+  size?: "sm" | "md" | "lg";
+  disabled?: boolean;
+  loading?: boolean;
+}
+
+// Quelles seraient les valeurs par défaut logiques ?
+const defaultButtonProps = {
+  size: ???,
+  disabled: ???,
+  loading: ???,
+};
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+interface CardProps {
+  title: string;
+  subtitle?: string;
+  image?: string;
+  variant?: "default" | "highlighted" | "compact";
+  onClick?: () => void;
+}
+
+const defaultButtonProps = {
+  size: "md" as const,
+  disabled: false,
+  loading: false,
+};
+```
+</details>
+
 ## 6. Typer les `emits` - Envoyer des événements
 
 ### Qu'est-ce que les emits ?
@@ -285,6 +515,53 @@ const emit = defineEmits<{
 }>();
 </script>
 ```
+
+### 🎯 Pratique — emits
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 4.11 : Définis les types d'emits pour un formulaire
+interface FormEmits {
+  // submit : envoie les données du formulaire (FormData)
+  // cancel : pas de paramètre
+  // validate : envoie le nom du champ (string) et sa validité (boolean)
+  // error : envoie un message d'erreur (string)
+}
+
+// Écris-le en syntaxe Vue 3.3+
+type FormEmitsVue33 = {
+  submit: [???];
+  cancel: [];
+  validate: [???, ???];
+  error: [???];
+};
+
+// Exercice 4.12 : Un composant DataTable qui émet des événements
+// - rowClick : envoie l'élément cliqué (T générique)
+// - sort : envoie le nom de la colonne (string) et la direction ("asc" | "desc")
+// - pageChange : envoie le numéro de page (number)
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+type FormEmitsVue33 = {
+  submit: [data: FormData];
+  cancel: [];
+  validate: [field: string, isValid: boolean];
+  error: [message: string];
+};
+
+// Pour DataTable générique
+type DataTableEmits<T> = {
+  rowClick: [item: T];
+  sort: [column: string, direction: "asc" | "desc"];
+  pageChange: [page: number];
+};
+```
+</details>
 
 ## 7. Typer les `slots` - Contenu personnalisable
 

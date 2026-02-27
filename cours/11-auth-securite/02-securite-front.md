@@ -371,6 +371,97 @@ Utilise cette liste pour vérifier la sécurité de ton application :
 
 ---
 
+## 🎯 Pratique
+
+### Exercice SEC.1 — XSS et v-html
+
+Ce code est-il sécurisé ? Comment l'améliorer ?
+
+```vue
+<template>
+  <div v-html="userComment"></div>
+</template>
+
+<script setup>
+const userComment = '<script>alert("hack!")</script>'
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+❌ **Non sécurisé** : `v-html` avec du contenu utilisateur = faille XSS.
+
+✅ **Solution avec DOMPurify** :
+```vue
+<template>
+  <div v-html="sanitizedComment"></div>
+</template>
+
+<script setup>
+import DOMPurify from 'dompurify'
+const userComment = '<script>alert("hack!")</script>'
+const sanitizedComment = DOMPurify.sanitize(userComment)
+// Retourne le texte sans le script malveillant
+</script>
+```
+</details>
+
+---
+
+### Exercice SEC.2 — Validation des URLs
+
+Cette URL utilisateur est-elle sécurisée ?
+
+```ts
+const userUrl = 'javascript:alert(document.cookie)'
+```
+
+Comment valider les URLs ?
+
+<details>
+<summary>Solution</summary>
+
+❌ **Dangereux** : `javascript:` exécute du code !
+
+✅ **Validation** :
+```ts
+function isSafeUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url)
+    return ['http:', 'https:'].includes(parsed.protocol)
+  } catch {
+    return false
+  }
+}
+```
+</details>
+
+---
+
+### Exercice SEC.3 — Variables d'environnement
+
+Laquelle de ces variables est sécurisée côté front ?
+
+```bash
+# .env
+VITE_API_URL=https://api.example.com
+VITE_STRIPE_SECRET_KEY=sk_live_xxxxx
+DATABASE_URL=postgres://user:pass@db
+```
+
+<details>
+<summary>Solution</summary>
+
+- ✅ `VITE_API_URL` : OK, c'est public (URL de l'API)
+- ❌ `VITE_STRIPE_SECRET_KEY` : **DANGER** ! Les variables `VITE_` sont visibles dans le bundle JavaScript
+- ✅ `DATABASE_URL` : Sans préfixe `VITE_`, elle n'est PAS accessible côté front
+
+**Règle** : Jamais de secrets dans les variables `VITE_*` !
+</details>
+
+---
+
 ## Suite
 
 → `cours/11-auth-securite/03-rbac-et-permissions.md`

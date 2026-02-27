@@ -95,6 +95,49 @@ const diana: User = {
 
 > **En résumé :** L'interface est un **gardien**. Elle vérifie que chaque objet a les bonnes propriétés avec les bons types. Plus de bugs silencieux !
 
+### 🎯 Pratique — Interfaces
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 2.1 : Crée une interface Product
+interface Product {
+  // id : nombre
+  // name : texte
+  // price : nombre
+  // inStock : booléen
+}
+
+// Exercice 2.2 : Crée un objet qui respecte cette interface
+const iphone: Product = {
+  // ??? complète ici
+};
+
+// Exercice 2.3 : Que dit TypeScript si tu oublies "inStock" ?
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  inStock: boolean;
+}
+
+const iphone: Product = {
+  id: 1,
+  name: "iPhone 15",
+  price: 999,
+  inStock: true,
+};
+
+// Erreur : Property 'inStock' is missing in type '...' but required in type 'Product'
+```
+</details>
+
 ---
 
 ## Propriétés optionnelles
@@ -146,6 +189,47 @@ if (bob.avatar) {
 // ✅ Alternative avec "?." (optional chaining)
 console.log(bob.avatar?.length);   // Affiche "undefined" au lieu de planter
 ```
+
+### 🎯 Pratique — Optionnel
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 2.4 : Ajoute une propriété optionnelle à Product
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  description: ???;  // optionnel !
+}
+
+// Exercice 2.5 : Crée 2 produits, un avec description, un sans
+
+// Exercice 2.6 : Affiche la longueur de la description (attention au undefined !)
+function afficherDescription(p: Product) {
+  // ???
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  description?: string;
+}
+
+const avecDesc: Product = { id: 1, name: "iPhone", price: 999, description: "Le dernier modèle" };
+const sansDesc: Product = { id: 2, name: "Coque", price: 29 };
+
+function afficherDescription(p: Product) {
+  console.log(p.description?.length ?? "Pas de description");
+}
+```
+</details>
 
 ---
 
@@ -243,6 +327,40 @@ const formatEuro: Formatter = (value) => {
 console.log(formatEuro(42));  // "42 €"
 ```
 
+### 🎯 Pratique — Type alias
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 2.7 : Crée un type pour les devises
+type Currency = ???;  // "EUR", "USD", "GBP"
+
+// Exercice 2.8 : Crée un type pour une coordonnée
+type Coordinate = {
+  // x et y sont des nombres
+};
+
+// Exercice 2.9 : Crée un type pour une fonction de calcul
+type Calculator = ???;  // prend 2 nombres, retourne 1 nombre
+
+const additionner: Calculator = (a, b) => a + b;
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+type Currency = "EUR" | "USD" | "GBP";
+
+type Coordinate = {
+  x: number;
+  y: number;
+};
+
+type Calculator = (a: number, b: number) => number;
+```
+</details>
+
 ---
 
 ## Union types (types "OU")
@@ -264,6 +382,46 @@ let userId: Id = 42;          // ✅ nombre → OK
 userId = "user-abc-123";      // ✅ texte → OK
 userId = true;                 // ❌ booléen → pas autorisé !
 ```
+
+### 🎯 Pratique — Union types
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 2.10 : Un résultat de recherche peut être trouvé ou non
+type SearchResult = ???;  // Product | null
+
+function chercher(terme: string): SearchResult {
+  if (terme === "iPhone") return { id: 1, name: "iPhone", price: 999, inStock: true };
+  return null;
+}
+
+// Exercice 2.11 : Un input peut accepter texte ou nombre
+type InputValue = ???;
+
+function traiter(valeur: InputValue) {
+  // Comment savoir si c'est un string ou un number ?
+  // ???
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+type SearchResult = Product | null;
+
+type InputValue = string | number;
+
+function traiter(valeur: InputValue) {
+  if (typeof valeur === "string") {
+    console.log(valeur.toUpperCase());
+  } else {
+    console.log(valeur.toFixed(2));
+  }
+}
+```
+</details>
 
 ---
 
@@ -296,6 +454,42 @@ const admin: AdminUser = {
   permissions: ["read", "write", "delete"] // propriété ajoutée
 };
 ```
+
+### 🎯 Pratique — Intersection types
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 2.12 : Combine Product avec des infos de tracking
+interface Trackable {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+type TrackedProduct = ???;  // Product & Trackable
+
+// Exercice 2.13 : Crée un produit tracké
+const produitSuivi: TrackedProduct = {
+  // ??? complète toutes les propriétés
+};
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+type TrackedProduct = Product & Trackable;
+
+const produitSuivi: TrackedProduct = {
+  id: 1,
+  name: "MacBook",
+  price: 1999,
+  inStock: true,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+```
+</details>
 
 ---
 
@@ -368,6 +562,53 @@ interface Article extends Timestamped, SoftDeletable {
 //           + title, content (propres)
 ```
 
+### 🎯 Pratique — Extends
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 2.14 : Crée une hiérarchie d'entités
+interface Entity {
+  id: number;
+  createdAt: Date;
+}
+
+interface Person extends ??? {
+  name: string;
+  email: string;
+}
+
+interface Employee extends ??? {
+  department: string;
+  salary: number;
+}
+
+// Exercice 2.15 : Combien de propriétés a Employee au total ?
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+interface Entity {
+  id: number;
+  createdAt: Date;
+}
+
+interface Person extends Entity {
+  name: string;
+  email: string;
+}
+
+interface Employee extends Person {
+  department: string;
+  salary: number;
+}
+
+// Employee a 6 propriétés : id, createdAt, name, email, department, salary
+```
+</details>
+
 ---
 
 ## Index signatures
@@ -415,6 +656,48 @@ const leaderboard: Scores = {
 const name = "Alice";
 console.log(leaderboard[name]);  // 150
 ```
+
+### 🎯 Pratique — Index signatures
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 2.16 : Crée un type pour un dictionnaire français/anglais
+interface Dictionnaire {
+  // clé = mot français (string), valeur = traduction (string)
+}
+
+const frToEn: Dictionnaire = {
+  bonjour: "hello",
+  merci: "thanks",
+  // ???
+};
+
+// Exercice 2.17 : Crée un type pour stocker des prix par nom de produit
+interface PrixProduits {
+  // ???
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+interface Dictionnaire {
+  [motFr: string]: string;
+}
+
+interface PrixProduits {
+  [nomProduit: string]: number;
+}
+
+const prix: PrixProduits = {
+  iPhone: 999,
+  MacBook: 1999,
+  AirPods: 199,
+};
+```
+</details>
 
 ---
 
@@ -473,6 +756,47 @@ Quand tu appelles une API dans un composant Vue, tu passes par ces états :
 4. **error** : quelque chose a mal tourné → on affiche un message d'erreur
 
 Ce pattern te permet de gérer **proprement** ces 4 cas sans oublier aucun scénario.
+
+### 🎯 Pratique — Discriminated unions
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 2.18 : Modélise le résultat d'un paiement
+type PaymentResult =
+  | { status: "pending" }                           // en attente
+  | { status: "success"; transactionId: string }    // réussi
+  | { status: "failed"; ???: ??? };                 // échoué avec message d'erreur
+
+// Exercice 2.19 : Écris une fonction qui traite le résultat
+function handlePayment(result: PaymentResult): string {
+  switch (result.status) {
+    // ??? complète les 3 cas
+  }
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+type PaymentResult =
+  | { status: "pending" }
+  | { status: "success"; transactionId: string }
+  | { status: "failed"; errorMessage: string };
+
+function handlePayment(result: PaymentResult): string {
+  switch (result.status) {
+    case "pending":
+      return "Paiement en cours...";
+    case "success":
+      return `Paiement réussi ! Ref: ${result.transactionId}`;
+    case "failed":
+      return `Échec : ${result.errorMessage}`;
+  }
+}
+```
+</details>
 
 ---
 
@@ -622,6 +946,43 @@ const users: UserMap = {
 | `Pick<T, Keys>`   | Ne garde que certains champs            | Aperçu / résumé d'un objet  |
 | `Omit<T, Keys>`   | Garde tout sauf certains champs         | Cacher des données sensibles |
 | `Record<K, V>`    | Crée un dictionnaire typé               | Index de données par id       |
+
+### 🎯 Pratique — Utility types
+
+Dans `01-playground.ts` :
+
+```ts
+interface Article {
+  id: number;
+  title: string;
+  content: string;
+  author: string;
+  publishedAt: Date;
+}
+
+// Exercice 2.20 : Crée un type pour mettre à jour un article (tout optionnel)
+type ArticleUpdate = ???;
+
+// Exercice 2.21 : Crée un aperçu d'article (juste id et title)
+type ArticlePreview = ???;
+
+// Exercice 2.22 : Crée un article sans la date de publication
+type DraftArticle = ???;
+
+// Exercice 2.23 : Crée un index d'articles par id
+type ArticleIndex = ???;
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+type ArticleUpdate = Partial<Article>;
+type ArticlePreview = Pick<Article, "id" | "title">;
+type DraftArticle = Omit<Article, "publishedAt">;
+type ArticleIndex = Record<number, Article>;
+```
+</details>
 
 ---
 

@@ -630,6 +630,178 @@ pnpm exec playwright show-report
 | **Page Object**      | Une classe par page pour organiser et ne pas se répéter          |
 | **CI**               | Les tests tournent automatiquement à chaque push sur GitHub      |
 
+---
+
+## 🎯 Pratique
+
+### Exercice E2E.1 — Premier test Playwright
+
+Écris un test E2E qui vérifie que la page d'accueil charge correctement :
+
+```ts
+// e2e/home.spec.ts
+import { test, expect } from '@playwright/test'
+
+test.describe('Page d\'accueil', () => {
+  test('affiche le titre', async ({ page }) => {
+    // Va sur la page d'accueil
+    // ???
+
+    // Vérifie que le titre h1 contient "Bienvenue"
+    // ???
+  })
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+test.describe('Page d\'accueil', () => {
+  test('affiche le titre', async ({ page }) => {
+    await page.goto('/')
+
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Bienvenue')
+  })
+})
+```
+</details>
+
+---
+
+### Exercice E2E.2 — Formulaire de connexion
+
+Écris un test E2E pour un formulaire de login :
+
+```ts
+test('permet de se connecter', async ({ page }) => {
+  await page.goto('/login')
+
+  // Remplis le champ email
+  // ???
+
+  // Remplis le champ password
+  // ???
+
+  // Clique sur le bouton "Se connecter"
+  // ???
+
+  // Vérifie qu'on est redirigé vers /dashboard
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+test('permet de se connecter', async ({ page }) => {
+  await page.goto('/login')
+
+  await page.getByLabel('Email').fill('test@example.com')
+  await page.getByLabel('Mot de passe').fill('password123')
+  await page.getByRole('button', { name: 'Se connecter' }).click()
+
+  await expect(page).toHaveURL('/dashboard')
+})
+```
+</details>
+
+---
+
+### Exercice E2E.3 — Page Object Pattern
+
+Crée un Page Object pour la page de login :
+
+```ts
+// e2e/pages/LoginPage.ts
+import { type Page, type Locator } from '@playwright/test'
+
+export class LoginPage {
+  private page: Page
+  private emailInput: Locator
+  private passwordInput: Locator
+  private submitButton: Locator
+
+  constructor(page: Page) {
+    this.page = page
+    // Initialise les locators
+    // ???
+  }
+
+  async goto() {
+    // ???
+  }
+
+  async login(email: string, password: string) {
+    // ???
+  }
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+export class LoginPage {
+  private page: Page
+  private emailInput: Locator
+  private passwordInput: Locator
+  private submitButton: Locator
+
+  constructor(page: Page) {
+    this.page = page
+    this.emailInput = page.getByLabel('Email')
+    this.passwordInput = page.getByLabel('Mot de passe')
+    this.submitButton = page.getByRole('button', { name: 'Se connecter' })
+  }
+
+  async goto() {
+    await this.page.goto('/login')
+  }
+
+  async login(email: string, password: string) {
+    await this.emailInput.fill(email)
+    await this.passwordInput.fill(password)
+    await this.submitButton.click()
+  }
+}
+```
+</details>
+
+---
+
+### Exercice E2E.4 — Utiliser le Page Object
+
+Réécris le test de login en utilisant le Page Object :
+
+```ts
+import { LoginPage } from './pages/LoginPage'
+
+test('login avec Page Object', async ({ page }) => {
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { LoginPage } from './pages/LoginPage'
+
+test('login avec Page Object', async ({ page }) => {
+  const loginPage = new LoginPage(page)
+
+  await loginPage.goto()
+  await loginPage.login('test@example.com', 'password123')
+
+  await expect(page).toHaveURL('/dashboard')
+})
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/03-avance/07-msw-et-mocking-api.md`

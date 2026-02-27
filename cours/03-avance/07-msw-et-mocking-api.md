@@ -649,6 +649,191 @@ it("charge les données via TanStack Query + MSW", async () => {
 | **resetHandlers()**  | Remettre les réponses par défaut après chaque test                      |
 | **Mode navigateur**  | MSW peut aussi servir pendant le développement, pas juste les tests     |
 
+---
+
+## 🎯 Pratique
+
+### Exercice MSW.1 — Créer un handler GET
+
+Crée un handler MSW pour intercepter `GET /api/users` :
+
+```ts
+// mocks/handlers.ts
+import { http, HttpResponse } from 'msw'
+
+export const handlers = [
+  // Intercepte GET /api/users et retourne une liste d'utilisateurs
+  // ???
+]
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { http, HttpResponse } from 'msw'
+
+export const handlers = [
+  http.get('/api/users', () => {
+    return HttpResponse.json([
+      { id: 1, name: 'Alice' },
+      { id: 2, name: 'Bob' }
+    ])
+  })
+]
+```
+</details>
+
+---
+
+### Exercice MSW.2 — Handler avec paramètre
+
+Crée un handler pour `GET /api/users/:id` :
+
+```ts
+// Intercepte GET /api/users/42 et retourne l'utilisateur avec cet id
+http.get('/api/users/:id', ({ params }) => {
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+http.get('/api/users/:id', ({ params }) => {
+  const { id } = params
+  return HttpResponse.json({
+    id: Number(id),
+    name: `User ${id}`
+  })
+})
+```
+</details>
+
+---
+
+### Exercice MSW.3 — Simuler une erreur
+
+Dans un test, utilise `server.use()` pour simuler une erreur 500 :
+
+```ts
+import { server } from '../mocks/server'
+import { http, HttpResponse } from 'msw'
+
+it('affiche une erreur quand l\'API échoue', async () => {
+  // Configure le mock pour retourner une erreur 500
+  // ???
+
+  // ... reste du test
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+it('affiche une erreur quand l\'API échoue', async () => {
+  server.use(
+    http.get('/api/users', () => {
+      return HttpResponse.json(
+        { message: 'Erreur serveur' },
+        { status: 500 }
+      )
+    })
+  )
+
+  // ... reste du test
+})
+```
+</details>
+
+---
+
+### Exercice MSW.4 — Handler POST
+
+Crée un handler pour `POST /api/users` qui crée un nouvel utilisateur :
+
+```ts
+http.post('/api/users', async ({ request }) => {
+  // Récupère le body de la requête
+  // ???
+
+  // Retourne le nouvel utilisateur avec un id généré
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+http.post('/api/users', async ({ request }) => {
+  const body = await request.json() as { name: string }
+
+  return HttpResponse.json(
+    { id: Date.now(), name: body.name },
+    { status: 201 }
+  )
+})
+```
+</details>
+
+---
+
+### Exercice MSW.5 — Setup dans les tests
+
+Complète le setup MSW pour Vitest :
+
+```ts
+// mocks/server.ts
+import { setupServer } from 'msw/node'
+import { handlers } from './handlers'
+
+export const server = ???
+```
+
+```ts
+// vitest.setup.ts
+import { beforeAll, afterEach, afterAll } from 'vitest'
+import { server } from './mocks/server'
+
+// Démarre le serveur avant tous les tests
+// ???
+
+// Reset les handlers après chaque test
+// ???
+
+// Arrête le serveur après tous les tests
+// ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+// mocks/server.ts
+import { setupServer } from 'msw/node'
+import { handlers } from './handlers'
+
+export const server = setupServer(...handlers)
+```
+
+```ts
+// vitest.setup.ts
+import { beforeAll, afterEach, afterAll } from 'vitest'
+import { server } from './mocks/server'
+
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
+
+afterEach(() => server.resetHandlers())
+
+afterAll(() => server.close())
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/04-expert/01-performance.md`

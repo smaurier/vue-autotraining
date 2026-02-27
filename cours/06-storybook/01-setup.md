@@ -282,6 +282,74 @@ storybook:
 | **Addon**        | Un plugin qui ajoute des fonctionnalités à Storybook        |
 | **Alias @/**     | Un raccourci de chemin qu'il faut configurer dans Storybook |
 
+---
+
+## 🎯 Pratique
+
+### Exercice SB.1 — Lancer Storybook
+
+Quelles commandes utilises-tu pour :
+1. Installer Storybook dans un projet Vue existant
+2. Lancer Storybook en mode développement
+3. Générer une version statique
+
+<details>
+<summary>Solution</summary>
+
+```bash
+# 1. Installer Storybook
+pnpm exec storybook@latest init
+
+# 2. Lancer en mode dev
+pnpm storybook
+
+# 3. Générer une version statique
+pnpm storybook build
+```
+</details>
+
+---
+
+### Exercice SB.2 — Configuration main.ts
+
+Complète cette configuration pour :
+- Trouver les stories dans `src/components/`
+- Activer les addons essentials et a11y
+
+```ts
+// .storybook/main.ts
+import type { StorybookConfig } from '@storybook/vue3-vite'
+
+const config: StorybookConfig = {
+  framework: '@storybook/vue3-vite',
+  stories: [
+    // ???
+  ],
+  addons: [
+    // ???
+  ]
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+const config: StorybookConfig = {
+  framework: '@storybook/vue3-vite',
+  stories: [
+    '../src/components/**/*.stories.@(ts|tsx)'
+  ],
+  addons: [
+    '@storybook/addon-essentials',
+    '@storybook/addon-a11y'
+  ]
+}
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/06-storybook/02-stories.md`

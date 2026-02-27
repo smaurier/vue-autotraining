@@ -436,6 +436,127 @@ async function login(credentials: LoginCredentials): Promise<void> {
 
 ---
 
+## 🎯 Pratique
+
+### Exercice RBAC.1 — Mapping rôles/permissions
+
+Complète ce mapping des permissions par rôle :
+
+```ts
+const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
+  admin: ???,
+  editor: ???,
+  viewer: ???
+}
+
+type Permission = 'users:read' | 'users:write' | 'users:delete' 
+                | 'products:read' | 'products:write'
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
+  admin: ['users:read', 'users:write', 'users:delete', 'products:read', 'products:write'],
+  editor: ['users:read', 'products:read', 'products:write'],
+  viewer: ['users:read', 'products:read']
+}
+```
+</details>
+
+---
+
+### Exercice RBAC.2 — Composable usePermissions
+
+Crée un composable pour vérifier les permissions :
+
+```ts
+export function usePermissions() {
+  const { user } = useAuth()
+  
+  function hasPermission(permission: Permission): boolean {
+    // ???
+  }
+  
+  function hasAnyPermission(permissions: Permission[]): boolean {
+    // ???
+  }
+  
+  return { hasPermission, hasAnyPermission }
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+export function usePermissions() {
+  const { user } = useAuth()
+  
+  function hasPermission(permission: Permission): boolean {
+    if (!user.value) return false
+    const userPermissions = ROLE_PERMISSIONS[user.value.role]
+    return userPermissions.includes(permission)
+  }
+  
+  function hasAnyPermission(permissions: Permission[]): boolean {
+    return permissions.some(p => hasPermission(p))
+  }
+  
+  return { hasPermission, hasAnyPermission }
+}
+```
+</details>
+
+---
+
+### Exercice RBAC.3 — Composant CanAccess
+
+Crée un composant qui affiche son contenu seulement si l'utilisateur a la permission :
+
+```vue
+<!-- CanAccess.vue -->
+<template>
+  ???
+</template>
+
+<script setup lang="ts">
+defineProps<{
+  permission: Permission
+}>()
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<template>
+  <slot v-if="hasPermission(permission)" />
+</template>
+
+<script setup lang="ts">
+import { usePermissions } from '@/composables/usePermissions'
+
+const props = defineProps<{
+  permission: Permission
+}>()
+
+const { hasPermission } = usePermissions()
+</script>
+```
+
+Utilisation :
+```vue
+<CanAccess permission="users:delete">
+  <button>Supprimer l'utilisateur</button>
+</CanAccess>
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/12-vue-query/01-tanstack-query.md`

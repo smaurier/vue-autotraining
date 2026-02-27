@@ -491,6 +491,130 @@ Le **skip link** (lien d'évitement) est un lien **caché** qui apparaît quand 
 ✅ Skip link : lien caché pour sauter la navigation
 ```
 
+---
+
+## 🎯 Pratique
+
+### Exercice ARIA.1 — Bouton icône
+
+Rends ce bouton icône accessible :
+
+```vue
+<button @click="deleteItem">
+  <TrashIcon />
+</button>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<button @click="deleteItem" aria-label="Supprimer l'élément">
+  <TrashIcon aria-hidden="true" />
+</button>
+```
+</details>
+
+---
+
+### Exercice ARIA.2 — Menu déroulant
+
+Ajoute les attributs ARIA pour ce menu :
+
+```vue
+<template>
+  <button @click="isOpen = !isOpen">
+    Menu
+  </button>
+  <ul v-if="isOpen">
+    <li><a href="/profile">Profil</a></li>
+    <li><a href="/settings">Paramètres</a></li>
+  </ul>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<template>
+  <button 
+    @click="isOpen = !isOpen"
+    :aria-expanded="isOpen"
+    aria-haspopup="true"
+  >
+    Menu
+  </button>
+  <ul v-if="isOpen" role="menu">
+    <li role="menuitem"><a href="/profile">Profil</a></li>
+    <li role="menuitem"><a href="/settings">Paramètres</a></li>
+  </ul>
+</template>
+```
+</details>
+
+---
+
+### Exercice ARIA.3 — Formulaire accessible
+
+Ajoute les attributs pour rendre ce champ accessible en cas d'erreur :
+
+```vue
+<template>
+  <label>Email</label>
+  <input type="email" v-model="email">
+  <span v-if="error">{{ error }}</span>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<template>
+  <label for="email-input">Email</label>
+  <input 
+    id="email-input"
+    type="email" 
+    v-model="email"
+    :aria-invalid="!!error"
+    :aria-describedby="error ? 'email-error' : undefined"
+  >
+  <span v-if="error" id="email-error" role="alert">
+    {{ error }}
+  </span>
+</template>
+```
+</details>
+
+---
+
+### Exercice ARIA.4 — Live region
+
+Ajoute une live region pour annoncer le succès d'une action :
+
+```vue
+<template>
+  <button @click="save">Sauvegarder</button>
+  <span v-if="saved">Sauvegardé !</span>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<template>
+  <button @click="save">Sauvegarder</button>
+  <span v-if="saved" role="status" aria-live="polite">
+    Sauvegardé !
+  </span>
+</template>
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/09-accessibilite/03-audit-a11y.md`

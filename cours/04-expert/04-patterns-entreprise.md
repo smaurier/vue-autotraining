@@ -530,6 +530,161 @@ d'une technologie à une autre (Vue 2 → Vue 3, Angular → Vue, etc.)
 
 ---
 
+## 🎯 Pratique
+
+### Exercice PAT.1 — Service Layer
+
+Transforme ce code en utilisant un service :
+
+```vue
+<script setup lang="ts">
+async function createUser(data: UserData) {
+  const res = await fetch('/api/users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  return res.json()
+}
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+// services/userService.ts
+export const userService = {
+  async create(data: UserData): Promise<User> {
+    const res = await fetch('/api/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    if (!res.ok) throw new Error('Erreur création utilisateur')
+    return res.json()
+  }
+}
+```
+
+```vue
+<script setup lang="ts">
+import { userService } from '@/services/userService'
+
+async function handleSubmit(data: UserData) {
+  const user = await userService.create(data)
+}
+</script>
+```
+</details>
+
+---
+
+### Exercice PAT.2 — Repository pattern
+
+Crée un repository pour les produits :
+
+```ts
+// repositories/productRepository.ts
+// Implémente : getAll, getById, create, update, delete
+
+export const productRepository = {
+  // ???
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+const API_URL = '/api/products'
+
+export const productRepository = {
+  async getAll(): Promise<Product[]> {
+    const res = await fetch(API_URL)
+    return res.json()
+  },
+
+  async getById(id: number): Promise<Product> {
+    const res = await fetch(`${API_URL}/${id}`)
+    return res.json()
+  },
+
+  async create(data: Omit<Product, 'id'>): Promise<Product> {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    return res.json()
+  },
+
+  async update(id: number, data: Partial<Product>): Promise<Product> {
+    const res = await fetch(`${API_URL}/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    return res.json()
+  },
+
+  async delete(id: number): Promise<void> {
+    await fetch(`${API_URL}/${id}`, { method: 'DELETE' })
+  }
+}
+```
+</details>
+
+---
+
+### Exercice PAT.3 — Value Object
+
+Crée un Value Object `Email` qui valide le format :
+
+```ts
+// domain/Email.ts
+export class Email {
+  // Le constructeur doit valider l'email
+  // Si invalide, il lève une erreur
+  // ???
+}
+
+// Utilisation attendue :
+const email = new Email('test@example.com')  // OK
+const bad = new Email('invalid')             // Erreur !
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+export class Email {
+  private readonly value: string
+
+  constructor(email: string) {
+    if (!this.isValid(email)) {
+      throw new Error(`Email invalide : ${email}`)
+    }
+    this.value = email.toLowerCase()
+  }
+
+  private isValid(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  }
+
+  toString(): string {
+    return this.value
+  }
+
+  equals(other: Email): boolean {
+    return this.value === other.value
+  }
+}
+```
+</details>
+
+---
+
 ## Suite
 
 → Module 05 : `cours/05-nuxt3/01-introduction.md`

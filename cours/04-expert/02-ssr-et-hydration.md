@@ -331,6 +331,100 @@ const { data: posts } = await useAsyncData(
 
 ---
 
+## 🎯 Pratique
+
+### Exercice SSR.1 — Identifier CSR vs SSR
+
+Pour chaque projet, indique si tu choisirais CSR, SSR ou SSG :
+
+1. Une application de gestion de stock interne (avec login)
+2. Un blog personnel avec articles
+3. Un site e-commerce avec prix dynamiques
+4. Une documentation technique
+5. Un dashboard analytics temps réel
+
+<details>
+<summary>Solution</summary>
+
+1. **CSR** — Application interne, pas de SEO nécessaire
+2. **SSG** — Contenu statique, SEO important
+3. **SSR** ou **ISR** — SEO crucial, contenu dynamique
+4. **SSG** (VitePress/Nuxt Content) — Contenu statique
+5. **CSR** — Dashboard privé, données temps réel
+</details>
+
+---
+
+### Exercice SSR.2 — Problème d'hydratation
+
+Ce code pose un problème d'hydratation. Trouve-le et corrige-le :
+
+```vue
+<script setup lang="ts">
+const currentTime = new Date().toLocaleTimeString()
+</script>
+
+<template>
+  <p>Heure actuelle : {{ currentTime }}</p>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+Le problème : l'heure côté serveur != l'heure côté client → mismatch d'hydratation.
+
+```vue
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+
+const currentTime = ref<string>('')
+
+// onMounted ne s'exécute que côté client
+onMounted(() => {
+  currentTime.value = new Date().toLocaleTimeString()
+})
+</script>
+
+<template>
+  <p v-if="currentTime">Heure actuelle : {{ currentTime }}</p>
+</template>
+```
+</details>
+
+---
+
+### Exercice SSR.3 — Vérifier côté client
+
+Tu veux utiliser `localStorage` qui n'existe que côté client. Comment faire ?
+
+```ts
+// Ce code crash côté serveur car window n'existe pas
+const theme = localStorage.getItem('theme')
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { ref, onMounted } from 'vue'
+
+const theme = ref<string>('light')
+
+onMounted(() => {
+  // onMounted = côté client uniquement
+  theme.value = localStorage.getItem('theme') || 'light'
+})
+
+// Alternative : vérifier si on est côté client
+if (typeof window !== 'undefined') {
+  const theme = localStorage.getItem('theme')
+}
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/04-expert/03-architecture-front.md`

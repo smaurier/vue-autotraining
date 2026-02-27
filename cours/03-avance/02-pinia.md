@@ -509,6 +509,229 @@ pinia.use(piniaPersistedState)   // "Pinia, utilise ce plugin pour sauvegarder l
 
 ---
 
+## 🎯 Pratique
+
+### Exercice PI.1 — Définir un store simple
+
+Crée un store `useCounterStore` avec Pinia :
+
+```ts
+// stores/counter.ts
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+
+export const useCounterStore = defineStore('counter', () => {
+  // State : un compteur qui commence à 0
+  // ???
+
+  // Getter : le double du compteur
+  // ???
+
+  // Actions : increment, decrement, reset
+  // ???
+
+  return { ??? }
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+
+export const useCounterStore = defineStore('counter', () => {
+  const count = ref(0)
+
+  const double = computed(() => count.value * 2)
+
+  function increment() {
+    count.value++
+  }
+
+  function decrement() {
+    count.value--
+  }
+
+  function reset() {
+    count.value = 0
+  }
+
+  return { count, double, increment, decrement, reset }
+})
+```
+</details>
+
+---
+
+### Exercice PI.2 — Utiliser le store dans un composant
+
+Complète ce composant pour utiliser le store créé :
+
+```vue
+<script setup lang="ts">
+// Importe et utilise le store
+// ???
+</script>
+
+<template>
+  <div>
+    <p>Compteur : {{ ??? }}</p>
+    <p>Double : {{ ??? }}</p>
+    <button @click="???">+1</button>
+    <button @click="???">-1</button>
+    <button @click="???">Reset</button>
+  </div>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<script setup lang="ts">
+import { useCounterStore } from '@/stores/counter'
+
+const counterStore = useCounterStore()
+</script>
+
+<template>
+  <div>
+    <p>Compteur : {{ counterStore.count }}</p>
+    <p>Double : {{ counterStore.double }}</p>
+    <button @click="counterStore.increment">+1</button>
+    <button @click="counterStore.decrement">-1</button>
+    <button @click="counterStore.reset">Reset</button>
+  </div>
+</template>
+```
+</details>
+
+---
+
+### Exercice PI.3 — Store avec state complexe
+
+Crée un store `useCartStore` pour gérer un panier d'achat :
+
+```ts
+// stores/cart.ts
+interface CartItem {
+  id: number
+  name: string
+  price: number
+  quantity: number
+}
+
+export const useCartStore = defineStore('cart', () => {
+  // State : tableau d'items
+  const items = ref<CartItem[]>([])
+
+  // Getter : total du panier (somme de price * quantity)
+  // ???
+
+  // Action : ajouter un item
+  function addItem(item: Omit<CartItem, 'quantity'>) {
+    // Si l'item existe déjà, augmente la quantité
+    // Sinon, ajoute-le avec quantity = 1
+    // ???
+  }
+
+  // Action : supprimer un item
+  function removeItem(id: number) {
+    // ???
+  }
+
+  return { items, total, addItem, removeItem }
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+
+interface CartItem {
+  id: number
+  name: string
+  price: number
+  quantity: number
+}
+
+export const useCartStore = defineStore('cart', () => {
+  const items = ref<CartItem[]>([])
+
+  const total = computed(() => {
+    return items.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  })
+
+  function addItem(item: Omit<CartItem, 'quantity'>) {
+    const existing = items.value.find(i => i.id === item.id)
+    if (existing) {
+      existing.quantity++
+    } else {
+      items.value.push({ ...item, quantity: 1 })
+    }
+  }
+
+  function removeItem(id: number) {
+    const index = items.value.findIndex(i => i.id === id)
+    if (index !== -1) {
+      items.value.splice(index, 1)
+    }
+  }
+
+  return { items, total, addItem, removeItem }
+})
+```
+</details>
+
+---
+
+### Exercice PI.4 — Store avec action async
+
+Ajoute une action async au store pour charger les données depuis une API :
+
+```ts
+export const useUsersStore = defineStore('users', () => {
+  const users = ref<User[]>([])
+  const isLoading = ref(false)
+  const error = ref<string | null>(null)
+
+  // Action async : charge les utilisateurs depuis /api/users
+  async function fetchUsers() {
+    // ???
+  }
+
+  return { users, isLoading, error, fetchUsers }
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+async function fetchUsers() {
+  isLoading.value = true
+  error.value = null
+
+  try {
+    const response = await fetch('/api/users')
+    if (!response.ok) throw new Error('Erreur serveur')
+    users.value = await response.json()
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Erreur inconnue'
+  } finally {
+    isLoading.value = false
+  }
+}
+```
+</details>
+
+---
+
 ## Exercice
 
 → `exercices/11-store-pinia/ENONCE.md`

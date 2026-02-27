@@ -442,6 +442,156 @@ onDeactivated(() => {
 
 ---
 
+## 🎯 Pratique
+
+### Exercice PF.1 — v-once
+
+Identifie où ajouter `v-once` dans ce template :
+
+```vue
+<template>
+  <div>
+    <!-- Ce titre ne changera jamais -->
+    <h1>Mon Application</h1>
+
+    <!-- Ce compteur change souvent -->
+    <p>Compteur : {{ count }}</p>
+
+    <!-- Cette liste de liens est statique -->
+    <ul>
+      <li v-for="link in links" :key="link.href">
+        <a :href="link.href">{{ link.label }}</a>
+      </li>
+    </ul>
+  </div>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<template>
+  <div>
+    <!-- v-once car ce titre ne changera jamais -->
+    <h1 v-once>Mon Application</h1>
+
+    <!-- Pas de v-once : ce compteur change -->
+    <p>Compteur : {{ count }}</p>
+
+    <!-- v-once car cette liste est statique -->
+    <ul v-once>
+      <li v-for="link in links" :key="link.href">
+        <a :href="link.href">{{ link.label }}</a>
+      </li>
+    </ul>
+  </div>
+</template>
+```
+</details>
+
+---
+
+### Exercice PF.2 — Lazy loading de route
+
+Transforme ces imports statiques en lazy loading :
+
+```ts
+// Avant : tout est chargé au démarrage
+import Home from '@/views/Home.vue'
+import Dashboard from '@/views/Dashboard.vue'
+import Settings from '@/views/Settings.vue'
+
+const routes = [
+  { path: '/', component: Home },
+  { path: '/dashboard', component: Dashboard },
+  { path: '/settings', component: Settings }
+]
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+// Après : chaque page est chargée seulement quand on y accède
+const routes = [
+  { path: '/', component: () => import('@/views/Home.vue') },
+  { path: '/dashboard', component: () => import('@/views/Dashboard.vue') },
+  { path: '/settings', component: () => import('@/views/Settings.vue') }
+]
+```
+</details>
+
+---
+
+### Exercice PF.3 — defineAsyncComponent
+
+Charge ce composant lourd de façon asynchrone avec un loading :
+
+```ts
+// ChartComponent est un gros composant de graphique (200KB)
+// Affiche "Chargement du graphique..." pendant le chargement
+
+const AsyncChart = ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { defineAsyncComponent } from 'vue'
+
+const AsyncChart = defineAsyncComponent({
+  loader: () => import('./ChartComponent.vue'),
+  loadingComponent: {
+    template: '<p>Chargement du graphique...</p>'
+  },
+  delay: 200
+})
+```
+</details>
+
+---
+
+### Exercice PF.4 — shallowRef
+
+Optimise ce code qui gère une grosse liste :
+
+```ts
+import { ref } from 'vue'
+
+// Cette liste peut contenir 10 000+ éléments
+// On ne modifie jamais les propriétés internes, on remplace la liste entière
+const bigList = ref<User[]>([])
+
+function updateList(newList: User[]) {
+  bigList.value = newList
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { shallowRef, triggerRef } from 'vue'
+
+const bigList = shallowRef<User[]>([])
+
+function updateList(newList: User[]) {
+  bigList.value = newList
+  // Pas besoin de triggerRef ici car on remplace la référence
+}
+
+// Si on modifie en place (rare), il faut notifier Vue :
+function addItem(item: User) {
+  bigList.value.push(item)
+  triggerRef(bigList)  // Force Vue à voir le changement
+}
+```
+</details>
+
+---
+
 ## Exercice
 
 → `exercices/13-performance-audit/ENONCE.md`

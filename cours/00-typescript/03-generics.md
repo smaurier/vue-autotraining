@@ -206,6 +206,44 @@ function premier<T>(tab: T[]): T { return tab[0] }
 
 > **Retiens :** Un générique = "le même code pour plusieurs types, **sans perdre la sécurité**"
 
+### 🎯 Pratique — Génériques simples
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 3.1 : Crée une fonction générique "dernier"
+// qui retourne le dernier élément d'un tableau
+function dernier<T>(tableau: ???): ??? {
+  return ???;
+}
+
+// Tests :
+dernier([1, 2, 3])              // doit retourner 3 (number)
+dernier(["a", "b", "c"])        // doit retourner "c" (string)
+
+// Exercice 3.2 : Crée une fonction "envelopper" qui met une valeur dans un tableau
+function envelopper<T>(valeur: ???): ??? {
+  return [valeur];
+}
+
+envelopper(42)       // doit retourner [42] de type number[]
+envelopper("hello")  // doit retourner ["hello"] de type string[]
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+function dernier<T>(tableau: T[]): T {
+  return tableau[tableau.length - 1];
+}
+
+function envelopper<T>(valeur: T): T[] {
+  return [valeur];
+}
+```
+</details>
+
 ---
 
 ## 🔒 Génériques avec contraintes (`extends`)
@@ -285,6 +323,50 @@ trouverParId([1, 2, 3], 1)
 ```
 
 > **Retiens :** `<T extends X>` veut dire "T doit être **au moins** de type X (et peut avoir plus)"
+
+### 🎯 Pratique — Contraintes extends
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 3.3 : Crée une fonction qui retourne le nom d'un objet
+// Contrainte : l'objet doit avoir une propriété "name"
+interface WithName {
+  name: string;
+}
+
+function getNom<T extends ???>(obj: T): string {
+  return obj.name;
+}
+
+// Tests :
+getNom({ name: "Alice", age: 25 })  // ✅ doit fonctionner
+getNom({ name: "Bob" })              // ✅ doit fonctionner  
+getNom({ title: "Test" })            // ❌ doit échouer (pas de "name")
+
+// Exercice 3.4 : Crée une fonction "comparer" pour des objets avec id
+interface WithId {
+  id: number;
+}
+
+function sontIdentiques<T extends ???>(a: T, b: T): boolean {
+  return ???;
+}
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+function getNom<T extends WithName>(obj: T): string {
+  return obj.name;
+}
+
+function sontIdentiques<T extends WithId>(a: T, b: T): boolean {
+  return a.id === b.id;
+}
+```
+</details>
 
 ---
 
@@ -384,6 +466,54 @@ const produit = await fetchApi<Produit>("/api/products/1")
 // produit.data est de type Produit ✅
 ```
 
+### 🎯 Pratique — Interfaces génériques
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 3.5 : Crée une interface générique "Boîte"
+interface Boite<T> {
+  contenu: T;
+  dateAjout: Date;
+}
+
+// Utilise-la pour créer :
+const boiteNombre: Boite<???> = { contenu: 42, dateAjout: new Date() };
+const boiteTexte: Boite<???> = { contenu: "hello", dateAjout: new Date() };
+
+// Exercice 3.6 : Crée une interface "Pagination" générique
+interface Pagination<T> {
+  items: ???;      // tableau d'éléments de type T
+  total: number;   // nombre total d'éléments
+  page: number;    // page actuelle
+}
+
+const pageUsers: Pagination<User> = {
+  // ??? complète
+};
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+const boiteNombre: Boite<number> = { contenu: 42, dateAjout: new Date() };
+const boiteTexte: Boite<string> = { contenu: "hello", dateAjout: new Date() };
+
+interface Pagination<T> {
+  items: T[];
+  total: number;
+  page: number;
+}
+
+const pageUsers: Pagination<User> = {
+  items: [{ id: 1, name: "Alice", email: "a@mail.com" }],
+  total: 100,
+  page: 1,
+};
+```
+</details>
+
 ---
 
 ## 📝 Génériques sur les types (`type`)
@@ -436,6 +566,44 @@ const echec: Resultat<Utilisateur> = {
   erreur: "Utilisateur non trouvé"           // ✅ L'erreur est un string
 }
 ```
+
+### 🎯 Pratique — Types génériques
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 3.7 : Crée un type "Maybe" qui peut être T ou null
+type Maybe<T> = ???;
+
+const utilisateur: Maybe<User> = { id: 1, name: "Alice" };  // ✅
+const pasDeUser: Maybe<User> = null;                         // ✅
+
+// Exercice 3.8 : Crée un type "AsyncState" pour un état de chargement
+type AsyncState<T> =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; data: ??? }
+  | { status: "error"; message: string };
+
+const etatChargement: AsyncState<Product[]> = {
+  status: "success",
+  data: [] // doit être Product[]
+};
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+type Maybe<T> = T | null;
+
+type AsyncState<T> =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; data: T }
+  | { status: "error"; message: string };
+```
+</details>
 
 ---
 
@@ -513,6 +681,55 @@ C'est comme une **machine à transformer** :
 - La machine produit du **jus** (type U = Jus)
 - La machine est la même, mais ce qui entre et ce qui sort sont de types différents !
 
+### 🎯 Pratique — Plusieurs génériques
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 3.9 : Crée une fonction "creerPaire" avec 2 génériques
+function creerPaire<T, U>(premier: ???, second: ???): [T, U] {
+  return [premier, second];
+}
+
+creerPaire("Alice", 25)    // doit retourner ["Alice", 25] de type [string, number]
+creerPaire(true, [1, 2])   // doit retourner [true, [1,2]] de type [boolean, number[]]
+
+// Exercice 3.10 : Crée une fonction "mapObject" 
+// qui transforme un objet { key: T } en { key: U }
+function mapObject<T, U>(
+  obj: Record<string, T>,
+  fn: (valeur: T) => U
+): Record<string, U> {
+  // ???
+}
+
+// Test:
+const prix = { pomme: 1.5, banane: 2.0 };
+const prixFormates = mapObject(prix, (p) => p + " €");
+// doit retourner { pomme: "1.5 €", banane: "2 €" }
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+function creerPaire<T, U>(premier: T, second: U): [T, U] {
+  return [premier, second];
+}
+
+function mapObject<T, U>(
+  obj: Record<string, T>,
+  fn: (valeur: T) => U
+): Record<string, U> {
+  const result: Record<string, U> = {};
+  for (const key in obj) {
+    result[key] = fn(obj[key]);
+  }
+  return result;
+}
+```
+</details>
+
 ---
 
 ## 🟢 Les génériques dans Vue 3
@@ -570,6 +787,39 @@ const user = ref<Utilisateur | null>(null)       // Ref<Utilisateur | null>
 const liste = ref<Produit[]>([])                 // Ref<Produit[]>
 const double = computed<number>(() => 2 * 2)     // ComputedRef<number>
 ```
+
+### 🎯 Pratique — Génériques Vue 3
+
+Dans `01-playground.ts` (syntaxe TS pure, sans Vue) :
+
+```ts
+// Exercice 3.11 : Simule le typage de ref
+interface Ref<T> {
+  value: T;
+}
+
+// Crée des "refs" typées
+const compteur: Ref<number> = { value: 0 };
+const utilisateur: Ref<??? | null> = { value: null }; // peut être User ou null
+const panier: Ref<???[]> = { value: [] };             // tableau de Product
+
+// Exercice 3.12 : Crée un type pour computed
+interface ComputedRef<T> {
+  readonly value: T;  // readonly = ne peut pas être modifié
+}
+
+const total: ComputedRef<number> = { value: 150 };
+// total.value = 200;  // ❌ doit échouer (readonly !)
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+const utilisateur: Ref<User | null> = { value: null };
+const panier: Ref<Product[]> = { value: [] };
+```
+</details>
 
 ---
 
@@ -670,6 +920,59 @@ const prefs = useLocalStorage("prefs", { langue: "fr", notifications: true })
 ```
 
 > **Le pouvoir des génériques :** Une **seule** fonction qui marche avec des strings, des tableaux, des objets... et TypeScript sait **toujours** quel type on manipule.
+
+### 🎯 Pratique — Composable générique
+
+Dans `01-playground.ts` :
+
+```ts
+// Exercice 3.13 : Crée un composable générique "useStack" (pile)
+// Une pile = on ajoute/retire des éléments par le dessus (LIFO)
+
+function useStack<T>(initial: T[] = []) {
+  const items: T[] = [...initial];
+  
+  return {
+    // push : ajoute un élément au sommet
+    push: (item: ???) => { items.push(item); },
+    
+    // pop : retire et retourne l'élément du sommet
+    pop: (): ??? => items.pop(),
+    
+    // peek : regarde l'élément du sommet sans le retirer
+    peek: (): ??? => items[items.length - 1],
+    
+    // size : nombre d'éléments
+    size: () => items.length,
+  };
+}
+
+// Tests :
+const pileNombres = useStack<number>();
+pileNombres.push(1);
+pileNombres.push(2);
+console.log(pileNombres.pop());  // 2
+
+const pileUsers = useStack<User>();
+pileUsers.push({ id: 1, name: "Alice" });
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+function useStack<T>(initial: T[] = []) {
+  const items: T[] = [...initial];
+  
+  return {
+    push: (item: T) => { items.push(item); },
+    pop: (): T | undefined => items.pop(),
+    peek: (): T | undefined => items[items.length - 1],
+    size: () => items.length,
+  };
+}
+```
+</details>
 
 ---
 

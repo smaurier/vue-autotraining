@@ -357,6 +357,147 @@ export default defineNuxtRouteMiddleware((to) => {
 
 ---
 
+## 🎯 Pratique
+
+### Exercice NXP.1 — Créer des pages
+
+Crée la structure de fichiers pour ces routes :
+- `/` → Page d'accueil
+- `/about` → Page "À propos"
+- `/products` → Liste des produits
+- `/products/42` → Détail du produit 42
+
+<details>
+<summary>Solution</summary>
+
+```
+pages/
+  index.vue         ← /
+  about.vue         ← /about
+  products/
+    index.vue       ← /products
+    [id].vue        ← /products/42 (ou tout autre id)
+```
+</details>
+
+---
+
+### Exercice NXP.2 — Route dynamique
+
+Complète cette page pour afficher le détail d'un produit :
+
+```vue
+<!-- pages/products/[id].vue -->
+<script setup lang="ts">
+// Récupère l'id depuis l'URL
+const ??? = ???
+</script>
+
+<template>
+  <h1>Produit n°{{ ??? }}</h1>
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<script setup lang="ts">
+const route = useRoute()
+const id = route.params.id
+</script>
+
+<template>
+  <h1>Produit n°{{ id }}</h1>
+</template>
+```
+</details>
+
+---
+
+### Exercice NXP.3 — Layout
+
+Crée un layout `admin` avec un menu latéral :
+
+```vue
+<!-- layouts/admin.vue -->
+<template>
+  <!-- Menu latéral + slot pour le contenu -->
+  <!-- ??? -->
+</template>
+```
+
+Et applique-le à une page :
+
+```vue
+<!-- pages/admin/index.vue -->
+<script setup lang="ts">
+// Utilise le layout "admin"
+// ???
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<!-- layouts/admin.vue -->
+<template>
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <nav>
+        <NuxtLink to="/admin">Dashboard</NuxtLink>
+        <NuxtLink to="/admin/users">Utilisateurs</NuxtLink>
+      </nav>
+    </aside>
+    <main class="content">
+      <slot />
+    </main>
+  </div>
+</template>
+```
+
+```vue
+<!-- pages/admin/index.vue -->
+<script setup lang="ts">
+definePageMeta({
+  layout: 'admin'
+})
+</script>
+```
+</details>
+
+---
+
+### Exercice NXP.4 — Middleware
+
+Crée un middleware qui redirige vers `/login` si l'utilisateur n'est pas connecté :
+
+```ts
+// middleware/auth.ts
+export default defineNuxtRouteMiddleware((to, from) => {
+  // Vérifie si l'utilisateur est connecté
+  // Sinon redirige vers /login
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+export default defineNuxtRouteMiddleware((to, from) => {
+  const { isAuthenticated } = useAuth()
+
+  if (!isAuthenticated.value && to.path !== '/login') {
+    return navigateTo('/login')
+  }
+})
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/05-nuxt3/03-data-fetching.md`

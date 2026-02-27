@@ -356,6 +356,130 @@ Si tu débutes, voici l'ordre recommandé :
 | **Logging** | Journal de bord de ton app (qui, quand, quoi, erreur ou pas) |
 | **p95** | 95% des requêtes sont plus rapides que cette valeur |
 
+---
+
+## 🎯 Pratique
+
+### Exercice MON.1 — Intégrer Sentry
+
+Complète l'intégration de Sentry dans une app Vue :
+
+```ts
+// main.ts
+import * as Sentry from '@sentry/vue'
+
+const app = createApp(App)
+
+// Initialise Sentry
+Sentry.init({
+  app,
+  // DSN : l'adresse où envoyer les erreurs
+  // ???
+  
+  // environnement : production, staging...
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+Sentry.init({
+  app,
+  dsn: import.meta.env.VITE_SENTRY_DSN,
+  environment: import.meta.env.MODE,
+  integrations: [
+    Sentry.browserTracingIntegration(),
+  ],
+  tracesSampleRate: 0.1  // 10% des requêtes tracées
+})
+```
+</details>
+
+---
+
+### Exercice MON.2 — Error Boundary
+
+Crée un composant ErrorBoundary qui capture les erreurs de ses enfants :
+
+```vue
+<!-- ErrorBoundary.vue -->
+<script setup lang="ts">
+import { ref, onErrorCaptured } from 'vue'
+
+const hasError = ref(false)
+const errorMessage = ref('')
+
+// Capture les erreurs des composants enfants
+// ???
+</script>
+
+<template>
+  <div v-if="hasError" class="error">
+    <p>Une erreur est survenue : {{ errorMessage }}</p>
+    <button @click="hasError = false">Réessayer</button>
+  </div>
+  <slot v-else />
+</template>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<script setup lang="ts">
+import { ref, onErrorCaptured } from 'vue'
+
+const hasError = ref(false)
+const errorMessage = ref('')
+
+onErrorCaptured((error) => {
+  hasError.value = true
+  errorMessage.value = error.message
+  return false  // empêche la propagation
+})
+</script>
+```
+</details>
+
+---
+
+### Exercice MON.3 — Web Vitals
+
+Intègre la mesure des Web Vitals :
+
+```ts
+import { onLCP, onFID, onCLS } from 'web-vitals'
+
+// Envoie les métriques à ton service d'analytics
+function sendToAnalytics(metric: { name: string; value: number }) {
+  // ???
+}
+
+// Mesure les 3 Core Web Vitals
+// ???
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { onLCP, onFID, onCLS } from 'web-vitals'
+
+function sendToAnalytics(metric: { name: string; value: number }) {
+  console.log(`[Web Vitals] ${metric.name}: ${metric.value}`)
+  // En production : envoyer à Google Analytics, Sentry, etc.
+}
+
+onLCP(sendToAnalytics)
+onFID(sendToAnalytics)
+onCLS(sendToAnalytics)
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/08-api-typees/01-graphql-vue3.md`

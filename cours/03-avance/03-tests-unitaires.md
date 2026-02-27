@@ -494,6 +494,240 @@ Tous les tests ne se valent pas. On les organise en pyramide :
 | **expect** | Vérifie qu'une valeur est correcte |
 | **Mock** | Fausse version d'une fonction/module pour les tests |
 
+---
+
+## 🎯 Pratique
+
+### Exercice TU.1 — Premier test
+
+Écris un test pour cette fonction :
+
+```ts
+// utils/math.ts
+export function add(a: number, b: number): number {
+  return a + b
+}
+```
+
+```ts
+// __tests__/math.spec.ts
+import { describe, it, expect } from 'vitest'
+import { add } from '../utils/math'
+
+describe('add', () => {
+  // Vérifie que 2 + 3 = 5
+  // ???
+
+  // Vérifie que -1 + 1 = 0
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { describe, it, expect } from 'vitest'
+import { add } from '../utils/math'
+
+describe('add', () => {
+  it('additionne deux nombres positifs', () => {
+    expect(add(2, 3)).toBe(5)
+  })
+
+  it('gère les nombres négatifs', () => {
+    expect(add(-1, 1)).toBe(0)
+  })
+})
+```
+</details>
+
+---
+
+### Exercice TU.2 — Tester un composable
+
+Écris un test pour ce composable :
+
+```ts
+// composables/useCounter.ts
+import { ref } from 'vue'
+
+export function useCounter(initial = 0) {
+  const count = ref(initial)
+  const increment = () => count.value++
+  const decrement = () => count.value--
+  return { count, increment, decrement }
+}
+```
+
+```ts
+// __tests__/useCounter.spec.ts
+import { describe, it, expect } from 'vitest'
+import { useCounter } from '../composables/useCounter'
+
+describe('useCounter', () => {
+  // Vérifie que count commence à 0 par défaut
+  // ???
+
+  // Vérifie que count commence à la valeur initiale
+  // ???
+
+  // Vérifie que increment augmente count de 1
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { describe, it, expect } from 'vitest'
+import { useCounter } from '../composables/useCounter'
+
+describe('useCounter', () => {
+  it('commence à 0 par défaut', () => {
+    const { count } = useCounter()
+    expect(count.value).toBe(0)
+  })
+
+  it('commence à la valeur initiale', () => {
+    const { count } = useCounter(10)
+    expect(count.value).toBe(10)
+  })
+
+  it('increment augmente count de 1', () => {
+    const { count, increment } = useCounter()
+    increment()
+    expect(count.value).toBe(1)
+  })
+})
+```
+</details>
+
+---
+
+### Exercice TU.3 — Mock une fonction
+
+Complète ce test en mockant la fonction `fetchUser` :
+
+```ts
+// services/user.ts
+export async function fetchUser(id: number) {
+  const res = await fetch(`/api/users/${id}`)
+  return res.json()
+}
+
+export async function getUserName(id: number) {
+  const user = await fetchUser(id)
+  return user.name
+}
+```
+
+```ts
+// __tests__/user.spec.ts
+import { describe, it, expect, vi } from 'vitest'
+import { getUserName } from '../services/user'
+
+// Mock le module services/user
+vi.mock('../services/user', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    fetchUser: vi.fn()  // On remplace fetchUser par un mock
+  }
+})
+
+import { fetchUser } from '../services/user'
+
+describe('getUserName', () => {
+  it('retourne le nom de l\'utilisateur', async () => {
+    // Configure le mock pour retourner { name: 'Alice' }
+    // ???
+
+    const name = await getUserName(1)
+    expect(name).toBe('Alice')
+  })
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+describe('getUserName', () => {
+  it('retourne le nom de l\'utilisateur', async () => {
+    vi.mocked(fetchUser).mockResolvedValue({ name: 'Alice' })
+
+    const name = await getUserName(1)
+    expect(name).toBe('Alice')
+  })
+})
+```
+</details>
+
+---
+
+### Exercice TU.4 — Test avec beforeEach
+
+Organise ces tests avec un `beforeEach` pour éviter la répétition :
+
+```ts
+describe('useCounter', () => {
+  it('increment fonctionne', () => {
+    const { count, increment } = useCounter()
+    increment()
+    expect(count.value).toBe(1)
+  })
+
+  it('decrement fonctionne', () => {
+    const { count, decrement } = useCounter()
+    decrement()
+    expect(count.value).toBe(-1)
+  })
+
+  it('double increment fonctionne', () => {
+    const { count, increment } = useCounter()
+    increment()
+    increment()
+    expect(count.value).toBe(2)
+  })
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+import { beforeEach, describe, it, expect } from 'vitest'
+
+describe('useCounter', () => {
+  let counter: ReturnType<typeof useCounter>
+
+  beforeEach(() => {
+    counter = useCounter()
+  })
+
+  it('increment fonctionne', () => {
+    counter.increment()
+    expect(counter.count.value).toBe(1)
+  })
+
+  it('decrement fonctionne', () => {
+    counter.decrement()
+    expect(counter.count.value).toBe(-1)
+  })
+
+  it('double increment fonctionne', () => {
+    counter.increment()
+    counter.increment()
+    expect(counter.count.value).toBe(2)
+  })
+})
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/03-avance/04-tests-composants.md`

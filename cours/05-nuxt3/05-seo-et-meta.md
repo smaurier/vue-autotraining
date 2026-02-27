@@ -317,6 +317,107 @@ pnpm generate
 
 ---
 
+## 🎯 Pratique
+
+### Exercice SEO.1 — Meta basique
+
+Configure les meta d'une page produit :
+
+```vue
+<!-- pages/products/[id].vue -->
+<script setup lang="ts">
+const route = useRoute()
+const { data: product } = await useFetch(`/api/products/${route.params.id}`)
+
+// Configure le titre et la description dynamiquement
+// ???
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<script setup lang="ts">
+const route = useRoute()
+const { data: product } = await useFetch(`/api/products/${route.params.id}`)
+
+useHead({
+  title: () => product.value?.name || 'Produit',
+  meta: [
+    { name: 'description', content: () => product.value?.description || '' }
+  ]
+})
+</script>
+```
+</details>
+
+---
+
+### Exercice SEO.2 — Open Graph
+
+Ajoute les balises Open Graph pour le partage social :
+
+```ts
+// Configure og:title, og:description et og:image
+useSeoMeta({
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+useSeoMeta({
+  title: product.value?.name,
+  ogTitle: product.value?.name,
+  description: product.value?.description,
+  ogDescription: product.value?.description,
+  ogImage: product.value?.image,
+  twitterCard: 'summary_large_image'
+})
+```
+</details>
+
+---
+
+### Exercice SEO.3 — URL canonique
+
+Définis l'URL canonique d'une page :
+
+```vue
+<script setup lang="ts">
+const config = useRuntimeConfig()
+const route = useRoute()
+
+// Définis l'URL canonique
+// ???
+</script>
+```
+
+<details>
+<summary>Solution</summary>
+
+```vue
+<script setup lang="ts">
+const config = useRuntimeConfig()
+const route = useRoute()
+
+useHead({
+  link: [
+    {
+      rel: 'canonical',
+      href: `${config.public.siteUrl}${route.path}`
+    }
+  ]
+})
+</script>
+```
+</details>
+
+---
+
 ## Exercice
 
 → `exercices/14-nuxt-blog/ENONCE.md`

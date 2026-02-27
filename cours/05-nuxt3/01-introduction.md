@@ -280,6 +280,97 @@ export default defineNuxtConfig({
 
 ---
 
+## 🎯 Pratique
+
+### Exercice NX.1 — Structure Nuxt
+
+Où placerais-tu ces fichiers dans un projet Nuxt ?
+
+1. La page d'accueil du site
+2. Un composant `Button.vue` réutilisable
+3. Un composable `useAuth.ts`
+4. Une route API qui retourne des produits
+5. Le layout principal (header + footer)
+
+<details>
+<summary>Solution</summary>
+
+```
+1. pages/index.vue
+2. components/Button.vue
+3. composables/useAuth.ts
+4. server/api/products.get.ts
+5. layouts/default.vue
+```
+</details>
+
+---
+
+### Exercice NX.2 — Configuration Nuxt
+
+Complète cette configuration nuxt.config.ts :
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  // Active le mode SSR
+  // ???
+
+  // Configure une variable runtime publique API_URL
+  // ???
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+export default defineNuxtConfig({
+  ssr: true,
+
+  runtimeConfig: {
+    public: {
+      apiUrl: process.env.API_URL || '/api'
+    }
+  }
+})
+```
+</details>
+
+---
+
+### Exercice NX.3 — Mode de rendu
+
+Configure les routes suivantes avec le mode de rendu approprié :
+- `/` : pré-rendue (SSG)
+- `/dashboard/**` : côté client uniquement (SPA)
+- `/blog/**` : regénérée toutes les heures (ISR)
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  routeRules: {
+    // ???
+  }
+})
+```
+
+<details>
+<summary>Solution</summary>
+
+```ts
+export default defineNuxtConfig({
+  routeRules: {
+    '/': { prerender: true },
+    '/dashboard/**': { ssr: false },
+    '/blog/**': { isr: 3600 }
+  }
+})
+```
+</details>
+
+---
+
 ## Suite
 
 → `cours/05-nuxt3/02-pages-et-layouts.md`
