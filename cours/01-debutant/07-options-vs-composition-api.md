@@ -70,7 +70,7 @@ au moins **reconnaître** l'Options API même si on code en Composition API.
 > En JavaScript, **`this`** est un mot-clé spécial qui fait référence à
 > **l'objet courant** — celui "dans lequel" tu te trouves.
 >
-> ```js
+> ```ts
 > const personne = {
 >   nom: 'Alice',
 >   direBonjour() {

@@ -49,9 +49,9 @@ Quand tu cliques sur "Envoyer", **la page se recharge complètement**. Le naviga
 
 En JavaScript classique :
 
-```js
+```ts
 // L'événement "submit" se déclenche quand on clique sur le bouton d'envoi
-formulaire.addEventListener("submit", function (event) {
+formulaire.addEventListener("submit", function (event: SubmitEvent) {
   event.preventDefault(); // ← EMPÊCHE le rechargement de la page
   // Maintenant on peut gérer l'envoi nous-mêmes
 });
@@ -218,9 +218,9 @@ Une **regex** (expression régulière), c'est un **motif de recherche** — une 
 
 **Analogie** : c'est comme un gabarit de forme. Tu as un moule en forme d'étoile et tu vérifies si un biscuit correspond à cette forme.
 
-```js
+```ts
 // Une regex se met entre deux / (slashes)
-const motif = /bonjour/;
+const motif: RegExp = /bonjour/;
 
 // .test() vérifie si le texte correspond au motif
 motif.test("bonjour le monde");  // true  (le mot "bonjour" est dedans)
@@ -229,9 +229,9 @@ motif.test("au revoir");          // false (pas de "bonjour" dedans)
 
 ### Les regex les plus courantes en validation
 
-```js
+```ts
 // Vérifier un email : "quelquechose @ quelquechose . quelquechose"
-const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const regexEmail: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // ^         = début du texte
 // [^\s@]+   = un ou plusieurs caractères qui ne sont ni un espace ni un @
 // @         = le symbole @
@@ -242,7 +242,7 @@ regexEmail.test("jean@email.com");   // true ✅
 regexEmail.test("pas un email");      // false ❌
 
 // Vérifier un numéro de téléphone français : 10 chiffres commençant par 0
-const regexTel = /^0[1-9]\d{8}$/;
+const regexTel: RegExp = /^0[1-9]\d{8}$/;
 // ^0        = commence par 0
 // [1-9]     = suivi d'un chiffre entre 1 et 9
 // \d{8}     = suivi de exactement 8 chiffres

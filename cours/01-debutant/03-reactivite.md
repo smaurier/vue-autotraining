@@ -40,9 +40,9 @@ Sans réactivité, tu devrais manuellement dire au navigateur "hey, la donnée a
 > **📖 Rappel JavaScript — Les objets**
 >
 > En JavaScript, un objet c'est un "sac" de propriétés :
-> ```js
+> ```ts
 > // Un objet simple avec deux propriétés
-> const personne = {
+> const personne: { nom: string; age: number } = {
 >   nom: "Alice",   // propriété "nom" qui vaut "Alice"
 >   age: 25         // propriété "age" qui vaut 25
 > };
@@ -68,9 +68,9 @@ Imagine un **chien de garde invisible** devant ta boîte aux lettres :
 > **📖 Rappel JavaScript — Les variables**
 >
 > En JS moderne, on déclare des variables avec `const` ou `let` :
-> ```js
-> const nom = "Alice";  // const = ne peut PAS être réassigné (on ne peut pas faire nom = "Bob")
-> let age = 25;         // let = PEUT être réassigné (age = 26 → OK)
+> ```ts
+> const nom: string = "Alice";  // const = ne peut PAS être réassigné (on ne peut pas faire nom = "Bob")
+> let age: number = 25;         // let = PEUT être réassigné (age = 26 → OK)
 > ```
 > Mais même avec `const`, si c'est un objet, on peut modifier ses propriétés internes.
 
@@ -102,10 +102,10 @@ C'est LA question que tout le monde se pose. Voici l'explication simple :
 
 En JavaScript, les types simples (`number`, `string`, `boolean`) sont des **valeurs brutes**. On ne peut pas "surveiller" une valeur brute :
 
-```js
-// JavaScript normal (PAS Vue)
-let compteur = 0  // juste un nombre tout nu
-compteur = 5      // JavaScript ne peut pas "savoir" que ça a changé
+```ts
+// TypeScript normal (PAS Vue)
+let compteur: number = 0  // juste un nombre tout nu
+compteur = 5      // TypeScript ne peut pas "savoir" que ça a changé
                    // Il n'y a aucun mécanisme de surveillance possible
 ```
 
@@ -324,12 +324,12 @@ state.count = 1
 > **📖 Rappel JavaScript — Le destructuring (décomposition)**
 >
 > Le destructuring permet d'**extraire** des valeurs d'un objet vers des variables séparées :
-> ```js
-> const personne = { nom: 'Alice', age: 25 }
+> ```ts
+> const personne: { nom: string; age: number } = { nom: 'Alice', age: 25 }
 >
 > // Sans destructuring (classique) :
-> const nom = personne.nom   // nom = 'Alice'
-> const age = personne.age   // age = 25
+> const nom: string = personne.nom   // nom = 'Alice'
+> const age: number = personne.age   // age = 25
 >
 > // Avec destructuring (raccourci) :
 > const { nom, age } = personne  // fait la même chose en une ligne !
@@ -523,14 +523,14 @@ const nomComplet = computed<string>(() => {
 > **📖 Rappel JavaScript — Les fonctions**
 >
 > Une fonction est un bloc de code réutilisable :
-> ```js
+> ```ts
 > // Déclarer une fonction
-> function additionner(a, b) {
+> function additionner(a: number, b: number): number {
 >   return a + b  // return = "renvoie ce résultat"
 > }
 >
 > // Appeler la fonction
-> const resultat = additionner(3, 5) // → 8
+> const resultat: number = additionner(3, 5) // → 8
 > ```
 
 Voici la différence entre `computed` et une simple fonction :

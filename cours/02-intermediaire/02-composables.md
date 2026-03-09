@@ -30,19 +30,25 @@ Au lieu de copier-coller le même code dans 5 composants différents, tu le mets
 
 Un composable est une **fonction qui retourne un objet**. Revoyons comment ça marche en JavaScript pur :
 
-```js
-// En JavaScript, une fonction peut retourner un objet
+```ts
+// En TypeScript, une fonction peut retourner un objet
 // Un objet, c'est un "sac" qui contient des valeurs et des fonctions
 
-function createCounter() {
-  let count = 0;                       // Une variable interne
+interface Counter {
+  count: number;
+  increment: () => void;
+  reset: () => void;
+}
 
-  function increment() {               // Une fonction interne
+function createCounter(): Counter {
+  let count: number = 0;                       // Une variable interne
+
+  function increment(): void {               // Une fonction interne
     count++;
     console.log("count =", count);
   }
 
-  function reset() {                   // Une autre fonction interne
+  function reset(): void {                   // Une autre fonction interne
     count = 0;
     console.log("count remis à 0");
   }
@@ -52,7 +58,7 @@ function createCounter() {
 }
 
 // Utilisation :
-const counter = createCounter();       // On appelle la fonction
+const counter: Counter = createCounter();       // On appelle la fonction
 counter.increment();                   // count = 1
 counter.increment();                   // count = 2
 counter.reset();                       // count remis à 0
@@ -60,9 +66,9 @@ counter.reset();                       // count remis à 0
 
 ### 📌 Rappel JavaScript : la déstructuration d'objet
 
-```js
+```ts
 // Au lieu de récupérer tout l'objet...
-const counter = createCounter();
+const counter: Counter = createCounter();
 counter.increment();
 
 // ...on peut extraire directement les propriétés qu'on veut
@@ -220,7 +226,7 @@ const { count, increment, decrement, reset, canIncrement, canDecrement } = useCo
 
 ### 📌 Rappel JavaScript : les événements du navigateur
 
-```js
+```ts
 // Le navigateur peut écouter des événements (clic, redimensionnement, etc.)
 
 // addEventListener = "quand cet événement arrive, exécute cette fonction"
@@ -290,14 +296,14 @@ const { width, height } = useWindowSize();
 
 ### 📌 Rappel JavaScript : `setTimeout` et le concept de "debounce"
 
-```js
+```ts
 // setTimeout exécute une fonction APRÈS un délai
 setTimeout(() => {
   console.log("Exécuté après 500ms");
 }, 500);
 
 // clearTimeout ANNULE un setTimeout avant qu'il s'exécute
-const timer = setTimeout(() => console.log("..."), 500);
+const timer: ReturnType<typeof setTimeout> = setTimeout(() => console.log("..."), 500);
 clearTimeout(timer); // Annulé ! Le console.log ne s'exécutera jamais.
 
 // Le "debounce" c'est : "attend que l'utilisateur ait FINI de taper
@@ -361,16 +367,16 @@ const debouncedSearch = useDebounce(search, 500);    // Version "retardée" (500
 
 ### 📌 Rappel JavaScript : `async` / `await` et `try` / `catch`
 
-```js
+```ts
 // async/await permet d'écrire du code asynchrone (qui attend des réponses)
 
-async function chargerDonnees() {
+async function chargerDonnees(): Promise<void> {
   try {
     // try = "essaie d'exécuter ce code"
-    const response = await fetch("/api/users"); // Envoie une requête HTTP
-    const data = await response.json();         // Convertit la réponse en objet JS
-    console.log(data);                          // Affiche les données
-  } catch (err) {
+    const response: Response = await fetch("/api/users"); // Envoie une requête HTTP
+    const data: unknown = await response.json();          // Convertit la réponse en objet
+    console.log(data);                                    // Affiche les données
+  } catch (err: unknown) {
     // catch = "si ça échoue, exécute ce code"
     console.error("Erreur :", err);             // Affiche l'erreur
   }

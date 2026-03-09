@@ -61,9 +61,9 @@ Une **directive** est un attribut spécial qu'on ajoute sur une balise HTML. Tou
 
 En JavaScript, on utilise `if` / `else` pour exécuter du code selon une condition :
 
-```js
+```ts
 // On déclare une variable
-const age = 20
+const age: number = 20
 
 // Si age est supérieur ou égal à 18...
 if (age >= 18) {
@@ -256,19 +256,19 @@ const menuOuvert = ref(false)
 
 En JavaScript, quand on veut **faire la même chose pour chaque élément** d'une liste, on utilise une boucle.
 
-```js
+```ts
 // Un tableau (array) = une liste d'éléments
-const fruits = ['Pomme', 'Banane', 'Cerise']
+const fruits: string[] = ['Pomme', 'Banane', 'Cerise']
 
 // === Boucle for classique ===
 // i commence à 0, augmente de 1 à chaque tour, s'arrête quand i atteint la taille du tableau
-for (let i = 0; i < fruits.length; i++) {
+for (let i: number = 0; i < fruits.length; i++) {
   console.log(fruits[i])  // Affiche : Pomme, puis Banane, puis Cerise
 }
 
 // === forEach (plus moderne, plus lisible) ===
 // Pour chaque fruit dans le tableau, on exécute cette fonction
-fruits.forEach((fruit) => {
+fruits.forEach((fruit: string) => {
   console.log(fruit)  // Affiche : Pomme, puis Banane, puis Cerise
 })
 ```
@@ -726,10 +726,10 @@ Exemples d'événements :
 
 En JavaScript pur, on écoute un événement comme ça :
 
-```js
+```ts
 // On dit au navigateur : "Quand on clique sur ce bouton, exécute cette fonction"
-const bouton = document.querySelector('#monBouton')
-bouton.addEventListener('click', () => {
+const bouton: HTMLElement | null = document.querySelector('#monBouton')
+bouton?.addEventListener('click', () => {
   console.log('Le bouton a été cliqué !')
 })
 ```
