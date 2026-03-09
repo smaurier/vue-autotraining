@@ -18,11 +18,11 @@
 >
 > En JavaScript classique, on manipulait le DOM à la main :
 >
-> ```js
+> ```ts
 > // On cherche l'élément dans la maison (le DOM)
-> const titre = document.getElementById("mon-titre");
+> const titre: HTMLElement | null = document.getElementById("mon-titre");
 > // On change son contenu
-> titre.textContent = "Nouveau titre";
+> if (titre) titre.textContent = "Nouveau titre";
 > ```
 >
 > Avec Vue, **tu n'as plus besoin de faire ça manuellement** : Vue s'occupe de mettre à jour le DOM pour toi quand tes données changent. C'est ça la « réactivité ».
@@ -284,8 +284,8 @@ createApp(App).mount("#app");
 >
 > En JavaScript, pour insérer une variable dans du texte, on utilise les backticks :
 >
-> ```js
-> const nom = "Alice";
+> ```ts
+> const nom: string = "Alice";
 > console.log(`Bonjour ${nom}`); // Affiche : Bonjour Alice
 > ```
 >

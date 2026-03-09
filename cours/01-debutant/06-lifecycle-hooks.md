@@ -155,10 +155,10 @@ Son rôle principal : **nettoyer** ce qu'on a mis en place dans `onMounted`.
 
 #### Rappel JavaScript : `setInterval` et `clearInterval`
 
-> ```js
+> ```ts
 > // setInterval = répéter une action toutes les X millisecondes
 > // Ici, on affiche "tic" toutes les 1000ms (= 1 seconde)
-> const id = setInterval(() => {
+> const id: ReturnType<typeof setInterval> = setInterval(() => {
 >   console.log('tic')
 > }, 1000)
 >
@@ -265,11 +265,11 @@ On retrouve **très souvent** ce schéma en 2 temps :
 
 #### Rappel JavaScript : `addEventListener` et `removeEventListener`
 
-> ```js
+> ```ts
 > // addEventListener = dire au navigateur :
 > // "Quand CET ÉVÉNEMENT arrive, exécute CETTE FONCTION"
 >
-> function direBonjour() {
+> function direBonjour(): void {
 >   console.log('Bonjour !')
 > }
 >

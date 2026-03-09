@@ -91,11 +91,11 @@ C'est une question **très importante** pour la sécurité. Voyons les options :
 
 > 💡 **Rappel — C'est quoi `localStorage` ?**
 > C'est un petit espace de stockage dans ton navigateur. Tu peux y mettre des données :
-> ```js
+> ```ts
 > // Sauvegarder une valeur
 > localStorage.setItem('nom', 'Alice')   // on stocke 'Alice' sous la clé 'nom'
 > // Lire une valeur
-> localStorage.getItem('nom')             // retourne 'Alice'
+> const nom: string | null = localStorage.getItem('nom')             // retourne 'Alice'
 > // Supprimer
 > localStorage.removeItem('nom')
 > ```

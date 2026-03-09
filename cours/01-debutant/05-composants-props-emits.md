@@ -46,38 +46,38 @@ Avant de créer des composants, il faut comprendre comment JavaScript partage du
 
 ### Exporter → rendre quelque chose disponible depuis un fichier
 
-```js
-// fichier : mathUtils.js
+```ts
+// fichier : mathUtils.ts
 
 // 'export' = "je rends cette fonction disponible pour les autres fichiers"
-export function addition(a, b) {
+export function addition(a: number, b: number): number {
   return a + b
 }
 
 // 'export default' = "c'est l'export principal de ce fichier"
 // Un fichier ne peut avoir qu'UN SEUL export default
-export default function multiplication(a, b) {
+export default function multiplication(a: number, b: number): number {
   return a * b
 }
 ```
 
 ### Importer → récupérer quelque chose depuis un autre fichier
 
-```js
-// fichier : app.js
+```ts
+// fichier : app.ts
 
 // Import d'un export nommé → on met des accolades { }
-import { addition } from './mathUtils.js'
+import { addition } from './mathUtils'
 
 // Import d'un export default → pas d'accolades, on choisit le nom qu'on veut
-import multiplication from './mathUtils.js'
+import multiplication from './mathUtils'
 
 console.log(addition(2, 3))       // 5
 console.log(multiplication(2, 3)) // 6
 ```
 
 > 💡 En Vue, chaque fichier `.vue` est un **export default** (le composant entier). C'est pour ça qu'on l'importe sans accolades :
-> ```js
+> ```ts
 > import UserCard from './components/UserCard.vue'  // pas de { }
 > ```
 

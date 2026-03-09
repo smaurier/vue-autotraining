@@ -28,12 +28,12 @@ Exemples d'événements du quotidien :
 
 En JavaScript pur (sans Vue), tu écoutes les événements comme ça :
 
-```js
+```ts
 // 1. On récupère le bouton dans le HTML
-const bouton = document.querySelector('#monBouton')
+const bouton: HTMLElement | null = document.querySelector('#monBouton')
 
 // 2. On lui dit : "quand quelqu'un clique sur toi, exécute cette fonction"
-bouton.addEventListener('click', function(event) {
+bouton?.addEventListener('click', function(event: MouseEvent) {
   // 'event' est un objet qui contient les détails de ce qui s'est passé
   // Par exemple : où était la souris au moment du clic
   console.log('Le bouton a été cliqué !')
@@ -123,8 +123,8 @@ function handleAction(id: number, event: MouseEvent): void {
 ```
 
 > 💡 **Rappel arrow function** : `(e) => handleAction(item.id, e)` est une façon courte d'écrire :
-> ```js
-> function(e) { handleAction(item.id, e) }
+> ```ts
+> function(e: Event) { handleAction(item.id, e) }
 > ```
 
 ---
@@ -221,17 +221,17 @@ Avant de voir `v-model`, rappelons comment les formulaires fonctionnent en HTML 
 </form>
 ```
 
-```js
-// En JavaScript pur, pour afficher ce que l'utilisateur tape :
-const champ = document.querySelector('#champNom')     // 1. Récupérer l'input
-const affichage = document.querySelector('#affichage') // 2. Récupérer le <p>
+```ts
+// En TypeScript pur, pour afficher ce que l'utilisateur tape :
+const champ: HTMLInputElement | null = document.querySelector('#champNom')     // 1. Récupérer l'input
+const affichage: HTMLElement | null = document.querySelector('#affichage') // 2. Récupérer le <p>
 
 // 3. Écouter chaque frappe au clavier dans le champ
-champ.addEventListener('input', function(event) {
+champ?.addEventListener('input', function(event: Event) {
   // 4. Récupérer la valeur actuelle du champ
-  const valeur = event.target.value
+  const valeur: string = (event.target as HTMLInputElement).value
   // 5. L'afficher dans le <p>
-  affichage.textContent = 'Tu as tapé : ' + valeur
+  if (affichage) affichage.textContent = 'Tu as tapé : ' + valeur
 })
 ```
 

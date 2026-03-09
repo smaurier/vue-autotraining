@@ -152,18 +152,20 @@ Imagine un composant comme une **pièce fermée** contenant des objets (des donn
 
 Avant de voir le code, un rappel important. En JavaScript, on peut **extraire des propriétés d'un objet** directement :
 
-```js
-// Sans destructuring — on accète chaque propriété une par une
-const personne = { nom: 'Alice', age: 30 }
-const nom = personne.nom     // 'Alice'
-const age = personne.age     // 30
+```ts
+// Sans destructuring — on accède chaque propriété une par une
+interface Personne { nom: string; age: number }
+
+const personne: Personne = { nom: 'Alice', age: 30 }
+const nom: string = personne.nom     // 'Alice'
+const age: number = personne.age     // 30
 
 // Avec destructuring — on extrait tout d'un coup avec { }
 const { nom, age } = personne
 // nom vaut 'Alice', age vaut 30
 
 // On peut aussi le faire dans les paramètres d'une fonction :
-function saluer({ nom, age }) {
+function saluer({ nom, age }: Personne): void {
   console.log(`Bonjour ${nom}, tu as ${age} ans`)
 }
 saluer(personne) // "Bonjour Alice, tu as 30 ans"

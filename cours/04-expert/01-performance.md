@@ -155,7 +155,7 @@ hugeList.value = [...hugeList.value, newItem]
 
 En JavaScript, il existe deux façons d'importer du code :
 
-```js
+```ts
 // Import STATIQUE — tout est chargé au démarrage
 import MonComposant from './MonComposant.vue'
 

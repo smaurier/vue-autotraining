@@ -20,8 +20,8 @@ Avant d'attaquer `watch`, il faut se rappeler ce qu'est un **callback** en JavaS
 
 Un callback, c'est simplement **une fonction qu'on donne à une autre fonction**, pour qu'elle l'appelle plus tard.
 
-```js
-// Exemple simple de callback en JavaScript pur
+```ts
+// Exemple simple de callback en TypeScript
 
 // setTimeout appelle notre fonction après 1 seconde
 // La fonction () => { ... } est le "callback"
@@ -241,11 +241,11 @@ stopEffect(); // Arrête cet effet
 
 ### 📌 Rappel JavaScript : `fetch` et annulation de requêtes
 
-```js
-// En JS, fetch() envoie une requête HTTP (comme un courrier)
+```ts
+// En TS, fetch() envoie une requête HTTP (comme un courrier)
 // AbortController permet d'ANNULER cette requête en cours de route
 
-const controller = new AbortController(); // On crée un "interrupteur"
+const controller: AbortController = new AbortController(); // On crée un "interrupteur"
 
 fetch("/api/data", {
   signal: controller.signal,  // On branche l'interrupteur sur la requête
@@ -376,13 +376,13 @@ C'est comme donner un ordre à un peintre : tu dis "peins le mur en bleu", mais 
 
 ### 📌 Rappel JavaScript : `async` / `await`
 
-```js
+```ts
 // async/await est une façon d'écrire du code qui "attend" un résultat
 
 // async devant la fonction = "cette fonction contient des attentes"
-async function exemple() {
+async function exemple(): Promise<void> {
   // await = "attends que cette opération soit finie avant de continuer"
-  const resultat = await fetch("/api/data"); // On attend la réponse
+  const resultat: Response = await fetch("/api/data"); // On attend la réponse
   console.log(resultat); // Ce code ne s'exécute QU'APRÈS la réponse
 }
 ```

@@ -34,9 +34,9 @@ En JavaScript, quand on fait un appel réseau (chercher des données sur un serv
 
 Une **Promise** (promesse), c'est un objet qui représente une valeur **qui n'existe pas encore** mais qui arrivera plus tard.
 
-```js
+```ts
 // Imagine : "je te PROMETS de te donner le résultat... plus tard"
-const maPromesse = fetch("https://api.exemple.com/donnees");
+const maPromesse: Promise<Response> = fetch("https://api.exemple.com/donnees");
 // maPromesse ne contient PAS encore les données
 // Elle contient une PROMESSE qu'elles arriveront
 ```
@@ -50,41 +50,41 @@ Une Promise peut avoir 3 états :
 
 `async` et `await` sont des mots-clés qui rendent le code asynchrone **plus lisible** :
 
-```js
+```ts
 // Le mot "async" devant la fonction dit : "cette fonction contient du code asynchrone"
-async function recupererDonnees() {
+async function recupererDonnees(): Promise<void> {
   // Le mot "await" dit : "ATTENDS que cette promesse soit terminée avant de continuer"
-  const reponse = await fetch("https://api.exemple.com/donnees");
+  const reponse: Response = await fetch("https://api.exemple.com/donnees");
   // Ici, reponse contient VRAIMENT la réponse (on a attendu)
 
-  // On transforme la réponse en objet JavaScript (JSON)
-  const donnees = await reponse.json();
+  // On transforme la réponse en objet typé (JSON)
+  const donnees: unknown = await reponse.json();
   // Maintenant "donnees" contient nos données utilisables
 }
 ```
 
 **Sans async/await**, on devrait écrire avec `.then()` (plus difficile à lire) :
 
-```js
+```ts
 // Même chose mais moins lisible :
 fetch("https://api.exemple.com/donnees")
-  .then((reponse) => reponse.json()) // quand la réponse arrive, transforme en JSON
-  .then((donnees) => console.log(donnees)); // quand le JSON est prêt, affiche-le
+  .then((reponse: Response) => reponse.json()) // quand la réponse arrive, transforme en JSON
+  .then((donnees: unknown) => console.log(donnees)); // quand le JSON est prêt, affiche-le
 ```
 
 ### try / catch / finally : gérer les erreurs
 
 Quand on fait un appel réseau, **ça peut échouer** (pas d'internet, serveur en panne...). Il faut prévoir ce cas :
 
-```js
+```ts
 try {
   // On ESSAIE d'exécuter ce code ("try" = "essayer")
-  const reponse = await fetch("https://api.exemple.com/donnees");
-  const donnees = await reponse.json();
+  const reponse: Response = await fetch("https://api.exemple.com/donnees");
+  const donnees: unknown = await reponse.json();
   console.log("Succès !", donnees);
-} catch (erreur) {
+} catch (erreur: unknown) {
   // Si quelque chose échoue dans le try, on ATTRAPE l'erreur ici ("catch" = "attraper")
-  console.log("Oups, erreur :", erreur.message);
+  console.log("Oups, erreur :", (erreur as Error).message);
 } finally {
   // Ce bloc s'exécute TOUJOURS, que ça ait marché OU échoué ("finally" = "finalement")
   // Utile pour arrêter un indicateur de chargement par exemple
@@ -110,14 +110,14 @@ L'outil pour faire ces appels en JavaScript, c'est la fonction `fetch()`.
 
 ### Ce que `fetch()` retourne
 
-```js
+```ts
 // fetch() retourne une PROMESSE qui se résout en un objet "Response"
-const reponse = await fetch("https://api.monsite.com/produits");
+const reponse: Response = await fetch("https://api.monsite.com/produits");
 
 // L'objet Response contient :
 reponse.ok;       // true si tout va bien (code 200-299), false sinon
 reponse.status;   // Le code HTTP (200 = OK, 404 = pas trouvé, 500 = erreur serveur)
-reponse.json();   // Une méthode pour transformer la réponse en objet JavaScript
+reponse.json();   // Une méthode pour transformer la réponse en objet typé
 ```
 
 ---

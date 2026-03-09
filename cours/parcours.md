@@ -22,23 +22,19 @@ Ce parcours applique les principes des sciences cognitives. **Respecte ces règl
 
 ---
 
-## Module 00 — TypeScript pour Vue 3
+## Prerequis — TypeScript
 
-| # | Cours | ⏱️ |
-|---|-------|-----|
-| 1 | `cours/00-typescript/01-types-de-base.md` | ~45 min |
-| 2 | `cours/00-typescript/02-interfaces-et-types.md` | ~40 min |
-| 3 | `cours/00-typescript/03-generics.md` | ~50 min |
-| 4 | `cours/00-typescript/04-typer-vue3.md` | ~45 min |
-
-Exercice : `exercices/01-typescript-labo/` → ex01 (~90 min)
+> **Avant de commencer ce cours Vue 3**, tu dois maitriser TypeScript.
+> Suis le cours complet TypeScript : [`typescript-course`](https://github.com/smaurier/TypeScript-autotraining)
+> Minimum requis : Modules 00-09 (Fondamentaux + Intermediaire).
 
 ---
 
-## Module 01 — Débutant
+## Module 01 — Debutant
 
 | # | Cours | ⏱️ |
 |---|-------|-----|
+| 0 | `cours/01-debutant/00-typer-vue3.md` | ~45 min |
 | 1 | `cours/01-debutant/01-environnement-et-premier-composant.md` | ~30 min |
 | 2 | `cours/01-debutant/02-template-et-directives.md` | ~40 min |
 | 3 | `cours/01-debutant/03-reactivite.md` | ~45 min |
@@ -224,10 +220,7 @@ Imprime ou copie ce tableau. Coche après chaque révision.
 
 | Cours | Date J | J+1 | J+7 | J+30 |
 |-------|--------|-----|-----|------|
-| 00-01 Types de base | 27/02 | ☐ | ☐ | ☐ |
-| 00-02 Interfaces | ___ | ☐ | ☐ | ☐ |
-| 00-03 Generics | ___ | ☐ | ☐ | ☐ |
-| 00-04 Typer Vue 3 | ___ | ☐ | ☐ | ☐ |
+| 01-00 Typer Vue 3 | ___ | ☐ | ☐ | ☐ |
 | 01-01 Environnement | ___ | ☐ | ☐ | ☐ |
 | 01-02 Templates | ___ | ☐ | ☐ | ☐ |
 | 01-03 Réactivité | ___ | ☐ | ☐ | ☐ |
@@ -301,8 +294,8 @@ Imprime ou copie ce tableau. Coche après chaque révision.
 
 | Niveau | Cours | Exercices | Total |
 |--------|-------|-----------|-------|
-| Module 00 (TypeScript) | ~3h | ~1h30 | **~4h30** |
-| Module 01 (Débutant) | ~4h30 | ~4h45 | **~9h15** |
+| Prerequis (TypeScript) | Voir [typescript-course](https://github.com/smaurier/TypeScript-autotraining) | — | — |
+| Module 01 (Debutant) | ~5h15 | ~4h45 | **~10h** |
 | Module 02 (Intermédiaire) | ~4h45 | ~9h | **~13h45** |
 | Module 03 (Avancé) | ~6h25 | ~7h30 | **~13h55** |
 | Module 04 (Expert) | ~4h | ~3h30 | **~7h30** |
