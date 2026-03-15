@@ -4,14 +4,14 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
-> 1. Où place-t-on les fichiers de pages dans un projet Nuxt ?
+> 1. Ou place-t-on les fichiers de pages dans un projet Nuxt ?
 > 2. Quel composant utilise-t-on dans un layout pour afficher le contenu de la page ?
 > 
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
 > 1. Dans le dossier `pages/` à la racine du projet
-> 2. `<NuxtPage />` (ou `<slot />` dans les layouts)
+> 2. `<NuxtPage />` (où `<slot />` dans les layouts)
 > </details>
 
 ---
@@ -147,9 +147,9 @@ const { data, pending, error, refresh, status } = await useFetch('/api/...')
 
 | Propriété  | Type        | C'est quoi ?                                                |
 |------------|-------------|-------------------------------------------------------------|
-| `data`     | `Ref`       | Les données récupérées (ou `null` si pas encore arrivées)   |
+| `data`     | `Ref`       | Les données récupérées (où `null` si pas encore arrivées)   |
 | `pending`  | `Ref<boolean>` | `true` pendant le chargement, `false` quand c'est fini |
-| `error`    | `Ref`       | L'erreur s'il y en a une, sinon `null`                      |
+| `error`    | `Ref`       | L'erreur s'il y en à une, sinon `null`                      |
 | `refresh`  | `Function`  | Une fonction pour re-charger les données                     |
 | `status`   | `Ref<string>` | `'idle'`, `'pending'`, `'success'`, ou `'error'`        |
 

@@ -31,7 +31,7 @@ Quand le navigateur affiche ta page, il fait un **rendu** (render en anglais) :
 ```
 1. Il lit le HTML        → c'est quoi la structure de la page ?
 2. Il lit le CSS          → à quoi ça doit ressembler ?
-3. Il calcule le layout   → où placer chaque élément ?
+3. Il calcule le layout   → ou placer chaque élément ?
 4. Il peint les pixels    → il affiche le résultat à l'écran
 ```
 
@@ -200,7 +200,7 @@ Au lieu de charger toutes les pages au démarrage, on charge chaque page **quand
 
 ### Lazy loading de composants
 
-Pour les composants lourds (graphiques, éditeurs, cartes…), on peut les charger à la demande :
+Pour les composants lourds (graphiques, éditeurs, cartes…), on peut les charger à la demandé :
 
 ```vue
 <script setup lang="ts">
@@ -281,7 +281,7 @@ Quand tu as une liste de 10 000 éléments, afficher tous les éléments d'un co
 
 La **virtualisation** = n'afficher que les éléments **visibles à l'écran** (environ 20-30) et créer les autres à la volée quand l'utilisateur scrolle.
 
-> 🎯 **Analogie** : C'est comme un ascenseur dans un immeuble de 100 étages. Tu ne construis pas tous les étages d'un coup. Tu affiches juste l'étage où tu es, et les étages proches.
+> 🎯 **Analogie** : C'est comme un ascenseur dans un immeuble de 100 étages. Tu ne construis pas tous les étages d'un coup. Tu affiches juste l'étage ou tu es, et les étages proches.
 
 ```bash
 # Installation de la bibliothèque de virtualisation
@@ -433,7 +433,7 @@ onDeactivated(() => {
 | Technique | Quand l'utiliser | Difficulté |
 |-----------|-----------------|------------|
 | `v-once` | Contenu qui ne change jamais | ⭐ Facile |
-| `v-memo` | Listes où peu d'éléments changent | ⭐⭐ Moyen |
+| `v-memo` | Listes ou peu d'éléments changent | ⭐⭐ Moyen |
 | Lazy loading des routes | Toujours ! C'est une bonne pratique | ⭐ Facile |
 | `defineAsyncComponent` | Composants lourds (graphiques, éditeurs) | ⭐⭐ Moyen |
 | `KeepAlive` | Navigation par onglets | ⭐ Facile |
@@ -446,7 +446,7 @@ onDeactivated(() => {
 
 ### Exercice PF.1 — v-once
 
-Identifie où ajouter `v-once` dans ce template :
+Identifie ou ajouter `v-once` dans ce template :
 
 ```vue
 <template>
@@ -594,9 +594,9 @@ function addItem(item: User) {
 
 ## Vue Vapor Mode (experimental)
 
-Vapor est le nouveau mode de compilation de Vue qui **elimine le Virtual DOM** pour les composants qui l'activent. Au lieu de generer un VDOM puis de le diff, le compilateur genere du code imperatif qui manipule le DOM directement — inspire de Solid.js.
+Vapor est le nouveau mode de compilation de Vue qui **elimine le Virtual DOM** pour les composants qui l'activent. Au lieu de générer un VDOM puis de le diff, le compilateur généré du code imperatif qui manipule le DOM directement — inspire de Solid.js.
 
-### Comment ca marche
+### Comment ça marche
 
 ```vue
 <!-- Composant classique : compile en Virtual DOM -->
@@ -614,15 +614,15 @@ Vapor est le nouveau mode de compilation de Vue qui **elimine le Virtual DOM** p
 
 ### Gains de performance
 
-- **~30-50% moins de memoire** (pas d'arbre VDOM en memoire)
+- **~30-50% moins de mémoire** (pas d'arbre VDOM en mémoire)
 - **Updates plus rapides** (pas de diffing, mutation directe)
 - **Bundle plus petit** (pas besoin du runtime VDOM)
 
 ### Adoption
 
 - **Opt-in par composant** — pas de migration big-bang
-- **Meme syntaxe SFC** — le code du template ne change pas
-- **Interoperable** — les composants Vapor et VDOM coexistent dans la meme app
+- **Même syntaxe SFC** — le code du template ne change pas
+- **Interoperable** — les composants Vapor et VDOM coexistent dans la même app
 - **Status (2026)** : experimental, pas encore recommande en production
 
 > **Quand utiliser Vapor ?** Pour les composants a haute frequence de mise a jour (tableaux, listes virtualisees, animations) ou les applications ou chaque milliseconde compte. Pour la majorite des composants, le VDOM classique de Vue reste parfaitement performant.

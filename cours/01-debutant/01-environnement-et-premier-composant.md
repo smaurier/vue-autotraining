@@ -47,7 +47,7 @@
 >
 > **Node.js** est un programme qui permet de faire tourner du JavaScript **sur ton ordinateur**, hors du navigateur. C'est grâce à lui qu'on peut utiliser des outils de développement écrits en JavaScript (comme Vite, pnpm, etc.).
 >
-> **Analogie** : JavaScript, c'est comme un poisson qui ne vivait que dans l'eau (le navigateur). Node.js, c'est un aquarium portable qui permet au poisson de vivre n'importe où (ton ordinateur, un serveur…).
+> **Analogie** : JavaScript, c'est comme un poisson qui ne vivait que dans l'eau (le navigateur). Node.js, c'est un aquarium portable qui permet au poisson de vivre n'importe ou (ton ordinateur, un serveur…).
 
 **Installe la version LTS** (Long Term Support = version stable recommandée) depuis [nodejs.org](https://nodejs.org).
 

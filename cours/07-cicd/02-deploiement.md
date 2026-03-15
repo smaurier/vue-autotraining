@@ -5,7 +5,7 @@
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
 > 1. Qu'est-ce qu'un pipeline CI/CD ?
-> 2. Où place-t-on le fichier de configuration GitHub Actions ?
+> 2. Ou place-t-on le fichier de configuration GitHub Actions ?
 > 
 > <details>
 > <summary>Vérifier mes réponses</summary>
@@ -105,7 +105,7 @@ vercel
 > "Ça marche sur mon ordinateur !" — Phrase célèbre de tout développeur 😅
 
 Ton app fonctionne sur ton PC, mais quand tu la mets sur un serveur, elle plante.
-Pourquoi ? Parce que le serveur a une version différente de Node.js, ou il manque
+Pourquoi ? Parce que le serveur à une version différente de Node.js, ou il manque
 un outil, ou la configuration est différente.
 
 ### La solution : Docker

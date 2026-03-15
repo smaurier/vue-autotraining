@@ -316,7 +316,7 @@ const fruits = ref<string[]>(['🍎 Pomme', '🍌 Banane', '🍒 Cerise'])
 
 ### Pourquoi `:key` est obligatoire — l'analogie des badges 🏷️
 
-Imagine une fête où les invités portent des **badges** avec leur nom. Si quelqu'un part, tu sais exactement **qui** est parti grâce au badge.
+Imagine une fête ou les invités portent des **badges** avec leur nom. Si quelqu'un part, tu sais exactement **qui** est parti grâce au badge.
 
 Sans badges, si quelqu'un part, tu ne sais plus qui est qui → c'est le bazar !
 
@@ -506,7 +506,7 @@ En HTML, les **attributs** donnent des informations supplémentaires aux balises
 <!-- "disabled" est un attribut qui désactive le bouton -->
 <button disabled>Impossible de cliquer</button>
 
-<!-- "href" est un attribut qui dit où mène le lien -->
+<!-- "href" est un attribut qui dit ou mène le lien -->
 <a href="https://vuejs.org">Site de Vue</a>
 ```
 

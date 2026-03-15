@@ -4,7 +4,7 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
-> 1. Où place-t-on les server routes dans un projet Nuxt 3 ?
+> 1. Ou place-t-on les server routes dans un projet Nuxt 3 ?
 > 2. Quelle fonction utilise-t-on pour définir un handler d'API serveur ?
 > 
 > <details>
@@ -287,7 +287,7 @@ export default defineNuxtConfig({
 
 ---
 
-## SSG — Static Site Generation (générer un site statique)
+## SSG — Static Site Génération (générer un site statique)
 
 Par défaut, Nuxt génère les pages **à chaque visite** (le serveur travaille à chaque requête). Avec le **SSG**, on peut **pré-générer toutes les pages** une seule fois sous forme de fichiers HTML.
 
@@ -441,3 +441,12 @@ useHead({
 ## Suite
 
 → `cours/06-storybook/01-setup.md`
+
+---
+
+<!-- parcours-recommande -->
+
+::: tip Parcours recommandé
+1. **Exercice** : [20-nuxt-patterns](../../exercices/20-nuxt-patterns/ENONCE)
+2. **Exercice** : [20-blog-nuxt-simule](../../exercices/20-blog-nuxt-simule/ENONCE)
+:::

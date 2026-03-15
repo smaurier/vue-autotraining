@@ -1,14 +1,14 @@
-# 02 — Strategies avancees d'internationalisation
+# 02 — Stratégies avancees d'internationalisation
 
 > **L'i18n ne se limite pas a traduire des chaines de caracteres.**
-> SEO, RTL, tests, extraction de chaines, performances — ce sont ces details qui font la difference entre un projet "traduit" et un projet "internationalise".
+> SEO, RTL, tests, extraction de chaines, performances — ce sont ces details qui font la différence entre un projet "traduit" et un projet "internationalise".
 
 ---
 
-> **🔄 Rappel du cours precedent**
-> Avant de continuer, verifie que tu peux repondre a ces questions :
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifié que tu peux repondre a ces questions :
 > 1. Quelle option faut-il activer pour utiliser vue-i18n en Composition API ?
-> 2. Comment gere-t-on la pluralisation dans vue-i18n ?
+> 2. Comment géré-t-on la pluralisation dans vue-i18n ?
 > 3. Quelles fonctions utilise-t-on pour formater les dates et les nombres ?
 >
 > <details>
@@ -25,7 +25,7 @@
 
 ### L'attribut `lang` sur `<html>`
 
-Les moteurs de recherche et les lecteurs d'ecran utilisent l'attribut `lang` pour determiner la langue de la page.
+Les moteurs de recherche et les lecteurs d'ecran utilisent l'attribut `lang` pour déterminer la langue de la page.
 
 ```ts
 // composables/useLocale.ts
@@ -46,7 +46,7 @@ export function useLocale() {
 
 ### Les balises `hreflang`
 
-Pour le SEO multilingue, il faut indiquer aux moteurs de recherche que la meme page existe dans plusieurs langues.
+Pour le SEO multilingue, il faut indiquer aux moteurs de recherche que la même page existe dans plusieurs langues.
 
 ```vue
 <script setup lang="ts">
@@ -72,7 +72,7 @@ useHead({
 </script>
 ```
 
-**Resultat HTML :**
+**Résultat HTML :**
 
 ```html
 <html lang="fr">
@@ -82,16 +82,16 @@ useHead({
 </head>
 ```
 
-### Strategies de routage i18n
+### Stratégies de routage i18n
 
-| Strategie | URL | Avantage | Inconvenient |
+| Stratégie | URL | Avantage | Inconvenient |
 |-----------|-----|----------|-------------|
 | **Prefixe** | `/fr/produits`, `/en/products` | SEO optimal, bookmarkable | Plus complexe a configurer |
 | **Sous-domaine** | `fr.site.com`, `en.site.com` | Separation claire | Infrastructure plus lourde |
 | **Sans prefixe** | `/produits` (langue en cookie/header) | URL plus simple | Mauvais SEO, pas bookmarkable |
-| **Parametre** | `/produits?lang=en` | Simple | Mauvais SEO |
+| **Paramètre** | `/produits?lang=en` | Simple | Mauvais SEO |
 
-> 💡 **Recommandation** : utilise la strategie **prefixe** pour les sites publics (SEO) et **sans prefixe** pour les applications internes.
+> 💡 **Recommandation** : utilise la stratégie **prefixe** pour les sites publics (SEO) et **sans prefixe** pour les applications internes.
 
 ### Vue Router avec prefixe de langue
 
@@ -210,9 +210,9 @@ const { direction } = useDirection()
 </style>
 ```
 
-### Proprietes logiques CSS — Aide-memoire
+### Proprietes logiques CSS — Aide-mémoire
 
-| Propriete physique | Propriete logique | Comportement RTL |
+| Propriété physique | Propriété logique | Comportement RTL |
 |-------------------|------------------|-----------------|
 | `margin-left` | `margin-inline-start` | Devient `margin-right` |
 | `margin-right` | `margin-inline-end` | Devient `margin-left` |
@@ -225,7 +225,7 @@ const { direction } = useDirection()
 
 ## 🧩 Traductions par composant
 
-Pour les gros projets, on peut definir des traductions au niveau du composant plutot qu'en global.
+Pour les gros projets, on peut définir des traductions au niveau du composant plutot qu'en global.
 
 ```vue
 <script setup lang="ts">
@@ -267,13 +267,13 @@ const { t } = useI18n({
 ```
 
 > **Avantage** : la traduction est collocated avec le composant, plus facile a maintenir.
-> **Inconvenient** : pas reutilisable, pas extractible facilement par les outils.
+> **Inconvenient** : pas réutilisable, pas extractible facilement par les outils.
 
 ---
 
-## 🔑 Typage des cles i18n
+## 🔑 Typage des clés i18n
 
-En TypeScript strict, on peut typer les cles de traduction pour eviter les erreurs.
+En TypeScript strict, on peut typer les clés de traduction pour éviter les erreurs.
 
 ```ts
 // types/i18n.d.ts
@@ -432,7 +432,7 @@ test.describe('Internationalisation', () => {
 
 Quand tu internationalises un projet existant, il faut trouver et extraire toutes les chaines en dur.
 
-### Methode manuelle (petits projets)
+### Méthode manuelle (petits projets)
 
 1. Chercher toutes les chaines dans les templates :
 
@@ -442,15 +442,15 @@ Quand tu internationalises un projet existant, il faut trouver et extraire toute
 rg '>[A-Za-zÀ-ÿ].*</' --type vue
 ```
 
-2. Remplacer chaque chaine par `t('cle')` et ajouter la cle dans les fichiers de traduction.
+2. Remplacer chaque chaine par `t('cle')` et ajouter la clé dans les fichiers de traduction.
 
-### Convention de nommage des cles
+### Convention de nommage des clés
 
 | Pattern | Exemple | Utilisation |
 |---------|---------|-------------|
-| `page.section.element` | `home.hero.title` | Cle specifique a une page |
-| `component.element` | `productCard.addToCart` | Cle specifique a un composant |
-| `common.action` | `common.save`, `common.cancel` | Cles reutilisables partout |
+| `page.section.element` | `home.hero.title` | Cle spécifique à une page |
+| `component.element` | `productCard.addToCart` | Cle spécifique à un composant |
+| `common.action` | `common.save`, `common.cancel` | Cles réutilisables partout |
 | `validation.rule` | `validation.required`, `validation.email` | Messages de validation |
 | `error.code` | `error.notFound`, `error.unauthorized` | Messages d'erreur |
 
@@ -631,7 +631,7 @@ export function useLocale() {
 
 ### Exercice I18N-ADV.3 — Tester le switch de langue
 
-Ecris un test Vitest qui verifie que le composant affiche le bon texte en francais et en anglais :
+Ecris un test Vitest qui vérifié que le composant affiche le bon texte en français et en anglais :
 
 ```ts
 import { describe, it, expect } from 'vitest'
@@ -697,3 +697,11 @@ describe('Switch de langue', () => {
 ## Suite
 
 → `cours/11-auth-securite/01-authentification.md`
+
+---
+
+<!-- parcours-recommande -->
+
+::: tip Parcours recommandé
+1. **Exercice** : [25-i18n-multi-locale](../../exercices/25-i18n-multi-locale/ENONCE)
+:::

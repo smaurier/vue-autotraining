@@ -26,12 +26,12 @@
 ### 🏠 L'analogie de la maison
 
 Imagine que tu construis une maison. Tu ne mets pas la cuisine dans la salle de bain,
-le lit dans le garage, et la douche dans le salon. **Chaque pièce a un rôle précis**,
-et tu sais toujours où trouver ce que tu cherches.
+le lit dans le garage, et la douche dans le salon. **Chaque pièce à un rôle précis**,
+et tu sais toujours ou trouver ce que tu cherches.
 
 L'**architecture** d'un projet, c'est exactement ça : **la façon dont tu organises
 tes fichiers et tes dossiers** pour que tout le monde (toi inclus dans 6 mois !)
-sache où trouver quoi.
+sache ou trouver quoi.
 
 ```
 🏠 Une maison bien organisée :
@@ -485,7 +485,7 @@ Voici des indicateurs que ton code a besoin d'être réorganisé :
 
 ### Exercice ARCH.1 — Organiser les fichiers
 
-Où placerais-tu ces fichiers dans une architecture par feature ?
+Ou placerais-tu ces fichiers dans une architecture par feature ?
 
 1. `LoginForm.vue` — Formulaire de connexion
 2. `useAuth.ts` — Composable d'authentification

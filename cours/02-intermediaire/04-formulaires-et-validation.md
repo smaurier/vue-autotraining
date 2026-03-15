@@ -43,7 +43,7 @@ Avant Vue, les formulaires étaient gérés **entièrement par HTML**. Petit rap
 
 ### Le problème avec les formulaires HTML classiques
 
-Quand tu cliques sur "Envoyer", **la page se recharge complètement**. Le navigateur envoie les données et charge une nouvelle page. Dans une application Vue (ou React, Angular...), on ne veut **PAS** ça — on veut rester sur la même page et gérer l'envoi nous-mêmes.
+Quand tu cliques sur "Envoyer", **la page se recharge complètement**. Le navigateur envoie les données et charge une nouvelle page. Dans une application Vue (où React, Angular...), on ne veut **PAS** ça — on veut rester sur la même page et gérer l'envoi nous-mêmes.
 
 ### Comment empêcher le rechargement ?
 
@@ -76,7 +76,7 @@ La **validation**, c'est comme un **videur** devant une boîte de nuit. Avant de
 
 - "Tu as ta carte d'identité ?" → Le champ nom n'est **pas vide**
 - "Tu as au moins 18 ans ?" → L'âge est **supérieur ou égal à 18**
-- "Tu es sur la liste ?" → L'email a un **format valide**
+- "Tu es sur la liste ?" → L'email à un **format valide**
 
 Si une règle n'est pas respectée, le videur refuse l'entrée et **explique pourquoi** (message d'erreur).
 

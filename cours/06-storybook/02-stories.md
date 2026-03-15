@@ -4,7 +4,7 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
-> 1. Où se trouve la configuration principale de Storybook ?
+> 1. Ou se trouve la configuration principale de Storybook ?
 > 2. À quoi sert le fichier `preview.ts` dans `.storybook/` ?
 > 
 > <details>
@@ -42,7 +42,7 @@ Un fichier de stories a toujours l'extension `.stories.ts` et contient :
 
 ## 📝 Ta première story (la plus simple possible)
 
-Imaginons qu'on a un composant `AppButton.vue`. Voici le fichier de stories **le plus simple** :
+Imaginons qu'on à un composant `AppButton.vue`. Voici le fichier de stories **le plus simple** :
 
 ```ts
 // src/components/AppButton.stories.ts
@@ -132,7 +132,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 ```
 
-Avec ça, dans Storybook tu verras un **panneau de contrôle** en bas de la page où tu pourras changer les props en temps réel !
+Avec ça, dans Storybook tu verras un **panneau de contrôle** en bas de la page ou tu pourras changer les props en temps réel !
 
 ---
 
@@ -175,7 +175,7 @@ export const Disabled: Story = {
 };
 ```
 
-> 💡 Chaque story a un nom clair qui décrit ce qu'elle montre. Dans Storybook, tu verras une liste : Default, Secondary, Danger, Disabled.
+> 💡 Chaque story à un nom clair qui décrit ce qu'elle montre. Dans Storybook, tu verras une liste : Default, Secondary, Danger, Disabled.
 
 ---
 
@@ -211,7 +211,7 @@ export const AllSizes: Story = {
 
 ## 🧱 Story avec slots
 
-> 💡 **Rappel :** Un **slot** en Vue, c'est un "trou" dans un composant où tu peux insérer du contenu. C'est comme une enveloppe : le composant est l'enveloppe, et le slot c'est l'ouverture où tu mets ta lettre.
+> 💡 **Rappel :** Un **slot** en Vue, c'est un "trou" dans un composant ou tu peux insérer du contenu. C'est comme une enveloppe : le composant est l'enveloppe, et le slot c'est l'ouverture ou tu mets ta lettre.
 
 Pour montrer un bouton qui contient une icône (via un slot) :
 

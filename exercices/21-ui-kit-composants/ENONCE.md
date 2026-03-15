@@ -24,7 +24,7 @@ Aller au-delà des composants atomiques (bouton, input) pour construire des **co
 
 ### Documentation
 
-7. Chaque composant a un fichier `.stories.ts` avec au minimum :
+7. Chaque composant à un fichier `.stories.ts` avec au minimum :
    - Story par défaut
    - Toutes les variantes
    - Story interactive (actions loguées)

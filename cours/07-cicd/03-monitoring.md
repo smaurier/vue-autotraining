@@ -26,7 +26,7 @@ Le **monitoring**, c'est **surveiller ton application** une fois qu'elle est en 
 > **Analogie** : C'est comme les **caméras de surveillance** dans un magasin 🏪.
 > Tu ne peux pas être physiquement dans le magasin 24h/24, mais grâce aux caméras,
 > tu vois ce qui se passe : est-ce que les clients trouvent ce qu'ils cherchent ?
-> Est-ce que quelqu'un a un problème ? Est-ce qu'il y a un incident ?
+> Est-ce que quelqu'un à un problème ? Est-ce qu'il y à un incident ?
 
 ### Pourquoi c'est important ?
 
@@ -92,7 +92,7 @@ Sentry.init({
   app,
 
   // "dsn" = l'adresse unique de ton projet Sentry
-  // (comme un numéro de téléphone — Sentry sait où envoyer les erreurs)
+  // (comme un numéro de téléphone — Sentry sait ou envoyer les erreurs)
   // ⚠️ On la met dans une variable d'environnement (pas en dur dans le code !)
   dsn: import.meta.env.VITE_SENTRY_DSN,
 
@@ -161,7 +161,7 @@ onErrorCaptured((err) => {
   </div>
 
   <!-- Si pas d'erreur → on affiche le contenu normal (les composants enfants) -->
-  <!-- <slot /> = "trou" où seront insérés les composants enfants -->
+  <!-- <slot /> = "trou" ou seront insérés les composants enfants -->
   <slot v-else />
 </template>
 ```
@@ -389,7 +389,7 @@ const app = createApp(App)
 // Initialise Sentry
 Sentry.init({
   app,
-  // DSN : l'adresse où envoyer les erreurs
+  // DSN : l'adresse ou envoyer les erreurs
   // ???
   
   // environnement : production, staging...
@@ -499,3 +499,12 @@ onCLS(sendToAnalytics)
 ## Suite
 
 → `cours/08-api-typees/01-graphql-vue3.md`
+
+---
+
+<!-- parcours-recommande -->
+
+::: tip Parcours recommandé
+1. **Exercice** : [22-pipeline-ci](../../exercices/22-pipeline-ci/ENONCE)
+2. **Exercice** : [22-pipeline-ci-visuel](../../exercices/22-pipeline-ci-visuel/ENONCE)
+:::

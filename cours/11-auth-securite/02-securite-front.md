@@ -21,7 +21,7 @@
 Tout au long de ce chapitre, on va comparer ton application à **une maison** :
 
 - **Ta maison** = ton application web
-- **Les portes et fenêtres** = les endroits où des données entrent et sortent
+- **Les portes et fenêtres** = les endroits ou des données entrent et sortent
 - **Les cambrioleurs** = les pirates / attaquants
 - **Les serrures et alarmes** = les protections de sécurité
 
@@ -165,7 +165,7 @@ function isValidUrl(url: string): boolean {
 > « Transférer 1000€ vers le compte du pirate ».
 >
 > Comme tu es connecté à ta banque (le cookie de session est encore valide),
-> ta banque croit que c'est TOI qui as fait la demande !
+> ta banque croit que c'est TOI qui as fait la demandé !
 >
 > C'est comme si quelqu'un imitait ta signature sur un chèque.
 
@@ -342,7 +342,7 @@ const secret = config.apiSecret           // Accessible UNIQUEMENT côté serveu
 ## 🔍 Vérifier les dépendances vulnérables
 
 > Les librairies que tu installes (pnpm install) peuvent contenir des **failles de sécurité**.
-> C'est comme acheter une serrure qui a un défaut de fabrication.
+> C'est comme acheter une serrure qui à un défaut de fabrication.
 
 ```bash
 # Vérifier si tes dépendances ont des failles connues

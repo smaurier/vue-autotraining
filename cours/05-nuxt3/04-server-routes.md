@@ -24,9 +24,9 @@ Imagine un restaurant :
 
 - **La salle (le navigateur / le front-end)** → c'est ce que le client voit : le menu, la décoration, les assiettes. C'est votre page Vue/Nuxt affichée dans le navigateur.
 - **La cuisine (le serveur / le back-end)** → c'est là où on prépare les plats. Le client ne voit jamais la cuisine, mais c'est là que tout le travail se fait : chercher les ingrédients (les données), les cuisiner (les transformer), les envoyer au client.
-- **Le serveur (la personne)** → c'est la "route API" : il fait le lien entre la salle et la cuisine. Le client demande "je veux une pizza", le serveur transmet la commande à la cuisine, et rapporte le plat.
+- **Le serveur (la personne)** → c'est la "route API" : il fait le lien entre la salle et la cuisine. Le client demandé "je veux une pizza", le serveur transmet la commande à la cuisine, et rapporte le plat.
 
-**Une "server route"**, c'est du code qui tourne **sur le serveur** (la cuisine), pas dans le navigateur du visiteur. Le navigateur envoie une **requête** (une demande), et le serveur répond avec des **données** (souvent au format JSON).
+**Une "server route"**, c'est du code qui tourne **sur le serveur** (la cuisine), pas dans le navigateur du visiteur. Le navigateur envoie une **requête** (une demandé), et le serveur répond avec des **données** (souvent au format JSON).
 
 ### Pourquoi c'est utile ?
 

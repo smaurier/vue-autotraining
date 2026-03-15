@@ -195,13 +195,13 @@ pages/
 - **Vue 3 seul** → pour un **dashboard** ou un **back-office** (pas besoin de SEO, pas besoin de SSR)
 - **Nuxt 3** → pour un **site public**, un **blog**, un **e-commerce** (SEO important, performance importante)
 
-> 💡 **En entreprise (ESN)** : la majorité des missions sont des dashboards → Vue SPA suffit souvent. Nuxt est demandé pour les projets où le SEO est important ou quand on veut un projet fullstack (front + back ensemble).
+> 💡 **En entreprise (ESN)** : la majorité des missions sont des dashboards → Vue SPA suffit souvent. Nuxt est demandé pour les projets ou le SEO est important ou quand on veut un projet fullstack (front + back ensemble).
 
 ---
 
 ## Le fichier de configuration : `nuxt.config.ts`
 
-C'est le fichier où tu configures le comportement de Nuxt. Voici un exemple commenté :
+C'est le fichier ou tu configures le comportement de Nuxt. Voici un exemple commenté :
 
 ```ts
 // nuxt.config.ts — le fichier de configuration principal de Nuxt
@@ -284,7 +284,7 @@ export default defineNuxtConfig({
 
 ### Exercice NX.1 — Structure Nuxt
 
-Où placerais-tu ces fichiers dans un projet Nuxt ?
+Ou placerais-tu ces fichiers dans un projet Nuxt ?
 
 1. La page d'accueil du site
 2. Un composant `Button.vue` réutilisable

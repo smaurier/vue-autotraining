@@ -408,7 +408,7 @@ const reset = () => (count.value = 0)         // Fonction pour remettre à 0
 
 ## Render functions (avancé — pour info)
 
-Pour des cas très rares où le template ne suffit pas, on peut créer du HTML avec du JavaScript pur :
+Pour des cas très rares ou le template ne suffit pas, on peut créer du HTML avec du JavaScript pur :
 
 ```ts
 import { h, defineComponent } from 'vue'

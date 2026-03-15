@@ -11,18 +11,18 @@
 > <summary>Vérifier mes réponses</summary>
 >
 > 1. `watch` surveille des sources explicites, `watchEffect` traque automatiquement les dépendances utilisées
-> 2. `toRefs()` convertit chaque propriété d'un objet reactive en ref individuelle, préservant la réactivité
+> 2. `toRefs()` convertit chaque propriété d'un objet réactive en ref individuelle, préservant la réactivité
 > </details>
 
 ---
 
 ## C'est quoi un composable ?
 
-Imagine une **boîte à outils** que tu peux emmener partout. Dedans, il y a un marteau, un tournevis, un mètre... Tu peux l'utiliser dans la cuisine, dans le salon, dans le garage — partout où tu en as besoin.
+Imagine une **boîte à outils** que tu peux emmener partout. Dedans, il y à un marteau, un tournevis, un mètre... Tu peux l'utiliser dans la cuisine, dans le salon, dans le garage — partout ou tu en as besoin.
 
 Un **composable** en Vue, c'est exactement ça : c'est une **fonction** qui contient de la **logique réactive** (des `ref`, des `computed`, des `watch`...) et que tu peux **réutiliser dans n'importe quel composant**.
 
-Au lieu de copier-coller le même code dans 5 composants différents, tu le mets dans un composable et tu l'importes partout où tu en as besoin.
+Au lieu de copier-coller le même code dans 5 composants différents, tu le mets dans un composable et tu l'importes partout ou tu en as besoin.
 
 ---
 

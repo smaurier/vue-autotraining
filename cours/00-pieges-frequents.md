@@ -76,7 +76,7 @@ function doubler() {
 
 ### La règle à retenir
 
-| Où ? | Écriture |
+| Ou ? | Écriture |
 |------|----------|
 | Dans `<script setup>` | `maRef.value` (toujours `.value`) |
 | Dans `<template>` | `maRef` (Vue déballe automatiquement) |
@@ -111,7 +111,7 @@ Quand tu **déstructures** un objet `reactive()`, les propriétés obtenues **ne
 
 ### Pourquoi ça arrive
 
-En JavaScript, déstructurer un objet crée des **copies** des valeurs primitives. Vue ne peut plus surveiller ces copies — il ne sait pas qu'elles existaient dans un reactive.
+En JavaScript, déstructurer un objet crée des **copies** des valeurs primitives. Vue ne peut plus surveiller ces copies — il ne sait pas qu'elles existaient dans un réactive.
 
 ### ❌ Code incorrect
 
@@ -183,7 +183,7 @@ function anniversaire() {
 
 ### Astuce mnémotechnique
 
-Déstructurer un reactive, c'est comme **photocopier** une clé USB : tu as les données à l'instant T, mais les modifications sur la copie n'impactent pas l'original. `toRefs()` crée des **raccourcis** vers l'original (comme un alias Windows).
+Déstructurer un réactive, c'est comme **photocopier** une clé USB : tu as les données à l'instant T, mais les modifications sur la copie n'impactent pas l'original. `toRefs()` crée des **raccourcis** vers l'original (comme un alias Windows).
 
 ---
 
@@ -294,11 +294,11 @@ async function chargerDonnees() {
 
 ### Le problème
 
-Les **props** sont en **lecture seule**. Un composant enfant n'a pas le droit de modifier directement une prop reçue de son parent. Ça cause une erreur (ou un avertissement) Vue et crée un flux de données chaotique.
+Les **props** sont en **lecture seule**. Un composant enfant n'a pas le droit de modifier directement une prop reçue de son parent. Ça cause une erreur (où un avertissement) Vue et crée un flux de données chaotique.
 
 ### Pourquoi ça arrive
 
-Dans les anciennes habitudes JS (ou en Options API mal comprise), il était tentant de modifier directement une variable reçue. En Vue 3, les props sont **explicitement protégées en écriture**.
+Dans les anciennes habitudes JS (où en Options API mal comprise), il était tentant de modifier directement une variable reçue. En Vue 3, les props sont **explicitement protégées en écriture**.
 
 ### ❌ Code incorrect
 
@@ -547,7 +547,7 @@ Une Promise sans `await`, c'est comme **commander une pizza** mais ne pas attend
 
 ---
 
-## PIÈGE 7 : `v-for` sans `:key` (ou avec `index` comme clé) 🔑
+## PIÈGE 7 : `v-for` sans `:key` (où avec `index` comme clé) 🔑
 
 ### Le problème
 
@@ -611,7 +611,7 @@ Vue construit l'interface de manière asynchrone. Quand le `<script setup>` s'ex
 
 ### Pourquoi ça arrive
 
-En JavaScript classique (ou jQuery), on mettait son code directement dans un fichier `.js` et ça fonctionnait après le chargement de la page. La notion de "cycle de vie du composant" n'existait pas.
+En JavaScript classique (où jQuery), on mettait son code directement dans un fichier `.js` et ça fonctionnait après le chargement de la page. La notion de "cycle de vie du composant" n'existait pas.
 
 ### ❌ Code incorrect
 
@@ -888,7 +888,7 @@ function annuler() {
 
 ### Le problème
 
-`watch` doit recevoir une **source réactive** — une ref, un reactive, ou un **getter** (une fonction qui retourne une valeur). Passer directement une valeur primitive (un nombre, une chaîne) ne fonctionnera pas.
+`watch` doit recevoir une **source réactive** — une ref, un réactive, ou un **getter** (une fonction qui retourne une valeur). Passer directement une valeur primitive (un nombre, une chaîne) ne fonctionnera pas.
 
 ### ❌ Code incorrect
 
@@ -963,7 +963,7 @@ watch(etat.compteur, callback)            // ❌ La propriété directe — ne r
 
 ### Le problème
 
-Mettre `v-if` et `v-for` sur le **même élément HTML** est fortement déconseillé. En Vue 3, `v-if` a la priorité sur `v-for`, ce qui peut produire des comportements inattendus (ou une erreur TypeScript car `item` est inaccessible dans `v-if`).
+Mettre `v-if` et `v-for` sur le **même élément HTML** est fortement déconseillé. En Vue 3, `v-if` à la priorité sur `v-for`, ce qui peut produire des comportements inattendus (où une erreur TypeScript car `item` est inaccessible dans `v-if`).
 
 ### ❌ Code incorrect
 
@@ -1019,7 +1019,7 @@ const articlesActifs = computed(() =>
 
 ### Astuce mnémotechnique
 
-C'est comme demander à quelqu'un de **choisir parmi les invités** avant que la liste d'invités soit connue. Filtre d'abord ta liste (computed), puis affiche-la — ou demande d'abord qui est là (`v-for`), et seulement après filtre (`v-if` dans l'enfant).
+C'est comme demander à quelqu'un de **choisir parmi les invités** avant que la liste d'invités soit connue. Filtre d'abord ta liste (computed), puis affiche-la — ou demandé d'abord qui est là (`v-for`), et seulement après filtre (`v-if` dans l'enfant).
 
 ---
 
@@ -1213,8 +1213,8 @@ Veux-tu juste AFFICHER une version filtrée/triée ?
 | # | Piège | Symptôme | Solution rapide |
 |---|-------|----------|-----------------|
 | 1 | Oublier `.value` | Interface figée, `NaN`, `RefImpl` dans la console | Ajouter `.value` dans `<script>` (pas dans `<template>`) |
-| 2 | Destructuring reactive | Interface figée malgré les modifications | Accéder via l'objet ou utiliser `toRefs()` |
-| 3 | Réassigner reactive | Perte silencieuse de réactivité | `Object.assign()` ou utiliser `ref` avec `.value =` |
+| 2 | Destructuring réactive | Interface figée malgré les modifications | Accéder via l'objet ou utiliser `toRefs()` |
+| 3 | Réassigner réactive | Perte silencieuse de réactivité | `Object.assign()` ou utiliser `ref` avec `.value =` |
 | 4 | Modifier les props | Avertissement Vue, comportement incohérent | Utiliser `emit` pour demander au parent de changer |
 | 5 | async dans computed | `[object Promise]` dans le template | Utiliser `watch` + `ref` pour les données async |
 | 6 | Oublier await | `[object Promise]` ou `undefined` | Ajouter `await` + `async` partout dans la chaîne |

@@ -1,14 +1,14 @@
-# 03 — Audit d'accessibilite
+# 03 — Audit d'accessibilité
 
 > **Un audit a11y, c'est comme un examen medical pour ton site.**
 > Tu peux automatiser une partie (outils), mais l'expertise humaine reste indispensable.
-> Les outils automatises ne detectent que ~30-40 % des problemes d'accessibilite.
+> Les outils automatises ne detectent que ~30-40 % des problèmes d'accessibilité.
 
 ---
 
-> **🔄 Rappel du cours precedent**
-> Avant de continuer, verifie que tu peux repondre a ces questions :
-> 1. Quelle est la premiere regle d'ARIA ?
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifié que tu peux repondre a ces questions :
+> 1. Quelle est la première regle d'ARIA ?
 > 2. A quoi sert `aria-live="polite"` ?
 > 3. Qu'est-ce qu'un focus trap et quand l'utiliser ?
 >
@@ -17,17 +17,17 @@
 >
 > 1. Ne pas utiliser ARIA si le HTML natif suffit
 > 2. A annoncer les changements de contenu aux lecteurs d'ecran quand l'utilisateur est inactif
-> 3. Un mecanisme qui empeche le focus de sortir d'un conteneur (modale) — a utiliser quand une modale est ouverte
+> 3. Un mécanisme qui empeche le focus de sortir d'un conteneur (modale) — à utiliser quand une modale est ouverte
 > </details>
 
 ---
 
 ## 🔍 Les 3 niveaux d'audit
 
-| Niveau | Methode | Couverture | Effort |
+| Niveau | Méthode | Couverture | Effort |
 |--------|---------|-----------|--------|
 | **Automatise** | Lighthouse, axe-core, eslint-plugin-vuejs-accessibility | ~30-40 % des criteres | Faible |
-| **Manuel** | Navigation clavier, verification visuelle, inspection du DOM | ~70-80 % | Moyen |
+| **Manuel** | Navigation clavier, vérification visuelle, inspection du DOM | ~70-80 % | Moyen |
 | **Lecteur d'ecran** | VoiceOver (Mac), NVDA (Windows), Orca (Linux) | ~95 %+ | Eleve |
 
 > 💡 **En pratique**, on combine les 3 : les outils automatises en CI, les tests manuels en revue de code, et les tests lecteur d'ecran avant chaque release majeure.
@@ -36,9 +36,9 @@
 
 ## ⚡ Outils automatises
 
-### 1. Lighthouse (integre a Chrome DevTools)
+### 1. Lighthouse (intégré a Chrome DevTools)
 
-Lighthouse est l'outil le plus accessible (sans jeu de mots). Il est integre a Chrome.
+Lighthouse est l'outil le plus accessible (sans jeu de mots). Il est intégré a Chrome.
 
 **Comment l'utiliser :**
 1. Ouvre Chrome DevTools (F12)
@@ -46,14 +46,14 @@ Lighthouse est l'outil le plus accessible (sans jeu de mots). Il est integre a C
 3. Coche "Accessibility"
 4. Clique "Analyze page load"
 
-**Ce qu'il detecte :**
+**Ce qu'il détecté :**
 - Contrastes insuffisants
 - Images sans `alt`
 - Labels manquants sur les inputs
 - Ordre des titres incorrect
-- Elements interactifs trop petits
+- Éléments interactifs trop petits
 
-**Ce qu'il ne detecte PAS :**
+**Ce qu'il ne détecté PAS :**
 - Logique de focus incorrecte
 - Annonces `aria-live` manquantes
 - Navigation clavier non fonctionnelle
@@ -61,7 +61,7 @@ Lighthouse est l'outil le plus accessible (sans jeu de mots). Il est integre a C
 
 ### 2. axe-core — Tests automatises en CI
 
-**axe-core** est la bibliotheque de reference pour l'audit a11y automatise. On peut l'integrer dans les tests Playwright ou Vitest.
+**axe-core** est la bibliotheque de référence pour l'audit a11y automatise. On peut l'intégrer dans les tests Playwright ou Vitest.
 
 ```bash
 pnpm add -D @axe-core/playwright
@@ -144,7 +144,7 @@ pnpm add -D jest-axe @types/jest-axe
 
 ### 3. eslint-plugin-vuejs-accessibility
 
-Ce plugin ESLint signale les problemes d'accessibilite directement dans ton editeur.
+Ce plugin ESLint signale les problèmes d'accessibilité directement dans ton editeur.
 
 ```bash
 pnpm add -D eslint-plugin-vuejs-accessibility
@@ -174,7 +174,7 @@ export default [
 ]
 ```
 
-**Ce que le plugin detecte :**
+**Ce que le plugin détecté :**
 - `<img>` sans `alt`
 - `<a>` sans contenu textuel
 - `<div @click>` sans `@keydown`
@@ -189,25 +189,25 @@ Les outils automatises ne suffisent pas. Voici la procedure de test manuel.
 
 ### Test clavier (5 minutes par page)
 
-| Etape | Action | Attendu |
+| Étape | Action | Attendu |
 |-------|--------|---------|
 | 1 | Appuie sur Tab depuis le haut de la page | Le focus se deplace dans l'ordre logique |
-| 2 | Verifie le focus visible | Chaque element focuse a un contour visible |
+| 2 | Verifie le focus visible | Chaque élément focuse à un contour visible |
 | 3 | Teste les boutons avec Enter et Space | Les deux touches activent le bouton |
-| 4 | Teste Escape sur les modales/dropdowns | L'element se ferme et le focus revient |
+| 4 | Teste Escape sur les modales/dropdowns | L'élément se ferme et le focus revient |
 | 5 | Verifie qu'il n'y a pas de piege au focus | Tu peux toujours quitter un composant avec Tab |
 | 6 | Teste le skip link | Il apparait au premier Tab et fonctionne |
 
 ### Test visuel (3 minutes par page)
 
-| Etape | Action |
+| Étape | Action |
 |-------|--------|
 | 1 | Zoom a 200 % — le contenu reste lisible ? |
 | 2 | Mode sombre / clair — les contrastes sont corrects ? |
-| 3 | Les textes sont lisibles sans CSS ? (desactiver les styles) |
+| 3 | Les textes sont lisibles sans CSS ? (désactiver les styles) |
 | 4 | Les animations respectent `prefers-reduced-motion` ? |
 
-### Verification `prefers-reduced-motion` en Vue
+### Vérification `prefers-reduced-motion` en Vue
 
 ```vue
 <script setup lang="ts">
@@ -260,9 +260,9 @@ onMounted(() => {
 
 | Action | Raccourci |
 |--------|-----------|
-| Activer/desactiver | Cmd + F5 |
-| Element suivant | VO + fleche droite (VO = Ctrl + Option) |
-| Activer un element | VO + Space |
+| Activer/désactiver | Cmd + F5 |
+| Élément suivant | VO + fleche droite (VO = Ctrl + Option) |
+| Activer un élément | VO + Space |
 | Lire la page | VO + A |
 | Ouvrir le rotor | VO + U |
 
@@ -270,16 +270,16 @@ onMounted(() => {
 
 | Action | Raccourci |
 |--------|-----------|
-| Activer/desactiver | Ctrl + Alt + N |
-| Element suivant | Tab ou fleche bas |
+| Activer/désactiver | Ctrl + Alt + N |
+| Élément suivant | Tab ou fleche bas |
 | Lire la page | NVDA + fleche bas |
 | Titre suivant | H |
 | Region suivante | D |
 | Liste des titres | NVDA + F7 |
 
-### Ce qu'il faut verifier avec un lecteur d'ecran
+### Ce qu'il faut vérifier avec un lecteur d'ecran
 
-| Element | Verification |
+| Élément | Vérification |
 |---------|-------------|
 | Images | Le texte alternatif est lu et pertinent |
 | Boutons | Le nom accessible est clair (pas juste "bouton") |
@@ -293,7 +293,7 @@ onMounted(() => {
 
 ## 📋 Checklist WCAG AA pour composants Vue
 
-Voici une checklist a integrer dans ta revue de code :
+Voici une checklist à intégrer dans ta revue de code :
 
 ```ts
 // utils/a11yChecklist.ts
@@ -333,7 +333,7 @@ export const A11Y_CHECKLIST = {
 
 ## 🔧 Corrections courantes
 
-### Probleme : contraste insuffisant
+### Problème : contraste insuffisant
 
 ```vue
 <style scoped>
@@ -351,9 +351,9 @@ export const A11Y_CHECKLIST = {
 </style>
 ```
 
-> 💡 Utilise https://webaim.org/resources/contrastchecker/ pour verifier les ratios.
+> 💡 Utilise https://webaim.org/resources/contrastchecker/ pour vérifier les ratios.
 
-### Probleme : structure de titres incorrecte
+### Problème : structure de titres incorrecte
 
 ```vue
 <template>
@@ -368,7 +368,7 @@ export const A11Y_CHECKLIST = {
 </template>
 ```
 
-### Probleme : formulaire sans gestion d'erreur accessible
+### Problème : formulaire sans gestion d'erreur accessible
 
 ```vue
 <script setup lang="ts">
@@ -426,12 +426,12 @@ function handleSubmit(): void {
 
 1. Ouvre ton application Vue en mode dev
 2. Lance un audit Lighthouse (onglet Lighthouse > Accessibility)
-3. Note les problemes trouves
+3. Note les problèmes trouves
 4. Corrige-les un par un
 
-### Exercice AUDIT.2 — Ecrire un test a11y Playwright
+### Exercice AUDIT.2 — Écrire un test a11y Playwright
 
-Complete ce test pour verifier l'accessibilite de la page d'accueil :
+Complete ce test pour vérifier l'accessibilité de la page d'accueil :
 
 ```ts
 import { test, expect } from '@playwright/test'
@@ -473,10 +473,19 @@ Parcours ton application **uniquement au clavier** (pas de souris) :
 4. Les modales sont-elles correctement piegeees (focus trap) ?
 5. Escape ferme-t-il les modales et dropdowns ?
 
-Note chaque probleme trouve et corrige-le.
+Note chaque problème trouve et corrige-le.
 
 ---
 
 ## Suite
 
 → `cours/10-i18n/01-vue-i18n.md`
+
+---
+
+<!-- parcours-recommande -->
+
+::: tip Parcours recommandé
+1. **Exercice** : [24-audit-accessibilité](../../exercices/24-audit-accessibilite/ENONCE)
+2. **Quiz** : [quiz 09 accessibilité](../../quizzes/quiz-09-accessibilite.html)
+:::

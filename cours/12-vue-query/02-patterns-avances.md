@@ -475,7 +475,7 @@ app.use(VueQueryPlugin, queryConfig)
 
 ## 8. Devtools (outils de développement)
 
-TanStack Query a un panneau de debug intégré qui te montre l'état de toutes tes requêtes en temps réel.
+TanStack Query à un panneau de debug intégré qui te montre l'état de toutes tes requêtes en temps réel.
 
 ### Installation
 
@@ -661,4 +661,24 @@ const { data: orders } = useQuery({
 
 ## Suite
 
-→ [cours/09-accessibilite/01-fondamentaux-wcag.md](../09-accessibilite/01-fondamentaux-wcag.md) (ou module suivant selon le parcours)
+→ [cours/09-accessibilité/01-fondamentaux-wcag.md](../09-accessibilite/01-fondamentaux-wcag.md) (où module suivant selon le parcours)
+
+---
+
+<!-- parcours-recommande -->
+
+::: tip Parcours recommandé
+1. **Exercice** : [27-vue-query-crud](../../exercices/27-vue-query-crud/ENONCE)
+2. **Projet fil rouge** : [README](../../projet-fil-rouge/README)
+:::
+
+---
+
+<!-- navigation-inter-cours -->
+
+::: info Cours suivant
+Bravo, tu as termine le cours **Vue.js** ! 
+Le prochain cours du curriculum est **Angular**.
+
+[Commencer Angular →](../../../09-angular/cours/00-de-vue-a-angular/01-vue-vs-angular-mental-model.md)
+:::

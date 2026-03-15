@@ -450,3 +450,16 @@ onMounted(() => {
 ## Suite
 
 → Module 02 : `cours/02-intermediaire/01-composition-api-avancee.md`
+
+---
+
+<!-- parcours-recommande -->
+
+::: tip Parcours recommandé
+1. **Exercice** : [02-compteur-réactif](../../exercices/02-compteur-reactif/ENONCE)
+2. **Exercice** : [03-liste-de-taches](../../exercices/03-liste-de-taches/ENONCE)
+3. **Exercice** : [04-formulaire-contact](../../exercices/04-formulaire-contact/ENONCE)
+4. **Exercice** : [05-catalogue-produits](../../exercices/05-catalogue-produits/ENONCE)
+5. **Exercice** : [06-chronometre](../../exercices/06-chronometre/ENONCE)
+6. **Exercice** : [07-options-vs-composition](../../exercices/07-options-vs-composition/ENONCE)
+:::

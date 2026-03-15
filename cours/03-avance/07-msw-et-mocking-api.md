@@ -2,9 +2,9 @@
 
 ---
 
-> **Prerequis : Testing Course**
+> **Prérequis : Testing Course**
 > Les fondamentaux de MSW (installation, handlers, server lifecycle, patterns de test) sont couverts en detail dans le **Testing Course** (module 08).
-> Ce module se concentre uniquement sur l'**integration MSW + Vue/Nuxt**.
+> Ce module se concentre uniquement sur l'**intégration MSW + Vue/Nuxt**.
 >
 > → [Testing Course — MSW Mock Service Worker](https://github.com/smaurier/testing-course)
 
@@ -12,8 +12,8 @@
 
 ## Objectifs
 
-- Integrer MSW avec les composables Vue (`useFetch`, `useAsyncData`)
-- Configurer MSW pour le mode developpement Nuxt
+- Intégrer MSW avec les composables Vue (`useFetch`, `useAsyncData`)
+- Configurer MSW pour le mode développement Nuxt
 - Tester les composants Vue qui appellent des APIs
 
 ---
@@ -86,7 +86,7 @@ describe('UserList', () => {
 
 ---
 
-## MSW en mode developpement Nuxt
+## MSW en mode développement Nuxt
 
 ```typescript
 // plugins/msw.client.ts (Nuxt plugin)
@@ -124,6 +124,18 @@ export const handlers = [
 
 ## Navigation
 
-| Precedent | Suivant |
+| Précédent | Suivant |
 |-----------|---------|
 | [06 — Tests E2E Playwright](./06-tests-e2e-playwright.md) | -- (Fin de la section avancee) |
+
+---
+
+<!-- parcours-recommande -->
+
+::: tip Parcours recommandé
+1. **Exercice** : [15-app-multi-pages](../../exercices/15-app-multi-pages/ENONCE)
+2. **Exercice** : [16-store-pinia](../../exercices/16-store-pinia/ENONCE)
+3. **Exercice** : [17-tests-complets](../../exercices/17-tests-complets/ENONCE)
+4. **Exercice** : [28-e2e-playwright](../../exercices/28-e2e-playwright/ENONCE)
+5. **Renforcement** : [28b-msw-vitest](../../exercices/28b-msw-vitest/ENONCE)
+:::

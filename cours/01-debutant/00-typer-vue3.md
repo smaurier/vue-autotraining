@@ -1,5 +1,9 @@
 # 04 — Typer Vue 3 (ref, props, emits, slots)
 
+<!-- nav-cours-précédent -->
+> **Cours précédent** : [JS Runtime](../../../02-js-runtime/modules/15-debugging-session.md). Si tu arrives ici sans avoir fait les cours précédents, consulte le [guide de démarrage](../../../GUIDE-DEMARRAGE.md).
+
+
 > **Pour les débutants :** Ce chapitre explique comment typer les concepts principaux de Vue 3. Si vous ne connaissez pas encore Vue, ces concepts peuvent sembler étranges, mais c'est normal !
 
 ---
@@ -146,7 +150,7 @@ form.age = null;         // ✅ null aussi
 // form.age = "30";      // ❌ string refusé !
 ```
 
-### 🎯 Pratique — reactive
+### 🎯 Pratique — réactive
 
 Dans `01-playground.ts` :
 
@@ -637,7 +641,7 @@ provide(ThemeKey, theme); // Fournir le thème à tous les descendants
 ```
 
 ```ts
-// Composant enfant (n'importe où dans l'arbre) : inject (injecter)
+// Composant enfant (n'importe ou dans l'arbre) : inject (injecter)
 import { inject } from "vue";
 import { ThemeKey } from "./types";
 
@@ -748,7 +752,7 @@ onMounted(() => {
 ## Ce qu'il faut retenir
 
 1. **Vue 3 + TypeScript** : La plupart du temps, TypeScript devine automatiquement les types
-2. **ref vs reactive** : `ref` pour valeurs simples, `reactive` pour objets
+2. **ref vs réactive** : `ref` pour valeurs simples, `reactive` pour objets
 3. **Props/Emits** : Toujours typer pour la sécurité
 4. **Le `.value`** : Avec `ref`, toujours utiliser `.value` pour accéder/modifier
 5. **Type safety** : TypeScript vous protège des erreurs courantes

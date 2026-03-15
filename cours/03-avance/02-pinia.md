@@ -49,7 +49,7 @@ Sans Pinia (prop drilling) :          Avec Pinia (store partagé) :
 
 ## Quand utiliser un store ?
 
-| Type de données                  | Où les mettre ?           | Analogie                                |
+| Type de données                  | Ou les mettre ?           | Analogie                                |
 | -------------------------------- | ------------------------- | --------------------------------------- |
 | Locales à 1 seul composant      | `ref` / `reactive`        | Un post-it sur TON bureau               |
 | Partagées parent ↔ enfant       | `props` / `emits`         | Parler directement à ton voisin         |

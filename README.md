@@ -12,14 +12,14 @@ Le format:
 - Langage: `TypeScript` partout
 - Vue APIs: Composition API + Options API (comparaison complète)
 
-## Demarrage rapide
+## Démarrage rapide
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-## Verification qualite
+## Vérification qualite
 
 ```bash
 pnpm typecheck
@@ -34,7 +34,7 @@ pnpm build
 
 ## Méthode de travail
 
-1. Lis la lecon correspondante dans `cours/`.
+1. Lis la leçon correspondante dans `cours/`.
 2. Ouvre l enonce dans `exercices/`.
 3. Code en TypeScript dans `src/exercises/...`.
 4. Lance l app et valide le comportement.
@@ -43,8 +43,8 @@ pnpm build
 ## Roadmap cible ESN
 
 - Débutant solide: fondamentaux Vue 3 + TS + conventions d équipe
-- Intermediaire: composables, patterns async, formulaires, architecture de features
-- Avance: routing, state management, tests unitaires/integration
+- Intermédiaire: composables, patterns async, formulaires, architecture de features
+- Avance: routing, state management, tests unitaires/intégration
 - Expert: performance, SSR/hydration, patterns d architecture front en contexte multi-projets
 
 Le detail est dans `cours/parcours.md`.

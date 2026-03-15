@@ -1,6 +1,6 @@
 # 01 — TanStack Query (Vue Query)
 
-> **Ce chapitre suppose que tu sais ce qu'est une API** (un serveur qui renvoie des données quand on lui demande) **et que tu as déjà vu `fetch`** (la fonction JavaScript pour appeler une API). Si ce n'est pas clair, relis d'abord le module sur les composables et le fetch.
+> **Ce chapitre suppose que tu sais ce qu'est une API** (un serveur qui renvoie des données quand on lui demandé) **et que tu as déjà vu `fetch`** (la fonction JavaScript pour appeler une API). Si ce n'est pas clair, relis d'abord le module sur les composables et le fetch.
 
 ---
 
