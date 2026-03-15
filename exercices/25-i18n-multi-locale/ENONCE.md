@@ -28,7 +28,7 @@ Construire une mini-application e-commerce avec **internationalisation complète
 
 ## Bonus
 
-- Lazy loading des traductions (la langue par défaut est inline, les autres chargées à la demande)
+- Lazy loading des traductions (la langue par défaut est inline, les autres chargées à la demandé)
 - Composant `<i18n-t>` pour interpolation de composants dans les traductions
 
 ## Fichiers

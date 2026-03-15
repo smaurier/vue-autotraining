@@ -1,25 +1,25 @@
-# 01 — Fondamentaux WCAG et accessibilite en Vue
+# 01 — Fondamentaux WCAG et accessibilité en Vue
 
-> **L'accessibilite n'est pas une option, c'est une obligation legale et ethique.**
-> En Europe, la directive europeenne sur l'accessibilite (EAA 2025) impose aux entreprises de rendre leurs services numeriques accessibles.
+> **L'accessibilité n'est pas une option, c'est une obligation legale et ethique.**
+> En Europe, la directive europeenne sur l'accessibilité (EAA 2025) impose aux entreprises de rendre leurs services numériques accessibles.
 > En France, le RGAA impose la conformite WCAG 2.1 AA pour les services publics et, de plus en plus, pour le prive.
 
 ---
 
-## 🎯 Pourquoi l'accessibilite ?
+## 🎯 Pourquoi l'accessibilité ?
 
 | Raison | Detail |
 |--------|--------|
 | **Legale** | RGAA (France), EAA (Europe), ADA (USA) — amendes possibles |
 | **Ethique** | ~15 % de la population mondiale vit avec un handicap |
-| **Business** | Un site accessible est mieux reference (SEO) et touche plus d'utilisateurs |
+| **Business** | Un site accessible est mieux référence (SEO) et touche plus d'utilisateurs |
 | **Qualite** | Un code accessible est un code semantique, mieux structure, plus maintenable |
 
 ---
 
 ## 📖 WCAG 2.1 — Les bases
 
-**WCAG** (Web Content Accessibility Guidelines) est le standard international. Il definit 3 niveaux de conformite :
+**WCAG** (Web Content Accessibility Guidelines) est le standard international. Il définit 3 niveaux de conformite :
 
 | Niveau | Description | Requis en pratique |
 |--------|-------------|-------------------|
@@ -35,7 +35,7 @@ Tout critere WCAG appartient a l'un de ces 4 principes :
 
 ### 1. Perceptible (Perceivable)
 
-L'information doit etre presentee de maniere perceptible par tous les sens.
+L'information doit etre presentee de manière perceptible par tous les sens.
 
 ```vue
 <script setup lang="ts">
@@ -60,8 +60,8 @@ defineProps<ImageProps>()
 </template>
 ```
 
-**Regles cles :**
-- Toute image informative a un `alt` descriptif
+**Regles clés :**
+- Toute image informative à un `alt` descriptif
 - Les videos ont des sous-titres
 - Le contraste texte/fond respecte un ratio minimum (4.5:1 pour AA, 3:1 pour les gros textes)
 
@@ -110,8 +110,8 @@ function handleKeydown(event: KeyboardEvent): void {
 </template>
 ```
 
-**Regles cles :**
-- Tout element interactif doit etre focusable et utilisable au clavier
+**Regles clés :**
+- Tout élément interactif doit etre focusable et utilisable au clavier
 - Utilise des `<button>` natifs, pas des `<div @click>`
 - Pas de piege au clavier (sauf focus trap volontaire dans les modales)
 - Delai suffisant pour interagir (pas d'auto-disparition trop rapide)
@@ -156,7 +156,7 @@ const emailError = computed(() => {
 </template>
 ```
 
-**Regles cles :**
+**Regles clés :**
 - Les labels sont explicites et lies aux inputs
 - Les messages d'erreur sont clairs et lies aux champs concernes
 - La navigation est coherente d'une page a l'autre
@@ -166,7 +166,7 @@ const emailError = computed(() => {
 
 Le contenu doit etre compatible avec les technologies d'assistance actuelles et futures.
 
-**Regles cles :**
+**Regles clés :**
 - HTML valide et semantique
 - Roles ARIA utilises correctement (et seulement quand le HTML natif ne suffit pas)
 - Composants compatibles avec les lecteurs d'ecran
@@ -205,7 +205,7 @@ Le contenu doit etre compatible avec les technologies d'assistance actuelles et 
 </template>
 ```
 
-### 3. Pas de gestion du focus apres changement de route
+### 3. Pas de gestion du focus après changement de route
 
 ```ts
 // composables/useRouteAnnounce.ts
@@ -311,13 +311,13 @@ function addToCart(): void {
 
 ## 📊 Checklist rapide WCAG AA pour Vue
 
-| Critere | Comment verifier |
+| Critere | Comment vérifier |
 |---------|-----------------|
 | Contrastes >= 4.5:1 | DevTools > Accessibility > Contrast |
-| Tous les inputs ont un label | Verifier `<label for>` ou `aria-label` |
+| Tous les inputs ont un label | Vérifier `<label for>` ou `aria-label` |
 | Navigation clavier complete | Tester avec Tab uniquement |
 | Images informatives ont un alt | Inspecter chaque `<img>` |
-| Focus visible sur tous les interactifs | Tabulation et verification visuelle |
+| Focus visible sur tous les interactifs | Tabulation et vérification visuelle |
 | Langue declaree | `<html lang="fr">` |
 | Structure de titres logique | h1 > h2 > h3, pas de saut |
 | Erreurs de formulaire liees aux champs | `aria-describedby` + `aria-invalid` |

@@ -25,7 +25,7 @@ Tu dois voir :
 ## types.ts (rappel, déjà fourni)
 
 ```ts
-// Un "tour" (lap) enregistre l'instant où on a appuyé sur le bouton Tour.
+// Un "tour" (lap) enregistre l'instant ou on a appuyé sur le bouton Tour.
 export interface Lap {
   id: number;   // Numéro du tour (1, 2, 3...)
   time: string; // Temps formaté au moment du tour (ex: "01:23:456")

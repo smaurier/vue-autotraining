@@ -1,4 +1,4 @@
-# 03 — La réactivité (ref, reactive, computed)
+# 03 — La réactivité (ref, réactive, computed)
 
 ---
 
@@ -10,7 +10,7 @@
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
-> 1. `v-if` (ou `v-show` pour cacher sans retirer du DOM)
+> 1. `v-if` (où `v-show` pour cacher sans retirer du DOM)
 > 2. `v-for="item in items"` avec un `:key` unique
 > </details>
 
@@ -127,7 +127,7 @@ count.value = 5  // Le chien de garde VOIT ce changement → il prévient Vue
 **Pense à `ref` comme une boîte-cadeau 🎁 :**
 - La boîte = l'objet ref (surveillé)
 - Le cadeau à l'intérieur = ta valeur (accessible via `.value`)
-- Pour voir ou changer le cadeau, tu dois **ouvrir la boîte** (`.value`)
+- Pour voir où changer le cadeau, tu dois **ouvrir la boîte** (`.value`)
 
 ### Bonne nouvelle : pas de `.value` dans le template !
 
@@ -158,7 +158,7 @@ function increment(): void {
 ```
 
 **Résumé :**
-| Où tu es | Faut-il écrire `.value` ? |
+| Ou tu es | Faut-il écrire `.value` ? |
 |---|---|
 | Dans `<script setup>` | ✅ **Oui**, toujours `count.value` |
 | Dans `<template>` | ❌ **Non**, juste `count` |
@@ -363,7 +363,7 @@ state.compteur++  // le chien de garde voit le changement → Vue réagit
 | `state = { compteur: 5 }` | ❌ Cassé — on a remplacé l'objet surveillé |
 | `const { compteur } = state` puis `compteur++` | ❌ Cassé — c'est une copie déconnectée |
 
-### 🎯 Pratique — reactive
+### 🎯 Pratique — réactive
 
 ```vue
 <!-- Exercice R.3 : Formulaire avec reactive -->
@@ -660,7 +660,7 @@ const tachesRestantes = computed(() => {
 
 > 💡 **Section avancée** — Tu peux la survoler pour l'instant et y revenir plus tard.
 
-`shallowRef` est comme `ref`, mais le chien de garde ne surveille que la **surface** de la boîte, pas ce qu'il y a à l'intérieur. C'est utile pour de très grosses listes où tu veux contrôler finement quand Vue recalcule.
+`shallowRef` est comme `ref`, mais le chien de garde ne surveille que la **surface** de la boîte, pas ce qu'il y a à l'intérieur. C'est utile pour de très grosses listes ou tu veux contrôler finement quand Vue recalcule.
 
 ```ts
 import { shallowRef } from 'vue'
@@ -679,7 +679,7 @@ grosseListe.value = [...grosseListe.value, 'nouvel élément']
 
 ---
 
-## `toRef` / `toRefs` — Extraire des refs depuis un reactive (avancé)
+## `toRef` / `toRefs` — Extraire des refs depuis un réactive (avancé)
 
 > 💡 **Section avancée** — Utile quand tu passeras des données à des composables (fonctions réutilisables).
 

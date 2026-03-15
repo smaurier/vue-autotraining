@@ -18,14 +18,14 @@
 
 ## 🧠 C'est quoi un design system ?
 
-Imagine que tu travailles pour une grande marque (comme McDonald's ou Apple). Cette marque a un **guide de style** qui dit :
+Imagine que tu travailles pour une grande marque (comme McDonald's ou Apple). Cette marque à un **guide de style** qui dit :
 
 - Le rouge McDonald's, c'est exactement `#DA291C` (pas un autre rouge)
 - Le logo doit toujours avoir 10 px d'espace autour
 - Les titres sont en police **Helvetica bold**
 - Les boutons ont des coins arrondis de 8 px
 
-Ce guide de style s'appelle un **design system**. C'est un **ensemble de règles + composants réutilisables** qui garantissent que toute l'application a la même apparence.
+Ce guide de style s'appelle un **design system**. C'est un **ensemble de règles + composants réutilisables** qui garantissent que toute l'application à la même apparence.
 
 > 💡 **Analogie :** Un design system, c'est comme une **charte graphique** pour un architecte : elle définit les matériaux, les couleurs et les formes à utiliser pour que tous les bâtiments d'un quartier aient un style cohérent.
 
@@ -458,3 +458,12 @@ import { Button, Input, Badge } from '@/components/ui'
 ## Suite
 
 → `cours/07-cicd/01-pipeline-ci.md`
+
+---
+
+<!-- parcours-recommande -->
+
+::: tip Parcours recommandé
+1. **Exercice** : [21-ui-kit-storybook](../../exercices/21-ui-kit-storybook/ENONCE)
+2. **Exercice** : [21-ui-kit-composants](../../exercices/21-ui-kit-composants/ENONCE)
+:::

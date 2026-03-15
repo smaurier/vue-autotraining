@@ -208,7 +208,7 @@ import type { AppRouter } from "../server";
 export const trpc = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "/api/trpc",   // L'URL où le serveur tRPC écoute
+      url: "/api/trpc",   // L'URL ou le serveur tRPC écoute
     }),
   ],
 });
@@ -343,7 +343,7 @@ const { data: users, isLoading, error } = useTrpcQuery(
 | | REST | GraphQL | tRPC |
 |---|---|---|---|
 | **Difficulté** | Facile | Moyen | Moyen |
-| **Type safety** | Manuelle (tu écris les types toi-même) | Avec code generation (outil externe) | **Native** (automatique !) |
+| **Type safety** | Manuelle (tu écris les types toi-même) | Avec code génération (outil externe) | **Native** (automatique !) |
 | **Langages backend** | Tous (PHP, Python, Java, Node...) | Tous | **TypeScript uniquement** |
 | **Complexité à mettre en place** | Faible | Élevée (schéma, resolvers...) | Faible |
 | **Écosystème** | Énorme (partout) | Large | En croissance |
@@ -498,3 +498,11 @@ async function createUser() {
 ## Suite
 
 → `cours/09-accessibilite/01-fondamentaux-wcag.md`
+
+---
+
+<!-- parcours-recommande -->
+
+::: tip Parcours recommandé
+1. **Exercice** : [23-client-api-type](../../exercices/23-client-api-type/ENONCE)
+:::

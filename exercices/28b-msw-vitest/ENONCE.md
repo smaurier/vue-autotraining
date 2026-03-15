@@ -34,7 +34,7 @@ En mission, tu testes des composants et des composables qui appellent une API RE
 
 2. Créer `src/mocks/handlers.ts` — handlers pour une API REST `/api/products` :
    - `GET /api/products` → retourne une liste de 3 produits (`{ id, name, price, inStock }`)
-   - `GET /api/products/:id` → retourne un produit par id (ou 404)
+   - `GET /api/products/:id` → retourne un produit par id (où 404)
    - `POST /api/products` → crée un produit (retourne 201 + body)
    - `PATCH /api/products/:id` → met à jour un produit
    - `DELETE /api/products/:id` → supprime (204)

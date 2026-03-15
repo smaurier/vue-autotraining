@@ -1,10 +1,12 @@
 # 01 — Authentification
 
+> **Auth cross-cours** : l'authentification JWT est aussi couverte dans 05-NestJS modules 08 et 19 (cote serveur), 08-React module 10 (NextAuth/Auth.js), 09-Angular module 11 (interceptors + guards). Ce cours pose les fondamentaux cote Vue/Nuxt.
+
 ## 🔑 C'est quoi l'authentification ?
 
 Imagine que tu arrives à l'entrée d'une boîte de nuit :
 
-1. **Authentification** = Le videur te demande ta carte d'identité → « Qui es-tu ? »
+1. **Authentification** = Le videur te demandé ta carte d'identité → « Qui es-tu ? »
 2. **Autorisation** = Le videur regarde ta carte VIP → « As-tu le droit d'entrer en zone VIP ? »
 
 Ce sont **deux choses différentes** :
@@ -40,7 +42,7 @@ Il existe plusieurs façons de gérer l'authentification. Voici les plus courant
 > - On te donne un **bracelet** (= le token JWT)
 > - Chaque fois que tu veux entrer dans une zone, tu montres ton bracelet
 > - Pas besoin de remontrer ton billet à chaque fois !
-> - Le bracelet est **signé** (il a un code unique) → impossible à falsifier
+> - Le bracelet est **signé** (il à un code unique) → impossible à falsifier
 
 Un JWT est simplement un **texte encodé** qui contient des informations sur toi (ton id, ton nom, ton rôle...) et une **signature** qui prouve que c'est le serveur qui l'a créé.
 
@@ -72,13 +74,13 @@ Voici ce qui se passe quand tu te connectes :
 ```
 
 > 💡 **Pourquoi deux tokens ?**
-> Le `accessToken` a une durée de vie courte (15 min) pour limiter les dégâts si quelqu'un le vole.
+> Le `accessToken` à une durée de vie courte (15 min) pour limiter les dégâts si quelqu'un le vole.
 > Le `refreshToken` permet d'obtenir un nouveau `accessToken` sans redemander le mot de passe.
 > C'est comme un pass journée + un pass semaine au festival.
 
 ---
 
-### 📦 Où stocker les tokens ?
+### 📦 Ou stocker les tokens ?
 
 C'est une question **très importante** pour la sécurité. Voyons les options :
 
@@ -256,7 +258,7 @@ export function useAuth() {
   // --- Créer le header d'autorisation ---
 
   function getAuthHeader(): Record<string, string> {
-    // Record<string, string> = un objet où les clés ET les valeurs sont des strings
+    // Record<string, string> = un objet ou les clés ET les valeurs sont des strings
     // Ex: { "Authorization": "Bearer abc123..." }
 
     if (!state.value.accessToken) return {}  // Pas de token → objet vide
@@ -365,7 +367,7 @@ import { useAuth } from '@/composables/useAuth'
 // ── Guard 1 : Vérifier que l'utilisateur est connecté ──
 
 export function authGuard(
-  to: RouteLocationNormalized,     // "to" = la page où l'utilisateur veut aller
+  to: RouteLocationNormalized,     // "to" = la page ou l'utilisateur veut aller
   _from: RouteLocationNormalized,  // "_from" = la page d'où il vient (le _ signifie qu'on ne l'utilise pas)
   next: NavigationGuardNext,       // "next" = la fonction pour continuer ou rediriger
 ): void {
@@ -567,7 +569,7 @@ router.beforeEach((to, from) => {
 
 ### Exercice AUTH.3 — Refresh token
 
-Où stocker chaque token et pourquoi ?
+Ou stocker chaque token et pourquoi ?
 
 - accessToken : ???
 - refreshToken : ???

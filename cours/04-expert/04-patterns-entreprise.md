@@ -702,3 +702,12 @@ export class Email {
 ## Suite
 
 → Module 05 : `cours/05-nuxt3/01-introduction.md`
+
+---
+
+<!-- parcours-recommande -->
+
+::: tip Parcours recommandé
+1. **Exercice** : [18-performance-audit](../../exercices/18-performance-audit/ENONCE)
+2. **Exercice** : [19-architecture-patterns](../../exercices/19-architecture-patterns/ENONCE)
+:::

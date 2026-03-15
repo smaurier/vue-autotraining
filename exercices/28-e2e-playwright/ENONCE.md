@@ -2,7 +2,7 @@
 
 ## Objectif
 
-Écrire une suite de tests E2E complète avec **Playwright** pour une mini-app de gestion d'utilisateurs, en utilisant **MSW** (ou `page.route()`) pour mocker l'API.
+Écrire une suite de tests E2E complète avec **Playwright** pour une mini-app de gestion d'utilisateurs, en utilisant **MSW** (où `page.route()`) pour mocker l'API.
 
 ## Contexte ESN
 

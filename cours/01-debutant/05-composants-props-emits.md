@@ -34,7 +34,7 @@ En Vue, les **composants** sont tes briques LEGO. Chaque composant est un fichie
 | Avantage          | Explication                                                        |
 | ----------------- | ------------------------------------------------------------------ |
 | **Réutilisation** | Un composant `UserCard` peut être utilisé 50 fois dans ton app     |
-| **Lisibilité**    | Chaque fichier a un seul rôle → plus facile à lire                 |
+| **Lisibilité**    | Chaque fichier à un seul rôle → plus facile à lire                 |
 | **Testabilité**   | On peut tester chaque composant séparément                         |
 | **Maintenabilité**| Modifier un composant ne casse pas le reste de l'application       |
 
@@ -187,7 +187,7 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 ```
 
-### Vue 3.5+ : destructuration reactive des props
+### Vue 3.5+ : destructuration réactive des props
 
 Avant Vue 3.5, destructurer les props cassait la réactivité. Il fallait toujours écrire `props.count`, `props.msg`, etc. Depuis Vue 3.5, on peut **destructurer directement `defineProps`** tout en gardant la réactivité :
 
@@ -546,7 +546,7 @@ const lastName = defineModel<string>('lastName')
 
 ### L'analogie du trou dans le mur 🕳️
 
-Imagine que tu construis un **cadre photo** (un composant). Le cadre a une bordure, un style, mais **le trou au milieu est vide** → c'est au parent de décider quelle photo mettre dedans.
+Imagine que tu construis un **cadre photo** (un composant). Le cadre à une bordure, un style, mais **le trou au milieu est vide** → c'est au parent de décider quelle photo mettre dedans.
 
 ```
 ┌──────────────────────────────┐

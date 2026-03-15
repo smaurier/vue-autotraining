@@ -13,7 +13,7 @@ Identifier et corriger des problèmes de performance courants dans une app Vue 3
 
 1. `HeavyList.vue` :
    - Liste de 10 000 éléments
-   - Chaque élément a un calcul coûteux dans le rendu (simulation)
+   - Chaque élément à un calcul coûteux dans le rendu (simulation)
    - Input de filtre qui re-rend toute la liste à chaque frappe
 
 ### Optimisations à appliquer

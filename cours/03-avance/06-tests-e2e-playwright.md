@@ -2,7 +2,7 @@
 
 ---
 
-> **Prerequis : Testing Course**
+> **Prérequis : Testing Course**
 > Les fondamentaux de Playwright (installation, selecteurs, actions, assertions, Page Objects, fixtures, CI) sont couverts en detail dans le **Testing Course** (modules 10-11).
 > Ce module se concentre uniquement sur les **specificites Vue/Nuxt** pour le E2E.
 >
@@ -14,7 +14,7 @@
 
 - Configurer Playwright pour un projet Nuxt 3
 - Tester les pages SSR et les transitions de route
-- Gerer l'hydration dans les tests E2E
+- Gérer l'hydration dans les tests E2E
 
 ---
 
@@ -94,6 +94,6 @@ test('async data should load on page', async ({ page }) => {
 
 ## Navigation
 
-| Precedent | Suivant |
+| Précédent | Suivant |
 |-----------|---------|
-| [05 — Tests d'integration](./05-tests-integration.md) | [07 — MSW et mocking API](./07-msw-et-mocking-api.md) |
+| [05 — Tests d'intégration](./05-tests-integration.md) | [07 — MSW et mocking API](./07-msw-et-mocking-api.md) |

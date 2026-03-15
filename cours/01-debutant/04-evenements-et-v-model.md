@@ -35,7 +35,7 @@ const bouton: HTMLElement | null = document.querySelector('#monBouton')
 // 2. On lui dit : "quand quelqu'un clique sur toi, exécute cette fonction"
 bouton?.addEventListener('click', function(event: MouseEvent) {
   // 'event' est un objet qui contient les détails de ce qui s'est passé
-  // Par exemple : où était la souris au moment du clic
+  // Par exemple : ou était la souris au moment du clic
   console.log('Le bouton a été cliqué !')
   console.log('Position de la souris :', event.clientX, event.clientY)
 })

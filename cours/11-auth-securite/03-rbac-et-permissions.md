@@ -27,7 +27,7 @@
 > - Le **manager** peut aussi ouvrir les bureaux de son équipe
 > - Le **PDG (CEO)** peut ouvrir toutes les portes, y compris le coffre-fort
 >
-> Chaque personne a un **badge** avec un **niveau d'accès** différent.
+> Chaque personne à un **badge** avec un **niveau d'accès** différent.
 > C'est exactement ça le RBAC : **attribuer un rôle à chaque utilisateur**,
 > et chaque rôle donne accès à certaines fonctionnalités.
 
@@ -187,7 +187,7 @@ ou cache son contenu selon les permissions de l'utilisateur.
 
 > **Analogie** : C'est comme un **cadenas intelligent** que tu mets sur une porte.
 > Si l'utilisateur a le bon badge → la porte s'ouvre et il voit le contenu.
-> Sinon → il voit un message "Accès refusé" (ou rien du tout).
+> Sinon → il voit un message "Accès refusé" (où rien du tout).
 
 ```vue
 <!-- components/CanAccess.vue -->
@@ -228,7 +228,7 @@ const allowed = computed(() => {
 ```
 
 > 💡 **Rappel — C'est quoi un slot ?**
-> Un slot c'est un "trou" dans un composant, où le parent peut injecter du contenu.
+> Un slot c'est un "trou" dans un composant, ou le parent peut injecter du contenu.
 > C'est comme un cadre photo : le composant fournit le cadre, le parent fournit la photo.
 
 ### Comment l'utiliser
@@ -345,7 +345,7 @@ import { usePermissions } from '@/composables/usePermissions'
 import type { Permission } from '@/types/permissions'
 
 export function permissionGuard(
-  to: RouteLocationNormalized,  // La page où l'utilisateur veut aller
+  to: RouteLocationNormalized,  // La page ou l'utilisateur veut aller
 ): boolean | { name: string } {
   // Cette fonction retourne :
   // - true              → OK, l'utilisateur peut accéder à la page
@@ -443,7 +443,7 @@ async function login(credentials: LoginCredentials): Promise<void> {
 | --- | --- |
 | **Rôle** | Une étiquette (admin, editor, viewer) attribuée à un utilisateur |
 | **Permission** | Un droit précis (users:delete, products:write) |
-| **RBAC** | Chaque rôle a un ensemble de permissions prédéfinies |
+| **RBAC** | Chaque rôle à un ensemble de permissions prédéfinies |
 | **usePermissions** | Composable pour vérifier les permissions de l'utilisateur connecté |
 | **`<CanAccess>`** | Composant qui affiche ou cache du contenu selon les permissions |
 | **`v-can`** | Directive pour cacher un élément selon une permission |
@@ -529,7 +529,7 @@ export function usePermissions() {
 
 ### Exercice RBAC.3 — Composant CanAccess
 
-Crée un composant qui affiche son contenu seulement si l'utilisateur a la permission :
+Crée un composant qui affiche son contenu seulement si l'utilisateur à la permission :
 
 ```vue
 <!-- CanAccess.vue -->
@@ -576,3 +576,11 @@ Utilisation :
 ## Suite
 
 → `cours/12-vue-query/01-tanstack-query.md`
+
+---
+
+<!-- parcours-recommande -->
+
+::: tip Parcours recommandé
+1. **Exercice** : [26-auth-sécurité](../../exercices/26-auth-securite/ENONCE)
+:::

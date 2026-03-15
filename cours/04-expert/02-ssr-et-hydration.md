@@ -1,5 +1,7 @@
 # 02 — SSR et Hydration
 
+> **SSR cross-cours** : le SSR et l'ISR sont aussi couverts dans 07-HTTP-Caching (modules 10-12 : stratégies de cache CDN, streaming) et 08-React module 06 (Next.js App Router, Server Components). Ici l'angle est Vue/Nuxt spécifique.
+
 > **Niveau** : avancé — Ce chapitre est utile pour **comprendre les concepts**.
 > En pratique, tu n'auras pas besoin de faire du SSR tout de suite, mais c'est important de savoir ce que c'est car on en parle souvent en entretien.
 > C'est OK d'y revenir plus tard !
@@ -50,7 +52,7 @@ La grande question est : **qui construit le HTML de la page ?** Le serveur ? Ou 
 > **C'est TOI (le navigateur) qui cuisines le plat (qui construit la page).**
 >
 > ➡️ Avantage : une fois que tout est prêt, changer de plat est très rapide (navigation fluide)
-> ➡️ Inconvénient : il y a un temps d'attente au début pendant que tu cuisines
+> ➡️ Inconvénient : il y à un temps d'attente au début pendant que tu cuisines
 
 Concrètement, voilà ce qui se passe en CSR :
 
@@ -78,7 +80,7 @@ Concrètement, voilà ce qui se passe en CSR :
 > Mais pour pouvoir le **manger** (interagir avec), tu dois attendre tes couverts (le JavaScript).
 >
 > ➡️ Avantage : tu vois le plat immédiatement (la page s'affiche tout de suite)
-> ➡️ Inconvénient : il y a un petit délai avant de pouvoir interagir
+> ➡️ Inconvénient : il y à un petit délai avant de pouvoir interagir
 
 Concrètement, voilà ce qui se passe en SSR :
 
@@ -168,7 +170,7 @@ Avec le SSR, l'utilisateur voit du contenu **immédiatement**, sans attendre que
 |------|----------|------------------------|-----|-------------------|
 | Client-Side Rendering | CSR | Le **navigateur** | ❌ Non | Dashboards, apps internes |
 | Server-Side Rendering | SSR | Le **serveur** (à chaque requête) | ✅ Oui | E-commerce, sites publics |
-| Static Site Generation | SSG | Le **build** (une seule fois) | ✅ Oui | Blogs, docs, sites vitrines |
+| Static Site Génération | SSG | Le **build** (une seule fois) | ✅ Oui | Blogs, docs, sites vitrines |
 | Incremental Static Regen | ISR | Le build + mise à jour | ✅ Oui | Le meilleur des deux mondes |
 
 > **SSG** = le HTML est généré une fois à la construction du site (comme imprimer des prospectus).
@@ -214,7 +216,7 @@ app.mount('#app')
 
 > ⚠️ **Concept avancé** — Mais bon à comprendre si tu fais du SSR.
 
-Le HTML généré par le serveur **doit être identique** à celui que Vue générerait dans le navigateur. Si ce n'est pas le cas, on a un **mismatch** (une incohérence) et Vue affiche un warning.
+Le HTML généré par le serveur **doit être identique** à celui que Vue générerait dans le navigateur. Si ce n'est pas le cas, on à un **mismatch** (une incohérence) et Vue affiche un warning.
 
 ### Exemple de problème : la date
 

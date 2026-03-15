@@ -22,15 +22,15 @@ Ce parcours applique les principes des sciences cognitives. **Respecte ces règl
 
 ---
 
-## Prerequis — TypeScript
+## Prérequis — TypeScript
 
-> **Avant de commencer ce cours Vue 3**, tu dois maitriser TypeScript.
+> **Avant de commencer ce cours Vue 3**, tu dois maîtriser TypeScript.
 > Suis le cours complet TypeScript : [`typescript-course`](https://github.com/smaurier/TypeScript-autotraining)
-> Minimum requis : Modules 00-09 (Fondamentaux + Intermediaire).
+> Minimum requis : Modules 00-09 (Fondamentaux + Intermédiaire).
 
 ---
 
-## Module 01 — Debutant
+## Module 01 — Débutant
 
 | # | Cours | ⏱️ |
 |---|-------|-----|
@@ -294,8 +294,8 @@ Imprime ou copie ce tableau. Coche après chaque révision.
 
 | Niveau | Cours | Exercices | Total |
 |--------|-------|-----------|-------|
-| Prerequis (TypeScript) | Voir [typescript-course](https://github.com/smaurier/TypeScript-autotraining) | — | — |
-| Module 01 (Debutant) | ~5h15 | ~4h45 | **~10h** |
+| Prérequis (TypeScript) | Voir [typescript-course](https://github.com/smaurier/TypeScript-autotraining) | — | — |
+| Module 01 (Débutant) | ~5h15 | ~4h45 | **~10h** |
 | Module 02 (Intermédiaire) | ~4h45 | ~9h | **~13h45** |
 | Module 03 (Avancé) | ~6h25 | ~7h30 | **~13h55** |
 | Module 04 (Expert) | ~4h | ~3h30 | **~7h30** |

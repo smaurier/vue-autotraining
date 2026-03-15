@@ -572,3 +572,19 @@ Corrige ce code pour que l'ancien élément disparaisse AVANT que le nouveau app
 ## Suite
 
 → Module 03 : `cours/03-avance/01-vue-router.md`
+
+---
+
+<!-- parcours-recommande -->
+
+::: tip Parcours recommandé
+1. **Exercice** : [08-theme-injection](../../exercices/08-theme-injection/ENONCE)
+2. **Exercice** : [09-dashboard-composables](../../exercices/09-dashboard-composables/ENONCE)
+3. **Exercice** : [09-dashboard-filtres](../../exercices/09-dashboard-filtres/ENONCE)
+4. **Exercice** : [10-crud-api](../../exercices/10-crud-api/ENONCE)
+5. **Exercice** : [11-formulaire-multi-étapes](../../exercices/11-formulaire-multi-etapes/ENONCE)
+6. **Exercice** : [12-carte-profil-slots](../../exercices/12-carte-profil-slots/ENONCE)
+7. **Exercice** : [13-tableau-générique](../../exercices/13-tableau-generique/ENONCE)
+8. **Exercice** : [13-tableau-réutilisable](../../exercices/13-tableau-reutilisable/ENONCE)
+9. **Exercice** : [14-galerie-animee](../../exercices/14-galerie-animee/ENONCE)
+:::

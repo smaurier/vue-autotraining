@@ -26,7 +26,7 @@ Si **un seul poste** échoue, la chaîne s'arrête → on ne livre pas un produi
 
 | Terme | Signification | Ce que ça fait |
 |-------|--------------|----------------|
-| **CI** — Intégration Continue | Continuous Integration | Vérifie automatiquement ton code à chaque modification |
+| **CI** — Intégration Continue | Continuous Intégration | Vérifie automatiquement ton code à chaque modification |
 | **CD** — Déploiement Continu | Continuous Delivery/Deployment | Met automatiquement ton app en ligne si tout passe |
 
 ---

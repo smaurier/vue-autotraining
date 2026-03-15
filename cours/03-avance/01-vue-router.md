@@ -57,7 +57,7 @@ pnpm add vue-router@4
 
 ## Étape 1 — Créer le routeur (la "carte" de l'appli)
 
-Le routeur, c'est un fichier où on liste toutes les "routes" : chaque route associe
+Le routeur, c'est un fichier ou on liste toutes les "routes" : chaque route associe
 un **chemin URL** à un **composant Vue**.
 
 ```ts
@@ -122,7 +122,7 @@ createApp(App)
 
 ## Étape 3 — Afficher les pages : `<RouterView>` et `<RouterLink>`
 
-Maintenant qu'on a un routeur, il faut deux choses dans notre template :
+Maintenant qu'on à un routeur, il faut deux choses dans notre template :
 
 1. **`<RouterView />`** — C'est l'**écran de télévision**. Le routeur "change la chaîne"
    en affichant le bon composant selon l'URL.
@@ -225,7 +225,7 @@ const userId = computed(() => Number(route.params.id))
 
 ## Routes imbriquées (nested) — Des pages dans des pages
 
-Imagine un **tableau de bord** (dashboard). Il a un menu latéral qui reste toujours visible,
+Imagine un **tableau de bord** (dashboard). Il à un menu latéral qui reste toujours visible,
 et seul le contenu à droite change selon la sous-page choisie.
 
 C'est comme une **poupée russe** : la page Dashboard contient d'autres pages à l'intérieur.
@@ -402,7 +402,7 @@ declare module 'vue-router' {
 
 ---
 
-## Lazy loading — Charger les pages à la demande
+## Lazy loading — Charger les pages à la demandé
 
 Par défaut, `() => import(...)` charge chaque composant seulement quand on en a besoin.
 C'est comme un livre : on ne charge que le chapitre qu'on lit, pas tout le livre d'un coup.

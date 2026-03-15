@@ -321,7 +321,7 @@ Ces maquettes te donnent une idée de ce que tu vas construire. Chaque écran se
 
 > **Les exercices isolés, c'est bien. Un vrai projet, c'est mieux.**
 
-Chaque concept que tu apprends a un **sens concret** dans DevDesk :
+Chaque concept que tu apprends à un **sens concret** dans DevDesk :
 
 - Les `ref` et `computed` ? Tu les utiliseras pour les filtres et les compteurs.
 - Les `composables` ? Tu en créeras pour la gestion du timer et des filtres.

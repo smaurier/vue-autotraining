@@ -2,7 +2,7 @@
 
 ---
 
-> **Prerequis : Testing Course**
+> **Prérequis : Testing Course**
 > Les fondamentaux de Vitest (configuration, matchers, mocking, tests asynchrones) sont couverts en detail dans le **Testing Course** (modules 02-05).
 > Ce module se concentre uniquement sur les **specificites Vue** : tester des composables et des fonctions utilitaires Vue.
 >
@@ -13,7 +13,7 @@
 ## Objectifs
 
 - Tester des composables Vue 3 avec Vitest
-- Tester des fonctions utilisant la reactivite Vue (`ref`, `computed`, `watch`)
+- Tester des fonctions utilisant la réactivité Vue (`ref`, `computed`, `watch`)
 - Configurer Vitest pour un projet Vue/Nuxt
 
 ---
@@ -95,7 +95,7 @@ describe('useCounter', () => {
 });
 ```
 
-### Composable avec lifecycle (necessite un composant hote)
+### Composable avec lifecycle (nécessité un composant hote)
 
 ```typescript
 // composables/useWindowSize.ts
@@ -220,7 +220,7 @@ describe('useFetch', () => {
 
 ---
 
-## Tester des utilitaires reactifs
+## Tester des utilitaires réactifs
 
 ```typescript
 // utils/reactive-utils.ts
@@ -276,6 +276,6 @@ describe('useDebounce', () => {
 
 ## Navigation
 
-| Precedent | Suivant |
+| Précédent | Suivant |
 |-----------|---------|
 | [02 — Pinia avance](./02-pinia-state-management.md) | [04 — Tests de composants](./04-tests-composants.md) |

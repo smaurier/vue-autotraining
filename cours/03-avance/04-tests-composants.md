@@ -239,7 +239,7 @@ it("affiche les erreurs quand on soumet un formulaire vide", async () => {
 
 ## Tester avec des slots
 
-Les **slots** sont des "trous" dans un composant où le parent peut injecter du contenu HTML.
+Les **slots** sont des "trous" dans un composant ou le parent peut injecter du contenu HTML.
 
 ```ts
 it("affiche le contenu passé dans les slots", () => {
@@ -363,7 +363,7 @@ it("affiche la barre de navigation avec les bons liens", async () => {
 | `shallowMount(Comp)` | Pareil mais remplace les composants enfants par des faux |
 | `wrapper.text()` | Lit tout le texte visible du composant |
 | `wrapper.find(selector)` | Trouve un élément HTML dans le composant |
-| `.trigger("click")` | Simule un clic (ou autre événement) |
+| `.trigger("click")` | Simule un clic (où autre événement) |
 | `.setValue("...")` | Simule la saisie dans un champ |
 | `wrapper.emitted()` | Vérifie les événements émis par le composant |
 

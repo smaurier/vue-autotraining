@@ -11,7 +11,7 @@ Construire un **dashboard visuel de pipeline CI/CD** qui affiche l'état des job
 ## Consignes
 
 1. Composant `PipelineGraph` : affiche les stages du pipeline sous forme de graphe horizontal (lint → test → build → deploy)
-2. Chaque stage a un statut : `pending | running | success | failed | skipped`
+2. Chaque stage à un statut : `pending | running | success | failed | skipped`
 3. Composant `JobCard` : affiche un job avec son nom, durée, statut, et icône
 4. Composant `LogViewer` : affiche les logs d'un job sélectionné (scroll auto, coloration syntaxique basique)
 5. Composant `PipelineMetrics` : temps total, taux de succès, job le plus lent

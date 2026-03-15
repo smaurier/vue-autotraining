@@ -132,7 +132,7 @@ const httpLink = createHttpLink({
 
 // On crée le client Apollo avec le lien et le cache
 export const apolloClient = new ApolloClient({
-  link: httpLink,          // ← Où envoyer les requêtes
+  link: httpLink,          // ← Ou envoyer les requêtes
   cache: new InMemoryCache(), // ← Garder les résultats en mémoire pour aller plus vite
 });
 ```
@@ -292,7 +292,7 @@ const result = await createUser({ input: data });
 
 ---
 
-## 🔧 Code Generation : créer les types automatiquement
+## 🔧 Code Génération : créer les types automatiquement
 
 > ⚡ **Section avancée** — À découvrir plus tard quand tu seras à l'aise avec GraphQL.
 
@@ -315,7 +315,7 @@ pnpm add -D @graphql-codegen/cli @graphql-codegen/typescript @graphql-codegen/ty
 # L'adresse de ton serveur GraphQL (pour lire le schéma)
 schema: http://localhost:4000/graphql
 
-# Où chercher tes fichiers .graphql dans le projet
+# Ou chercher tes fichiers .graphql dans le projet
 documents: "src/**/*.graphql"
 
 # Ce qui sera généré

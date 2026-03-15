@@ -103,7 +103,7 @@ const filteredTodos = computed(() => {
 });
 
 // remainingCount : le nombre de tâches NON terminées.
-// filter() compte les tâches où done est false, puis .length donne le nombre.
+// filter() compte les tâches ou done est false, puis .length donne le nombre.
 const remainingCount = computed(() => {
   return todos.value.filter((todo) => !todo.done).length;
 });

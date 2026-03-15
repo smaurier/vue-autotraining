@@ -12,7 +12,7 @@ C'est un outil qui te permet de :
 - **Tester différentes variantes** (bouton rouge, bouton bleu, bouton désactivé…)
 - **Documenter** tes composants pour que d'autres développeurs les comprennent
 
-> 💡 **Analogie :** Ton application Vue = la maison meublée. Storybook = le catalogue IKEA où tu vois chaque meuble sous tous les angles.
+> 💡 **Analogie :** Ton application Vue = la maison meublée. Storybook = le catalogue IKEA ou tu vois chaque meuble sous tous les angles.
 
 ### Pourquoi c'est utile ?
 
@@ -180,7 +180,7 @@ import { mergeConfig } from "vite";   // Outil de Vite pour fusionner des config
 import path from "path";              // Module Node.js pour manipuler les chemins de fichiers
 
 const config: StorybookConfig = {
-  // Où chercher les fichiers de stories
+  // Ou chercher les fichiers de stories
   stories: ["../src/**/*.stories.@(ts|tsx)"],
 
   // On utilise Vue 3 avec Vite
@@ -199,7 +199,7 @@ const config: StorybookConfig = {
       resolve: {
         alias: {
           // On dit à Storybook : quand tu vois "@/", remplace par le dossier "src/"
-          // __dirname = le dossier où se trouve CE fichier (.storybook/)
+          // __dirname = le dossier ou se trouve CE fichier (.storybook/)
           // "../src" = on remonte d'un niveau puis on va dans src/
           "@": path.resolve(__dirname, "../src"),
         },
@@ -277,7 +277,7 @@ storybook:
 | Concept          | C'est quoi                                                  |
 | ---------------- | ----------------------------------------------------------- |
 | **Storybook**    | Un showroom pour voir tes composants Vue un par un          |
-| **main.ts**      | La configuration : où sont les stories, quels plugins       |
+| **main.ts**      | La configuration : ou sont les stories, quels plugins       |
 | **preview.ts**   | L'apparence : styles globaux, réglages d'affichage          |
 | **Addon**        | Un plugin qui ajoute des fonctionnalités à Storybook        |
 | **Alias @/**     | Un raccourci de chemin qu'il faut configurer dans Storybook |

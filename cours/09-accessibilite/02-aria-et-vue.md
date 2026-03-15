@@ -1,16 +1,16 @@
 # 02 — ARIA et Vue 3
 
 > **Premiere regle d'ARIA : ne pas utiliser ARIA si le HTML natif suffit.**
-> Un `<button>` est toujours preferable a un `<div role="button">`.
+> Un `<button>` est toujours preferable à un `<div role="button">`.
 > ARIA comble les lacunes du HTML natif, il ne le remplace pas.
 
 ---
 
-> **🔄 Rappel du cours precedent**
-> Avant de continuer, verifie que tu peux repondre a ces questions :
+> **🔄 Rappel du cours précédent**
+> Avant de continuer, vérifié que tu peux repondre a ces questions :
 > 1. Quels sont les 4 principes de WCAG (POUR) ?
 > 2. Quel est le ratio de contraste minimum pour le niveau AA ?
-> 3. Pourquoi un `<button>` est-il preferable a un `<div @click>` ?
+> 3. Pourquoi un `<button>` est-il preferable à un `<div @click>` ?
 >
 > <details>
 > <summary>Verifier mes reponses</summary>
@@ -26,19 +26,19 @@
 
 **ARIA** (Accessible Rich Internet Applications) est un ensemble d'attributs HTML qui enrichissent la semantique pour les technologies d'assistance (lecteurs d'ecran, plages braille, etc.).
 
-ARIA definit 3 types d'informations :
+ARIA définit 3 types d'informations :
 
 | Type | Exemples | Role |
 |------|----------|------|
-| **Roles** | `role="dialog"`, `role="tab"`, `role="alert"` | Ce qu'EST l'element |
-| **Proprietes** | `aria-label`, `aria-describedby`, `aria-controls` | Ce que l'element SIGNIFIE |
-| **Etats** | `aria-expanded`, `aria-selected`, `aria-disabled` | L'ETAT actuel de l'element |
+| **Roles** | `role="dialog"`, `role="tab"`, `role="alert"` | Ce qu'EST l'élément |
+| **Proprietes** | `aria-label`, `aria-describedby`, `aria-controls` | Ce que l'élément SIGNIFIE |
+| **Etats** | `aria-expanded`, `aria-selected`, `aria-disabled` | L'ETAT actuel de l'élément |
 
 ---
 
 ## 🗣️ `aria-live` — Annonces dynamiques
 
-En SPA (Single Page Application), le contenu change sans rechargement de page. Les lecteurs d'ecran ne detectent pas ces changements automatiquement. `aria-live` resout ce probleme.
+En SPA (Single Page Application), le contenu change sans rechargement de page. Les lecteurs d'ecran ne detectent pas ces changements automatiquement. `aria-live` resout ce problème.
 
 ### Les 3 valeurs
 
@@ -146,13 +146,13 @@ function removeItem(index: number): void {
 
 ## 🏷️ `aria-label` et `aria-labelledby`
 
-Ces attributs donnent un **nom accessible** aux elements.
+Ces attributs donnent un **nom accessible** aux éléments.
 
 | Attribut | Quand l'utiliser | Exemple |
 |----------|-----------------|---------|
-| `aria-label` | Pas de texte visible pour nommer l'element | `<button aria-label="Fermer">X</button>` |
-| `aria-labelledby` | Un element visible sert de label | `<dialog aria-labelledby="dialog-title">` |
-| `aria-describedby` | Un element visible fournit une description supplementaire | `<input aria-describedby="email-help">` |
+| `aria-label` | Pas de texte visible pour nommer l'élément | `<button aria-label="Fermer">X</button>` |
+| `aria-labelledby` | Un élément visible sert de label | `<dialog aria-labelledby="dialog-title">` |
+| `aria-describedby` | Un élément visible fournit une description supplementaire | `<input aria-describedby="email-help">` |
 
 ```vue
 <script setup lang="ts">
@@ -184,7 +184,7 @@ const isOpen = ref(false)
 
 ## 🔄 Roles dynamiques avec Vue
 
-Les roles ARIA permettent de creer des widgets complexes. Voici les patterns les plus courants.
+Les roles ARIA permettent de créer des widgets complexes. Voici les patterns les plus courants.
 
 ### Onglets (Tabs)
 
@@ -272,7 +272,7 @@ function handleTabKeydown(event: KeyboardEvent, index: number): void {
 </template>
 ```
 
-**Points cles du pattern Tabs :**
+**Points clés du pattern Tabs :**
 - `role="tablist"` sur le conteneur
 - `role="tab"` sur chaque onglet
 - `role="tabpanel"` sur chaque panneau
@@ -474,17 +474,17 @@ function skipToContent(): void {
 
 | Touche | Comportement attendu |
 |--------|---------------------|
-| **Tab** | Passer a l'element focusable suivant |
-| **Shift+Tab** | Revenir a l'element focusable precedent |
+| **Tab** | Passer a l'élément focusable suivant |
+| **Shift+Tab** | Revenir a l'élément focusable précédent |
 | **Enter** | Activer un lien ou un bouton |
 | **Space** | Activer un bouton, cocher une case |
 | **Escape** | Fermer une modale, un dropdown, un tooltip |
 | **Fleches** | Naviguer dans un groupe (onglets, menu, liste) |
-| **Home / End** | Premier / dernier element d'un groupe |
+| **Home / End** | Premier / dernier élément d'un groupe |
 
 ### Pattern "Roving tabindex"
 
-Dans un groupe d'elements (tabs, menu), un seul element a `tabindex="0"`. Les autres ont `tabindex="-1"`. Les fleches deplacent le focus au sein du groupe.
+Dans un groupe d'éléments (tabs, menu), un seul élément a `tabindex="0"`. Les autres ont `tabindex="-1"`. Les fleches deplacent le focus au sein du groupe.
 
 ```ts
 // composables/useRovingTabindex.ts
@@ -529,7 +529,7 @@ export function useRovingTabindex(itemCount: Ref<number>) {
 
 ## 🎯 Pratique
 
-### Exercice ARIA.1 — Creer une region live
+### Exercice ARIA.1 — Créer une region live
 
 Cree un composant notification qui annonce les messages au lecteur d'ecran :
 
@@ -598,7 +598,7 @@ Explique pourquoi ce code ne fonctionne pas correctement et corrige-le :
 3. Pas de `aria-labelledby` pour nommer la modale
 4. Pas de gestion de Escape
 5. Le focus n'est pas deplace dans la modale a l'ouverture
-6. Le focus n'est pas restaure a la fermeture
+6. Le focus n'est pas restaure à la fermeture
 
 ```vue
 <script setup lang="ts">

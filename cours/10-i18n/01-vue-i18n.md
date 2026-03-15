@@ -1,8 +1,8 @@
 # 01 — vue-i18n — Internationalisation avec Vue 3
 
 > **i18n = "internationalization" (i + 18 lettres + n).**
-> C'est le processus de conception d'un logiciel pour qu'il puisse s'adapter a differentes langues et regions sans modification du code source.
-> Ne pas confondre avec **l10n** (localization) = l'adaptation effective a une langue/region specifique.
+> C'est le processus de conception d'un logiciel pour qu'il puisse s'adapter a différentes langues et regions sans modification du code source.
+> Ne pas confondre avec **l10n** (localization) = l'adaptation effective à une langue/region spécifique.
 
 ---
 
@@ -86,7 +86,7 @@ app.mount('#app')
 
 ## 📖 La fonction `t()` — Traduire du texte
 
-`t()` est la fonction centrale de vue-i18n. Elle prend une cle et retourne la traduction dans la langue active.
+`t()` est la fonction centrale de vue-i18n. Elle prend une clé et retourne la traduction dans la langue active.
 
 ```vue
 <script setup lang="ts">
@@ -146,7 +146,7 @@ const messages = {
 
 ## 🔢 Pluralisation
 
-La pluralisation gere les cas ou le texte change selon un nombre. Les regles varient selon la langue.
+La pluralisation géré les cas où le texte change selon un nombre. Les regles varient selon la langue.
 
 ```ts
 const messages = {
@@ -187,7 +187,7 @@ const cartCount = ref(0)
 
 ## 📅 Formatage de dates et nombres
 
-vue-i18n integre l'API `Intl` de JavaScript pour formater les dates et nombres selon la locale.
+vue-i18n intégré l'API `Intl` de JavaScript pour formater les dates et nombres selon la locale.
 
 ### Configuration des formats
 
@@ -322,7 +322,7 @@ export function useLocale() {
 
 ## 📦 Lazy loading des traductions
 
-Pour les grosses applications, charger toutes les traductions au demarrage est penalisant. On peut charger les langues a la demande.
+Pour les grosses applications, charger toutes les traductions au démarrage est penalisant. On peut charger les langues à la demandé.
 
 ```ts
 // plugins/i18n.ts
@@ -487,7 +487,7 @@ const price = 1299.99
 </template>
 ```
 
-Avec la configuration `numberFormats` qui definit `currency` pour chaque locale.
+Avec la configuration `numberFormats` qui définit `currency` pour chaque locale.
 </details>
 
 ---

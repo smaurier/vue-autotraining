@@ -273,7 +273,7 @@ On retrouve **très souvent** ce schéma en 2 temps :
 >   console.log('Bonjour !')
 > }
 >
-> // Quand l'utilisateur clique n'importe où, affiche "Bonjour !"
+> // Quand l'utilisateur clique n'importe ou, affiche "Bonjour !"
 > window.addEventListener('click', direBonjour)
 >
 > // removeEventListener = ARRÊTER d'écouter cet événement

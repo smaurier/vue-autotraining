@@ -202,7 +202,7 @@ Le layout `default.vue` est automatiquement appliqué à **toutes les pages** (s
     <main>
       <slot />
       <!-- ⬆️ C'est ici que le contenu de la page s'affiche ! -->
-      <!-- <slot /> est un "trou" dans le layout où Nuxt insère la page active -->
+      <!-- <slot /> est un "trou" dans le layout ou Nuxt insère la page active -->
       <!-- Si l'URL est /, c'est pages/index.vue qui s'affiche ici -->
       <!-- Si l'URL est /about, c'est pages/about.vue qui s'affiche ici -->
     </main>
