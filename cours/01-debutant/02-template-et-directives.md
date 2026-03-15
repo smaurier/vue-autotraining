@@ -645,6 +645,33 @@ const taille = ref<number>(20)              // La taille en pixels
 </template>
 ```
 
+### Vue 3.4+ : raccourci same-name pour `v-bind`
+
+Depuis Vue 3.4, quand le **nom de l'attribut** et le **nom de la variable** sont identiques, on peut omettre la valeur. C'est le même principe que le shorthand objet en JavaScript (`{ id }` au lieu de `{ id: id }`).
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const id = ref('mon-composant')
+const name = ref('Alice')
+const disabled = ref(false)
+</script>
+
+<template>
+  <!-- Avant (Vue 3.3) : on répète le nom -->
+  <MyComponent :id="id" :name="name" :disabled="disabled" />
+
+  <!-- Après (Vue 3.4+) : raccourci same-name — on omet la valeur -->
+  <MyComponent :id :name :disabled />
+
+  <!-- Fonctionne aussi sur les éléments HTML natifs -->
+  <input :id :name :disabled />
+</template>
+```
+
+> 💡 **Retiens :** `:id` tout seul est exactement équivalent à `:id="id"`. Ça ne fonctionne que si le nom de la variable correspond au nom de l'attribut.
+
 ### 🎯 Pratique — v-bind
 
 ```vue
