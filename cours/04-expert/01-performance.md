@@ -592,6 +592,43 @@ function addItem(item: User) {
 
 ---
 
+## Vue Vapor Mode (experimental)
+
+Vapor est le nouveau mode de compilation de Vue qui **elimine le Virtual DOM** pour les composants qui l'activent. Au lieu de generer un VDOM puis de le diff, le compilateur genere du code imperatif qui manipule le DOM directement — inspire de Solid.js.
+
+### Comment ca marche
+
+```vue
+<!-- Composant classique : compile en Virtual DOM -->
+<template>
+  <div>{{ count }}</div>
+</template>
+<!-- Genere : h('div', null, count) → diff → patch -->
+
+<!-- Composant Vapor : compile en manipulation DOM directe -->
+<template>
+  <div>{{ count }}</div>
+</template>
+<!-- Genere : setText(n0, count) — pas de VDOM -->
+```
+
+### Gains de performance
+
+- **~30-50% moins de memoire** (pas d'arbre VDOM en memoire)
+- **Updates plus rapides** (pas de diffing, mutation directe)
+- **Bundle plus petit** (pas besoin du runtime VDOM)
+
+### Adoption
+
+- **Opt-in par composant** — pas de migration big-bang
+- **Meme syntaxe SFC** — le code du template ne change pas
+- **Interoperable** — les composants Vapor et VDOM coexistent dans la meme app
+- **Status (2026)** : experimental, pas encore recommande en production
+
+> **Quand utiliser Vapor ?** Pour les composants a haute frequence de mise a jour (tableaux, listes virtualisees, animations) ou les applications ou chaque milliseconde compte. Pour la majorite des composants, le VDOM classique de Vue reste parfaitement performant.
+
+---
+
 ## Exercice
 
 → `exercices/13-performance-audit/ENONCE.md`
