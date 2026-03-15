@@ -187,6 +187,39 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 ```
 
+### Vue 3.5+ : destructuration reactive des props
+
+Avant Vue 3.5, destructurer les props cassait la réactivité. Il fallait toujours écrire `props.count`, `props.msg`, etc. Depuis Vue 3.5, on peut **destructurer directement `defineProps`** tout en gardant la réactivité :
+
+```vue
+<script setup lang="ts">
+import { watchEffect } from 'vue'
+
+// ❌ Avant (Vue 3.4 et avant) : la destructuration casse la réactivité
+// const { count } = defineProps<{ count: number }>()
+// count ne serait plus réactif → watchEffect ne se redéclencherait pas
+
+// ✅ Après (Vue 3.5+) : la destructuration est reactive !
+const { count, msg = 'hello' } = defineProps<{
+  count: number
+  msg?: string
+}>()
+
+// count et msg restent réactifs
+watchEffect(() => console.log(count)) // se redéclenche quand count change
+
+// Les valeurs par défaut se mettent directement dans la destructuration
+// Plus besoin de withDefaults() pour les cas simples !
+</script>
+
+<template>
+  <!-- On utilise directement count et msg (pas besoin de props.count) -->
+  <p>{{ msg }} — compteur : {{ count }}</p>
+</template>
+```
+
+> 💡 **Retiens :** en Vue 3.5+, `const { count, msg = 'hello' } = defineProps<...>()` remplace avantageusement `withDefaults` pour les valeurs par défaut simples. Les deux approches restent valides.
+
 ---
 
 ### Passer des props dynamiques

@@ -697,6 +697,41 @@ const childComponentRef = ref<InstanceType<typeof ChildComponent> | null>(null);
 </template>
 ```
 
+### Vue 3.5+ : `useTemplateRef` — la nouvelle approche
+
+Avec l'approche classique (`ref<HTMLInputElement>(null)`), le **nom de la variable** doit correspondre exactement à l'attribut `ref` dans le template. Cela crée un couplage implicite.
+
+Vue 3.5 introduit **`useTemplateRef`** qui découple les deux :
+
+```vue
+<script setup lang="ts">
+// ❌ Avant (Vue 3.4 et avant) : le nom de la variable DOIT matcher le ref du template
+import { ref, onMounted } from 'vue'
+const inputRef = ref<HTMLInputElement | null>(null) // "inputRef" = "inputRef" dans le template
+
+// ✅ Après (Vue 3.5+) : useTemplateRef prend le nom du ref en paramètre
+import { useTemplateRef, onMounted } from 'vue'
+const input = useTemplateRef<HTMLInputElement>('my-input') // le nom de variable est libre
+
+onMounted(() => {
+  input.value?.focus()
+})
+</script>
+
+<template>
+  <!-- Avant : le ref DOIT s'appeler "inputRef" pour matcher la variable -->
+  <input ref="inputRef" type="text" />
+
+  <!-- Après : le ref s'appelle "my-input", la variable peut s'appeler n'importe quoi -->
+  <input ref="my-input" type="text" />
+</template>
+```
+
+**Avantages :**
+- Plus de couplage implicite entre nom de variable et attribut `ref`
+- Le nom du ref est une **string explicite**, plus facile à comprendre
+- Meilleur support TypeScript (le type générique est inféré correctement)
+
 ## Résumé : Quand annoter les types ?
 
 | Situation                 | Annoter ?                  | Pourquoi ?                    |
