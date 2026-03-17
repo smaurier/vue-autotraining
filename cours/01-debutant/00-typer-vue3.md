@@ -6,6 +6,8 @@
 
 > **Pour les débutants :** Ce chapitre explique comment typer les concepts principaux de Vue 3. Si vous ne connaissez pas encore Vue, ces concepts peuvent sembler étranges, mais c'est normal !
 
+> **Ressource transversale** : consulte [`00-pieges-frequents.md`](../00-pieges-frequents.md) régulièrement — il liste les 20 pièges les plus courants en Vue 3. Relis-le une fois par semaine pendant le premier mois.
+
 ---
 
 > **🔄 Rappel du cours précédent**

@@ -5,6 +5,22 @@
 
 ---
 
+<details>
+<summary>Rappel du cours précédent</summary>
+
+1. **À quoi sert MSW (Mock Service Worker) dans les tests Vue ?**
+   MSW intercepte les requêtes HTTP au niveau du réseau pour les remplacer par des réponses simulées, permettant de tester les composants qui appellent des APIs sans vrai serveur.
+
+2. **Comment configure-t-on MSW pour les tests avec Vitest ?**
+   On utilise `setupServer()` depuis `msw/node`, avec `beforeAll(() => server.listen())`, `afterEach(() => server.resetHandlers())` et `afterAll(() => server.close())`.
+
+3. **Comment simuler une erreur API avec MSW dans un test ?**
+   On utilise `server.use()` avec un handler qui retourne `HttpResponse.error()` pour surcharger temporairement le handler par défaut dans un test spécifique.
+
+</details>
+
+---
+
 ## C'est quoi la "performance" ?
 
 La **performance**, c'est tout simplement **la vitesse à laquelle ton application répond** à l'utilisateur.
@@ -626,6 +642,18 @@ Vapor est le nouveau mode de compilation de Vue qui **elimine le Virtual DOM** p
 - **Status (2026)** : experimental, pas encore recommande en production
 
 > **Quand utiliser Vapor ?** Pour les composants a haute frequence de mise a jour (tableaux, listes virtualisees, animations) ou les applications ou chaque milliseconde compte. Pour la majorite des composants, le VDOM classique de Vue reste parfaitement performant.
+
+---
+
+---
+
+## Ce qu'il faut retenir
+
+1. **`v-once` et `v-memo` evitent les re-rendus inutiles** — `v-once` fige un element apres le premier rendu, `v-memo` ne le recalcule que si les valeurs specifiees changent.
+2. **Le lazy loading est une bonne pratique systematique** — charger les routes et composants lourds avec `() => import(...)` reduit le bundle initial et accelere le premier affichage.
+3. **`shallowRef` optimise les grosses listes** — il ne surveille que le remplacement complet de la valeur, pas les mutations internes, ce qui reduit la charge de reactivite.
+4. **`KeepAlive` garde les composants en cache** — utile pour la navigation par onglets, il evite de detruire et recreer les composants a chaque changement.
+5. **Toujours diagnostiquer avant d'optimiser** — utilise Vue DevTools pour identifier les composants qui se re-rendent trop souvent avant d'appliquer des optimisations.
 
 ---
 

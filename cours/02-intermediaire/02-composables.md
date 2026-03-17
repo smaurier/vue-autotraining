@@ -762,6 +762,162 @@ export function useLocalStorage<T>(key: string, defaultValue: T): Ref<T> {
 
 ---
 
+---
+
+## VueUse : la bibliothèque de composables prêts à l'emploi
+
+### C'est quoi VueUse ?
+
+Tu viens de créer `useWindowSize`, `useDebounce`, `useLocalStorage`... Et si quelqu'un avait déjà fait tout ça (et 200 autres composables) avec des tests, de la documentation et un support TypeScript parfait ?
+
+C'est exactement ce qu'est **@vueuse/core** : une collection de **200+ composables** réutilisables pour Vue 3, maintenus par Anthony Fu (membre de la core team Vue).
+
+```bash
+npm install @vueuse/core
+```
+
+> **Analogie** : Si tes composables personnalisés sont tes outils faits maison, VueUse c'est la boîte à outils professionnelle Facom. Tu **peux** fabriquer ton tournevis, mais pour 99% des cas, celui du commerce est mieux testé et plus fiable.
+
+### Les composables VueUse les plus utiles
+
+#### `useLocalStorage` — Persistance réactive
+
+```ts
+import { useLocalStorage } from '@vueuse/core'
+
+// Crée une ref synchronisée avec localStorage
+// Si la clé existe déjà, la valeur est restaurée automatiquement
+const theme = useLocalStorage('theme', 'light')
+// theme est une Ref<string>
+
+theme.value = 'dark'
+// → localStorage.setItem('theme', '"dark"') est appelé automatiquement
+// → Au prochain chargement, theme.value sera 'dark'
+```
+
+C'est comme ton exercice CP.4, mais en **mieux** : VueUse gère la sérialisation, les erreurs, le SSR, et la synchronisation entre onglets.
+
+#### `useDark` — Mode sombre en une ligne
+
+```ts
+import { useDark, useToggle } from '@vueuse/core'
+
+const isDark = useDark()          // Détecte automatiquement la préférence système
+const toggleDark = useToggle(isDark) // Fonction pour basculer
+
+// isDark est une Ref<boolean> réactive
+// Elle ajoute/retire la classe 'dark' sur <html> automatiquement
+```
+
+#### `useIntersectionObserver` — Détecter la visibilité
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useIntersectionObserver } from '@vueuse/core'
+
+const target = ref<HTMLElement | null>(null) // Référence vers l'élément HTML
+const isVisible = ref(false)
+
+// Quand l'élément entre/sort du viewport, isVisible est mis à jour
+useIntersectionObserver(target, ([entry]) => {
+  isVisible.value = entry.isIntersecting
+})
+</script>
+
+<template>
+  <div ref="target">
+    <p v-if="isVisible">Je suis visible à l'écran !</p>
+    <p v-else>Je suis hors de l'écran...</p>
+  </div>
+</template>
+```
+
+Cas d'usage typique : lazy loading d'images, animations au scroll, infinite scroll.
+
+#### `useFetch` — Requêtes HTTP réactives
+
+```ts
+import { useFetch } from '@vueuse/core'
+
+// Lance la requête immédiatement et retourne des refs réactives
+const { data, error, isFetching } = useFetch<User[]>('/api/users')
+  .get()
+  .json()
+
+// data : Ref<User[] | null>
+// error : Ref<any>
+// isFetching : Ref<boolean>
+```
+
+### Combiner VueUse avec tes propres composables
+
+La vraie puissance apparaît quand tu **combines** VueUse avec ta logique métier :
+
+```ts
+// composables/useUserPreferences.ts
+import { useLocalStorage, useDark } from '@vueuse/core'
+import { computed } from 'vue'
+
+interface UserPreferences {
+  fontSize: number
+  language: string
+  notifications: boolean
+}
+
+export function useUserPreferences() {
+  // VueUse gère la persistance
+  const preferences = useLocalStorage<UserPreferences>('user-prefs', {
+    fontSize: 16,
+    language: 'fr',
+    notifications: true,
+  })
+
+  // VueUse gère le mode sombre
+  const isDark = useDark()
+
+  // Ta logique métier par-dessus
+  const cssVariables = computed(() => ({
+    '--font-size': `${preferences.value.fontSize}px`,
+    '--theme': isDark.value ? 'dark' : 'light',
+  }))
+
+  function resetToDefaults(): void {
+    preferences.value = { fontSize: 16, language: 'fr', notifications: true }
+  }
+
+  return { preferences, isDark, cssVariables, resetToDefaults }
+}
+```
+
+### Quand NE PAS utiliser VueUse
+
+VueUse est excellent, mais il ne faut pas en abuser :
+
+| Situation | Utiliser VueUse ? | Pourquoi |
+|-----------|-------------------|----------|
+| Logique standard (localStorage, dark mode, fetch) | Oui | Déjà testé, documenté, edge cases gérés |
+| Logique métier spécifique | Non | Écris ton propre composable |
+| Composable de 5 lignes | Non | L'import VueUse est plus lourd que le code |
+| Apprentissage | Non d'abord | Comprends le mécanisme avant d'utiliser la lib |
+| Un seul composable VueUse | Peut-être | Ça vaut le coup d'ajouter une dépendance ? |
+
+> **Principe de simplicité** : n'ajoute pas une dépendance pour remplacer 10 lignes de code. Utilise VueUse quand tu as besoin de **plusieurs** de ses composables, ou quand le composable VueUse gère des edge cases complexes (SSR, synchronisation onglets, nettoyage...) que tu ne veux pas gérer toi-même.
+
+---
+
+---
+
+## Ce qu'il faut retenir
+
+1. **Un composable est une fonction `use...()` réutilisable** — elle contient de la logique réactive (refs, computed, watch) et retourne un objet avec les données et fonctions nécessaires.
+2. **Chaque appel crée sa propre instance** — deux composants utilisant `useCounter()` ont chacun leur propre compteur indépendant.
+3. **Toujours nettoyer les side effects** — si un composable ajoute un `addEventListener` ou un `setInterval`, il doit les supprimer dans `onUnmounted` pour éviter les fuites mémoire.
+4. **Les composables se composent entre eux** — `useSearchUsers` peut utiliser `useDebounce` et `useAsyncData` comme des briques LEGO pour créer une logique complexe.
+5. **VueUse est la bibliothèque de référence** — elle fournit 200+ composables prêts à l'emploi, mais il faut d'abord comprendre le mécanisme avant de l'utiliser.
+
+---
+
 ## Exercice
 
 → `exercices/06-dashboard-filtres/ENONCE.md`

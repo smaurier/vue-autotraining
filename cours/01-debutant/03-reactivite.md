@@ -722,6 +722,18 @@ age.value = 31            // ← modifie aussi state.age !
 
 ---
 
+---
+
+## Ce qu'il faut retenir
+
+1. **`ref` est l'outil principal** — il emballe n'importe quelle valeur dans un objet réactif surveillé par Vue, accessible via `.value` dans le script.
+2. **`.value` dans le script, pas dans le template** — Vue déballe automatiquement les refs dans `<template>`, donc on écrit `{{ count }}` et non `{{ count.value }}`.
+3. **`reactive` est réservé aux formulaires** — il rend un objet directement réactif sans `.value`, mais ne doit jamais être réassigné ni déstructuré sans `toRefs`.
+4. **`computed` = formule Excel** — une valeur calculée à partir d'autres refs, avec mise en cache automatique et recalcul uniquement quand les dépendances changent.
+5. **Préfère `ref` à `reactive`** — `ref` est plus flexible (accepte tout type, réassignable), et ses pièges sont moins nombreux que ceux de `reactive`.
+
+---
+
 ## Suite
 
 → `cours/01-debutant/04-evenements-et-v-model.md`

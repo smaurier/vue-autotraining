@@ -1,5 +1,21 @@
 # 01 — Nuxt 3 : Introduction
 
+<details>
+<summary>Rappel du cours précédent</summary>
+
+1. **Qu'est-ce qu'un pattern "Service Layer" et pourquoi l'utiliser ?**
+   C'est une couche de code dédiée aux appels API, séparée des composants. Cela évite de mélanger logique d'affichage et communication serveur, et facilite la maintenance si l'URL de l'API change.
+
+2. **Quel est l'avantage du pattern Repository avec une interface ?**
+   On peut avoir plusieurs implémentations (HTTP pour la production, InMemory pour les tests) tout en utilisant le même contrat, ce qui rend le code testable et découplé.
+
+3. **Qu'est-ce qu'un Value Object comme `Email` ?**
+   C'est un objet qui encapsule une valeur avec ses règles de validation. Une fois créé, on est garanti que la valeur est valide partout dans le code, sans devoir la revérifier.
+
+</details>
+
+---
+
 ## Avant de commencer : c'est quoi un "framework" ?
 
 > **Analogie** : imagine que tu veux construire une maison.

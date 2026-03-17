@@ -553,6 +553,18 @@ async function deleteProduct(id: number) {
 
 ---
 
+---
+
+## Ce qu'il faut retenir
+
+1. **`useFetch` est l'outil principal pour charger des donnees** — il gere automatiquement le SSR (pas de double chargement), le cache et retourne `data`, `pending`, `error` et `refresh`.
+2. **`useAsyncData` offre plus de controle** — il permet de combiner plusieurs requetes, transformer les donnees et definir une cle de cache personnalisee.
+3. **`$fetch` est reserve aux actions utilisateur** — pour les clics, soumissions de formulaire et autres evenements, on utilise `$fetch` directement au lieu de `useFetch`.
+4. **`refresh()` recharge les donnees apres une mutation** — apres un POST ou DELETE, appeler `refresh()` met a jour la liste affichee sans recharger la page.
+5. **L'option `watch` re-execute automatiquement la requete** — en passant des refs dans `watch: [search]`, `useFetch` relance la requete a chaque changement de la variable surveillee.
+
+---
+
 ## Suite
 
 → `cours/05-nuxt3/04-server-routes.md`

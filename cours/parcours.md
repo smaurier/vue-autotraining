@@ -51,6 +51,17 @@ Exercices :
 - `exercices/06-chronometre/` → ex06 (~45 min)
 - `exercices/07-options-vs-composition/` → ex07 (~30 min)
 
+Quizzes :
+- `quizzes/quiz-00-pieges-frequents.html`
+- `quizzes/quiz-01-00-typer-vue3.html`
+- `quizzes/quiz-01-01-environnement.html`
+- `quizzes/quiz-01-02-template-et-directives.html`
+- `quizzes/quiz-01-03-reactivite.html`
+- `quizzes/quiz-01-04-evenements-et-v-model.html`
+- `quizzes/quiz-01-05-composants-props-emits.html`
+- `quizzes/quiz-01-06-lifecycle-hooks.html`
+- `quizzes/quiz-01-07-options-vs-composition.html`
+
 ---
 
 ## Module 02 — Intermédiaire
@@ -75,6 +86,14 @@ Exercices :
 - ⟳ `exercices/13-tableau-reutilisable/` → ex13b — **Renforcement** (~90 min)
 - `exercices/14-galerie-animee/` → ex14 (~60 min)
 
+Quizzes :
+- `quizzes/quiz-02-01-composition-api-avancee.html`
+- `quizzes/quiz-02-02-composables.html`
+- `quizzes/quiz-02-03-gestion-async.html`
+- `quizzes/quiz-02-04-formulaires-et-validation.html`
+- `quizzes/quiz-02-05-slots-avances.html`
+- `quizzes/quiz-02-06-transitions-et-animations.html`
+
 ---
 
 ## Module 03 — Avancé
@@ -96,6 +115,15 @@ Exercices :
 - `exercices/28-e2e-playwright/` → ex28 (~90 min)
 - ⟳ `exercices/28b-msw-vitest/` → ex28b — **Renforcement** (~75 min)
 
+Quizzes :
+- `quizzes/quiz-03-01-vue-router.html`
+- `quizzes/quiz-03-02-pinia.html`
+- `quizzes/quiz-03-03-tests-unitaires.html`
+- `quizzes/quiz-03-04-tests-composants.html`
+- `quizzes/quiz-03-05-tests-integration.html`
+- `quizzes/quiz-03-06-tests-e2e-playwright.html`
+- `quizzes/quiz-03-07-msw-et-mocking-api.html`
+
 ---
 
 ## Module 04 — Expert
@@ -110,6 +138,12 @@ Exercices :
 Exercices :
 - `exercices/18-performance-audit/` → ex18 (~90 min)
 - `exercices/19-architecture-patterns/` → ex19 (~120 min)
+
+Quizzes :
+- `quizzes/quiz-04-01-performance.html`
+- `quizzes/quiz-04-02-ssr-et-hydration.html`
+- `quizzes/quiz-04-03-architecture-front.html`
+- `quizzes/quiz-04-04-patterns-entreprise.html`
 
 ---
 
@@ -127,6 +161,13 @@ Exercices :
 - `exercices/20-nuxt-patterns/` → ex20 (~75 min)
 - ⟳ `exercices/20-blog-nuxt-simule/` → ex20b — **Renforcement** (~120 min)
 
+Quizzes :
+- `quizzes/quiz-05-01-introduction.html`
+- `quizzes/quiz-05-02-pages-et-layouts.html`
+- `quizzes/quiz-05-03-data-fetching.html`
+- `quizzes/quiz-05-04-server-routes.html`
+- `quizzes/quiz-05-05-seo-et-meta.html`
+
 ---
 
 ## Module 06 — Storybook & Design System
@@ -140,6 +181,11 @@ Exercices :
 Exercices :
 - `exercices/21-ui-kit-storybook/` → ex21 (~75 min)
 - ⟳ `exercices/21-ui-kit-composants/` → ex21b — **Renforcement** (~90 min)
+
+Quizzes :
+- `quizzes/quiz-06-01-setup.html`
+- `quizzes/quiz-06-02-stories.html`
+- `quizzes/quiz-06-03-design-system.html`
 
 ---
 
@@ -155,6 +201,11 @@ Exercices :
 - `exercices/22-pipeline-ci/` → ex22 (~60 min)
 - ⟳ `exercices/22-pipeline-ci-visuel/` → ex22b — **Renforcement** (~75 min)
 
+Quizzes :
+- `quizzes/quiz-07-01-pipeline-ci.html`
+- `quizzes/quiz-07-02-deploiement.html`
+- `quizzes/quiz-07-03-monitoring.html`
+
 ---
 
 ## Module 08 — API Typées (GraphQL / tRPC)
@@ -165,6 +216,10 @@ Exercices :
 | 2 | `cours/08-api-typees/02-trpc.md` | ~50 min |
 
 Exercice : `exercices/23-client-api-type/` → ex23 (~90 min)
+
+Quizzes :
+- `quizzes/quiz-08-01-graphql-vue3.html`
+- `quizzes/quiz-08-02-trpc.html`
 
 ---
 
@@ -178,6 +233,11 @@ Exercice : `exercices/23-client-api-type/` → ex23 (~90 min)
 
 Exercice : `exercices/24-audit-accessibilite/` → ex24 (~75 min)
 
+Quizzes :
+- `quizzes/quiz-09-accessibilite.html`
+- `quizzes/quiz-09-02-aria-et-vue.html`
+- `quizzes/quiz-09-03-audit-a11y.html`
+
 ---
 
 ## Module 10 — Internationalisation (i18n)
@@ -188,6 +248,10 @@ Exercice : `exercices/24-audit-accessibilite/` → ex24 (~75 min)
 | 2 | `cours/10-i18n/02-strategies-avancees.md` | ~50 min |
 
 Exercice : `exercices/25-i18n-multi-locale/` → ex25 (~75 min)
+
+Quizzes :
+- `quizzes/quiz-10-01-vue-i18n.html`
+- `quizzes/quiz-10-02-strategies-avancees.html`
 
 ---
 
@@ -201,6 +265,11 @@ Exercice : `exercices/25-i18n-multi-locale/` → ex25 (~75 min)
 
 Exercice : `exercices/26-auth-securite/` → ex26 (~90 min)
 
+Quizzes :
+- `quizzes/quiz-11-01-authentification.html`
+- `quizzes/quiz-11-02-securite-front.html`
+- `quizzes/quiz-11-03-rbac-et-permissions.html`
+
 ---
 
 ## Module 12 — TanStack Query (Vue Query)
@@ -211,6 +280,10 @@ Exercice : `exercices/26-auth-securite/` → ex26 (~90 min)
 | 2 | `cours/12-vue-query/02-patterns-avances.md` | ~60 min |
 
 Exercice : `exercices/27-vue-query-crud/` → ex27 (~90 min)
+
+Quizzes :
+- `quizzes/quiz-12-01-tanstack-query.html`
+- `quizzes/quiz-12-02-patterns-avances.html`
 
 ---
 
