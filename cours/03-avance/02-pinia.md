@@ -746,6 +746,18 @@ async function fetchUsers() {
 
 ---
 
+---
+
+## Ce qu'il faut retenir
+
+1. **Pinia est le tableau blanc partagé** — il permet à tous les composants d'accéder aux mêmes données (state) sans prop drilling entre niveaux de composants.
+2. **Un store se compose de state, getters et actions** — le state contient les données brutes, les getters sont des valeurs calculées, les actions modifient le state.
+3. **`defineStore` avec la syntaxe Composition API** — on utilise `ref` pour le state, `computed` pour les getters, et des fonctions pour les actions, le tout dans une fonction retournant un objet.
+4. **Attention à la déstructuration** — le state et les getters perdent leur réactivité si on déstructure directement le store ; il faut utiliser `storeToRefs()` pour conserver la réactivité.
+5. **Un store n'est nécessaire que pour les données partagées** — les données locales à un seul composant restent dans des `ref`/`reactive` locaux, pas dans un store.
+
+---
+
 ## Exercice
 
 → `exercices/11-store-pinia/ENONCE.md`

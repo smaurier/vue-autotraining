@@ -5,6 +5,22 @@
 
 ---
 
+<details>
+<summary>Rappel du cours précédent</summary>
+
+1. **Quel composant Vue utilise-t-on pour animer l'entrée/sortie d'un seul élément ?**
+   `<Transition>` avec un attribut `name` qui définit le préfixe des classes CSS (ex : `.fade-enter-from`).
+
+2. **Quelle est la différence entre `<Transition>` et `<TransitionGroup>` ?**
+   `<Transition>` anime un seul élément, `<TransitionGroup>` anime une liste d'éléments (ajouts, suppressions, repositionnements avec la classe `-move`).
+
+3. **Pourquoi utiliser `mode="out-in"` sur une `<Transition>` ?**
+   Pour que l'ancien élément disparaisse complètement avant que le nouveau apparaisse, évitant ainsi la superposition des deux éléments pendant l'animation.
+
+</details>
+
+---
+
 ## C'est quoi le "routing" ?
 
 Imagine que ton application est un **grand immeuble**. Chaque appartement est une page différente

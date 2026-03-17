@@ -1,5 +1,21 @@
 # 01 — Composition API avancée : surveiller et réagir aux données
 
+<details>
+<summary>Rappel du cours précédent</summary>
+
+1. **Quelles sont les deux façons d'écrire un composant Vue 3 ?**
+   L'Options API (organisation par type : `data`, `computed`, `methods`) et la Composition API (organisation par feature avec `<script setup>`).
+
+2. **Comment reconnaître la Composition API d'un coup d'oeil ?**
+   Elle utilise `<script setup lang="ts">`, importe `ref`, `computed` depuis Vue, et n'utilise jamais `this`.
+
+3. **Pourquoi la Composition API est-elle recommandée pour les nouveaux projets ?**
+   Meilleur support TypeScript, code regroupé par feature, pas de `this`, possibilité de créer des composables réutilisables.
+
+</details>
+
+---
+
 ## C'est quoi la "Composition API avancée" ?
 
 Dans les chapitres précédents, tu as appris les bases : `ref()`, `reactive()`, `computed()`.
