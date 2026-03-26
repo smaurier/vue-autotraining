@@ -5,6 +5,9 @@
   "type": "module",
   "packageManager": "pnpm@10.6.5",
   "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
@@ -21,6 +24,7 @@
     "pinia": "^2.2.6"
   },
   "devDependencies": {
+    "vitepress": "^1.6.3",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/test-utils": "^2.4.6",
     "happy-dom": "^15.11.7",
