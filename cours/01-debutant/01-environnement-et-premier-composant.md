@@ -31,12 +31,12 @@
 
 ## Ce qu'on installe (et pourquoi !)
 
-| Outil              | C'est quoi ?                             | Analogie                                                  |
-| ------------------ | ---------------------------------------- | --------------------------------------------------------- |
-| **Node.js** (LTS)  | Runtime JavaScript                       | Un moteur qui fait tourner JavaScript en dehors du navigateur |
-| **pnpm**           | Gestionnaire de paquets                  | Comme un **App Store** pour les bibliothèques de code     |
-| **Vite**           | Bundler de développement                 | Un **chef cuisinier** qui prépare et sert ton code au navigateur |
-| **VS Code**        | Éditeur de code                          | Ton atelier de travail avec des super-pouvoirs            |
+| Outil             | C'est quoi ?             | Analogie                                                         |
+| ----------------- | ------------------------ | ---------------------------------------------------------------- |
+| **Node.js** (LTS) | Runtime JavaScript       | Un moteur qui fait tourner JavaScript en dehors du navigateur    |
+| **pnpm**          | Gestionnaire de paquets  | Comme un **App Store** pour les bibliothèques de code            |
+| **Vite**          | Bundler de développement | Un **chef cuisinier** qui prépare et sert ton code au navigateur |
+| **VS Code**       | Éditeur de code          | Ton atelier de travail avec des super-pouvoirs                   |
 
 ### 🔍 Node.js — c'est quoi ?
 
@@ -232,7 +232,7 @@ h1 {
 
 #### `<template>`
 
-- C'est du **HTML enrichi** avec la syntaxe Vue (directives, interpolation `{{ }}`…).
+- C'est du **HTML enrichi** avec la syntaxe Vue (directives, interpolation `&#123;&#123; &#125;&#125;`…).
 - En Vue 3, tu peux mettre **plusieurs éléments** côte à côte (pas besoin d'un `<div>` qui englobe tout). C'est ce qu'on appelle les **fragments**.
 
 #### `<style scoped>`
@@ -278,7 +278,7 @@ createApp(App).mount("#app");
 
 ---
 
-## L'interpolation `{{ }}` — afficher des données dans le HTML
+## L'interpolation `&#123;&#123; &#125;&#125;` — afficher des données dans le HTML
 
 > 📖 **Rappel JavaScript**
 >
@@ -289,17 +289,17 @@ createApp(App).mount("#app");
 > console.log(`Bonjour ${nom}`); // Affiche : Bonjour Alice
 > ```
 >
-> En Vue, c'est le même principe mais dans le HTML, avec des **doubles accolades** `{{ }}`.
+> En Vue, c'est le même principe mais dans le HTML, avec des **doubles accolades** `&#123;&#123; &#125;&#125;`.
 
-Les doubles accolades `{{ }}` servent à **afficher la valeur d'une expression JavaScript** dans le template HTML.
+Les doubles accolades `&#123;&#123; &#125;&#125;` servent à **afficher la valeur d'une expression JavaScript** dans le template HTML.
 
 > **Analogie** : Imagine un modèle de lettre avec des trous :
 >
-> *« Cher {{ nom }}, votre commande n° {{ numCommande }} est prête. »*
+> `Cher &#123;&#123; nom &#125;&#125;, votre commande n° &#123;&#123; numCommande &#125;&#125; est prête.`
 >
 > Vue remplit les trous avec les vraies valeurs. Si `nom` vaut `"Alice"` et `numCommande` vaut `42`, on obtient :
 >
-> *« Cher Alice, votre commande n° 42 est prête. »*
+> _« Cher Alice, votre commande n° 42 est prête. »_
 
 ### Exemples
 
@@ -325,7 +325,7 @@ const message = ref<string>("Bonjour");
 </template>
 ```
 
-> ⚠️ **Attention** : entre les `{{ }}`, on met des **expressions** (quelque chose qui produit une valeur), pas des **instructions** (comme `if`, `for`, `let`…). Par exemple `{{ 1 + 1 }}` ✅ mais `{{ let x = 1 }}` ❌.
+> ⚠️ **Attention** : entre les `&#123;&#123; &#125;&#125;`, on met des **expressions** (quelque chose qui produit une valeur), pas des **instructions** (comme `if`, `for`, `let`…). Par exemple `&#123;&#123; 1 + 1 &#125;&#125;` ✅ mais `&#123;&#123; let x = 1 &#125;&#125;` ❌.
 
 ---
 

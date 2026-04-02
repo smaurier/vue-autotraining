@@ -57,7 +57,7 @@ features:
 ## Démarrer en local
 
 ```bash
-# dans 01-vue/
+# dans 02-vue/
 pnpm install
 pnpm docs:dev    # → http://localhost:5171
 ```

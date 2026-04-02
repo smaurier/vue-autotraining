@@ -2,8 +2,11 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 
+const lifecycleEvent = process.env.npm_lifecycle_event ?? "";
+const isVitePress = lifecycleEvent.startsWith("docs:");
+
 export default defineConfig({
-  plugins: [vue()],
+  plugins: isVitePress ? [] : [vue()],
   resolve: {
     alias: {
       "@": "/src",

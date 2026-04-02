@@ -2,6 +2,7 @@
 
 Projet d apprentissage progressif Vue 3 de débutant a expert, cible ESN.
 Le format:
+
 - cours en Markdown
 - exercices pratiques dans le code
 - correction par review (tu me partages tes fichiers, je corrige)
@@ -16,7 +17,13 @@ Le format:
 
 ```bash
 pnpm install
-pnpm dev
+pnpm docs:dev    # → http://localhost:5171 — Voir les cours (VitePress)
+```
+
+Pour les exercices :
+
+```bash
+pnpm dev         # → Développer les exercices (Vite)
 ```
 
 ## Vérification qualite
@@ -56,10 +63,12 @@ Module: debutant / exercice 01
 Objectif: ce que j ai voulu faire
 Blocages: points fragiles
 Fichiers modifies:
+
 - src/exercises/ex01/CounterReactive.vue
 ```
 
 Je te repondrai avec:
+
 - bugs et regressions
 - qualite du code
 - version corrigee proposee

@@ -680,5 +680,5 @@ const { data: orders } = useQuery({
 Bravo, tu as termine le cours **Vue.js** ! 
 Le prochain cours du curriculum est **Angular**.
 
-[Commencer Angular →](../../../09-angular/cours/00-de-vue-a-angular/01-vue-vs-angular-mental-model.md)
+[Commencer Angular →](../../../03-angular/cours/00-de-vue-a-angular/01-vue-vs-angular-mental-model.md)
 :::
