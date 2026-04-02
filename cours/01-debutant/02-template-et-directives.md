@@ -6,9 +6,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Que signifie SFC et quelles sont les 3 sections d'un fichier `.vue` ?
 > 2. À quoi sert `<script setup>` par rapport à `<script>` classique ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -45,13 +46,13 @@ Une **directive** est un attribut spécial qu'on ajoute sur une balise HTML. Tou
 
 ### Les directives qu'on va apprendre
 
-| Directive | Ce qu'elle fait (en français simple)                |
-| --------- | --------------------------------------------------- |
-| `v-if`    | « Affiche ça SI la condition est vraie »            |
+| Directive | Ce qu'elle fait (en français simple)               |
+| --------- | -------------------------------------------------- |
+| `v-if`    | « Affiche ça SI la condition est vraie »           |
 | `v-show`  | « Cache/montre ça (mais ça reste dans la page) »   |
-| `v-for`   | « Répète ça pour chaque élément d'une liste »       |
-| `v-bind`  | « Connecte cet attribut HTML à une variable »       |
-| `v-on`    | « Quand cet événement arrive, fais quelque chose »  |
+| `v-for`   | « Répète ça pour chaque élément d'une liste »      |
+| `v-bind`  | « Connecte cet attribut HTML à une variable »      |
+| `v-on`    | « Quand cet événement arrive, fais quelque chose » |
 
 ---
 
@@ -63,15 +64,15 @@ En JavaScript, on utilise `if` / `else` pour exécuter du code selon une conditi
 
 ```ts
 // On déclare une variable
-const age: number = 20
+const age: number = 20;
 
 // Si age est supérieur ou égal à 18...
 if (age >= 18) {
-  console.log("Majeur")     // ...on affiche "Majeur"
+  console.log("Majeur"); // ...on affiche "Majeur"
 }
 // Sinon...
 else {
-  console.log("Mineur")     // ...on affiche "Mineur"
+  console.log("Mineur"); // ...on affiche "Mineur"
 }
 ```
 
@@ -80,6 +81,7 @@ else {
 **Affichage conditionnel** = décider quel élément montrer selon une condition.
 
 C'est comme un **panneau d'affichage** dans un magasin :
+
 - Si le magasin est **ouvert** → on montre le panneau "Bienvenu !"
 - Si le magasin est **fermé** → on montre le panneau "Revenez demain"
 - On ne montre **jamais les deux** en même temps
@@ -89,11 +91,11 @@ C'est comme un **panneau d'affichage** dans un magasin :
 ```vue
 <script setup lang="ts">
 // On importe ref pour créer des variables réactives (on verra ça en détail au cours 03)
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // On crée une variable "magasinOuvert" qui vaut true (ouvert)
 // ref() rend la variable "réactive" → Vue surveille les changements
-const magasinOuvert = ref<boolean>(true)
+const magasinOuvert = ref<boolean>(true);
 </script>
 
 <template>
@@ -113,14 +115,14 @@ Parfois on a **plus de deux cas**. C'est comme un feu tricolore :
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // On définit un type personnalisé : la variable ne peut contenir QUE ces 3 valeurs
 // C'est TypeScript qui nous protège des fautes de frappe !
-type Feu = 'rouge' | 'orange' | 'vert'
+type Feu = "rouge" | "orange" | "vert";
 
 // La variable "feu" contient la couleur actuelle du feu
-const feu = ref<Feu>('rouge')
+const feu = ref<Feu>("rouge");
 </script>
 
 <template>
@@ -153,15 +155,16 @@ Condition = false  →  (rien, le vide)          (l'élément est SUPPRIMÉ de l
 `v-show` fonctionne différemment : au lieu de **supprimer** l'élément, il le **cache** en le rendant invisible.
 
 C'est la différence entre :
+
 - **`v-if`** = enlever un livre de l'étagère (il n'est plus là)
 - **`v-show`** = mettre un drap sur le livre (il est toujours là, mais on ne le voit pas)
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // Variable qui contrôle si le message est visible ou non
-const messageVisible = ref<boolean>(true)
+const messageVisible = ref<boolean>(true);
 </script>
 
 <template>
@@ -171,28 +174,26 @@ const messageVisible = ref<boolean>(true)
 
   <!-- Un bouton pour montrer/cacher le message -->
   <!-- Au clic, on inverse la valeur : true devient false, false devient true -->
-  <button @click="messageVisible = !messageVisible">
-    Montrer / Cacher
-  </button>
+  <button @click="messageVisible = !messageVisible">Montrer / Cacher</button>
 </template>
 ```
 
 ### `v-if` vs `v-show` — Quand utiliser lequel ?
 
-| Question                                          | Réponse        |
-| ------------------------------------------------- | -------------- |
-| L'élément change **souvent** (toggle fréquent) ?  | → `v-show` ✅  |
-| L'élément change **rarement** ?                   | → `v-if` ✅    |
-| Tu veux que l'élément **n'existe pas du tout** ?  | → `v-if` ✅    |
+| Question                                         | Réponse       |
+| ------------------------------------------------ | ------------- |
+| L'élément change **souvent** (toggle fréquent) ? | → `v-show` ✅ |
+| L'élément change **rarement** ?                  | → `v-if` ✅   |
+| Tu veux que l'élément **n'existe pas du tout** ? | → `v-if` ✅   |
 
 **Pourquoi ?**
 
-| Aspect                  | `v-if`                                    | `v-show`                               |
-| ----------------------- | ----------------------------------------- | -------------------------------------- |
-| Quand la condition est fausse | L'élément est **supprimé** du HTML   | L'élément est **caché** (CSS `display: none`) |
-| Coût au premier affichage | **Faible** si la condition commence à false | **Toujours présent**, même si caché   |
-| Coût pour montrer/cacher | **Élevé** (crée/détruit l'élément à chaque fois) | **Faible** (change juste le CSS)  |
-| Exemple d'utilisation   | Page d'erreur, contenu admin              | Menu déroulant, tooltip, panneau latéral |
+| Aspect                        | `v-if`                                           | `v-show`                                      |
+| ----------------------------- | ------------------------------------------------ | --------------------------------------------- |
+| Quand la condition est fausse | L'élément est **supprimé** du HTML               | L'élément est **caché** (CSS `display: none`) |
+| Coût au premier affichage     | **Faible** si la condition commence à false      | **Toujours présent**, même si caché           |
+| Coût pour montrer/cacher      | **Élevé** (crée/détruit l'élément à chaque fois) | **Faible** (change juste le CSS)              |
+| Exemple d'utilisation         | Page d'erreur, contenu admin                     | Menu déroulant, tooltip, panneau latéral      |
 
 > 💡 **Astuce simple :** si l'utilisateur clique souvent pour montrer/cacher → `v-show`. Si c'est une condition qui change rarement → `v-if`.
 
@@ -203,9 +204,9 @@ Crée un fichier `.vue` et implémente :
 ```vue
 <!-- Exercice D.1 : Affiche un message différent selon le score -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const score = ref(75)
+const score = ref(75);
 </script>
 
 <template>
@@ -219,9 +220,9 @@ const score = ref(75)
 ```vue
 <!-- Exercice D.2 : Menu déroulant avec v-show -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const menuOuvert = ref(false)
+const menuOuvert = ref(false);
 </script>
 
 <template>
@@ -246,6 +247,7 @@ const menuOuvert = ref(false)
 <button @click="menuOuvert = !menuOuvert">Menu</button>
 <ul v-show="menuOuvert">...</ul>
 ```
+
 </details>
 
 ---
@@ -258,19 +260,19 @@ En JavaScript, quand on veut **faire la même chose pour chaque élément** d'un
 
 ```ts
 // Un tableau (array) = une liste d'éléments
-const fruits: string[] = ['Pomme', 'Banane', 'Cerise']
+const fruits: string[] = ["Pomme", "Banane", "Cerise"];
 
 // === Boucle for classique ===
 // i commence à 0, augmente de 1 à chaque tour, s'arrête quand i atteint la taille du tableau
 for (let i: number = 0; i < fruits.length; i++) {
-  console.log(fruits[i])  // Affiche : Pomme, puis Banane, puis Cerise
+  console.log(fruits[i]); // Affiche : Pomme, puis Banane, puis Cerise
 }
 
 // === forEach (plus moderne, plus lisible) ===
 // Pour chaque fruit dans le tableau, on exécute cette fonction
 fruits.forEach((fruit: string) => {
-  console.log(fruit)  // Affiche : Pomme, puis Banane, puis Cerise
-})
+  console.log(fruit); // Affiche : Pomme, puis Banane, puis Cerise
+});
 ```
 
 ### le concept de `v-for`
@@ -283,11 +285,11 @@ C'est comme un **tampon encreur** : tu définis le modèle une seule fois, et Vu
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // On crée un tableau de strings (chaînes de caractères)
 // ref() le rend réactif : si on ajoute un fruit, Vue met à jour l'affichage
-const fruits = ref<string[]>(['🍎 Pomme', '🍌 Banane', '🍒 Cerise'])
+const fruits = ref<string[]>(["🍎 Pomme", "🍌 Banane", "🍒 Cerise"]);
 </script>
 
 <template>
@@ -339,22 +341,22 @@ Sans badges, si quelqu'un part, tu ne sais plus qui est qui → c'est le bazar !
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // On définit la forme (interface) d'une tâche
 // Chaque tâche DOIT avoir ces 3 propriétés
 interface Tache {
-  id: number        // Identifiant unique (pour le :key)
-  texte: string     // Le texte de la tâche
-  terminee: boolean // Est-ce que la tâche est terminée ?
+  id: number; // Identifiant unique (pour le :key)
+  texte: string; // Le texte de la tâche
+  terminee: boolean; // Est-ce que la tâche est terminée ?
 }
 
 // On crée une liste de tâches (un tableau de Tache)
 const taches = ref<Tache[]>([
-  { id: 1, texte: 'Apprendre Vue', terminee: false },
-  { id: 2, texte: 'Lire le cours', terminee: true },
-  { id: 3, texte: 'Faire les exercices', terminee: false },
-])
+  { id: 1, texte: "Apprendre Vue", terminee: false },
+  { id: 2, texte: "Lire le cours", terminee: true },
+  { id: 3, texte: "Faire les exercices", terminee: false },
+]);
 </script>
 
 <template>
@@ -366,7 +368,7 @@ const taches = ref<Tache[]>([
     -->
     <li v-for="tache in taches" :key="tache.id">
       <!-- Si terminée → ✅, sinon → ⬜ -->
-      {{ tache.terminee ? '✅' : '⬜' }} {{ tache.texte }}
+      {{ tache.terminee ? "✅" : "⬜" }} {{ tache.texte }}
     </li>
     <!--
       Résultat :
@@ -412,10 +414,10 @@ On peut aussi boucler sur les propriétés d'un objet :
 // Record<string, string | number> = un objet dont les clés sont des strings
 // et les valeurs sont des strings ou des numbers
 const personne: Record<string, string | number> = {
-  nom: 'Alice',     // clé: "nom",  valeur: "Alice"
-  age: 30,          // clé: "age",  valeur: 30
-  ville: 'Paris'    // clé: "ville", valeur: "Paris"
-}
+  nom: "Alice", // clé: "nom",  valeur: "Alice"
+  age: 30, // clé: "age",  valeur: 30
+  ville: "Paris", // clé: "ville", valeur: "Paris"
+};
 </script>
 
 <template>
@@ -444,19 +446,19 @@ Crée un composant Vue :
 ```vue
 <!-- Exercice D.3 : Affiche une liste de produits -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 interface Product {
-  id: number
-  name: string
-  price: number
+  id: number;
+  name: string;
+  price: number;
 }
 
 const produits = ref<Product[]>([
-  { id: 1, name: 'T-shirt', price: 29 },
-  { id: 2, name: 'Jean', price: 59 },
-  { id: 3, name: 'Baskets', price: 89 },
-])
+  { id: 1, name: "T-shirt", price: 29 },
+  { id: 2, name: "Jean", price: 59 },
+  { id: 3, name: "Baskets", price: 89 },
+]);
 </script>
 
 <template>
@@ -489,6 +491,7 @@ const produits = ref<Product[]>([
   {{ index + 1 }}. {{ produit.name }}
 </li>
 ```
+
 </details>
 
 ---
@@ -515,6 +518,7 @@ Le problème : ces valeurs sont **figées** (statiques). Elles ne changent jamai
 ### Le concept : attributs dynamiques
 
 Et si on veut que l'attribut **change** selon une variable ? Par exemple :
+
 - L'URL de l'image vient d'une API
 - Le bouton est désactivé seulement si le formulaire est invalide
 - La couleur dépend du choix de l'utilisateur
@@ -530,13 +534,13 @@ HTML dynamique :  <img :src="urlDeLImage" />         ← l'image change si la va
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // URL de l'image (peut changer plus tard)
-const urlImage = ref<string>('/photo-profil.jpg')
+const urlImage = ref<string>("/photo-profil.jpg");
 
 // Le bouton est-il désactivé ? (oui par défaut)
-const boutonDesactive = ref<boolean>(true)
+const boutonDesactive = ref<boolean>(true);
 </script>
 
 <template>
@@ -569,9 +573,15 @@ Avant de parler de classes dynamiques, petit rappel :
 
 ```css
 /* En CSS, on définit ce que fait chaque classe */
-.rouge { color: red; }          /* Texte en rouge */
-.gras  { font-weight: bold; }   /* Texte en gras */
-.cache { display: none; }       /* Élément invisible */
+.rouge {
+  color: red;
+} /* Texte en rouge */
+.gras {
+  font-weight: bold;
+} /* Texte en gras */
+.cache {
+  display: none;
+} /* Élément invisible */
 ```
 
 ### Classes dynamiques avec `:class`
@@ -580,10 +590,10 @@ On peut **ajouter ou retirer des classes CSS** selon des conditions :
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const estActif = ref<boolean>(true)       // L'élément est-il actif ?
-const aUneErreur = ref<boolean>(false)    // Y a-t-il une erreur ?
+const estActif = ref<boolean>(true); // L'élément est-il actif ?
+const aUneErreur = ref<boolean>(false); // Y a-t-il une erreur ?
 </script>
 
 <template>
@@ -593,9 +603,7 @@ const aUneErreur = ref<boolean>(false)    // Y a-t-il une erreur ?
     Si la condition est true → la classe est ajoutée
     Si la condition est false → la classe est retirée
   -->
-  <div :class="{ active: estActif, erreur: aUneErreur }">
-    Mon contenu
-  </div>
+  <div :class="{ active: estActif, erreur: aUneErreur }">Mon contenu</div>
   <!--
     Avec estActif = true et aUneErreur = false :
     Résultat HTML : <div class="active">Mon contenu</div>
@@ -607,9 +615,7 @@ const aUneErreur = ref<boolean>(false)    // Y a-t-il une erreur ?
     On liste les classes à appliquer
     On peut mélanger des classes fixes et des conditions
   -->
-  <div :class="['carte', estActif ? 'active' : '']">
-    Mon contenu
-  </div>
+  <div :class="['carte', estActif ? 'active' : '']">Mon contenu</div>
   <!--
     estActif ? 'active' : '' → c'est un opérateur ternaire (raccourci de if/else)
     Si estActif est true → ajoute 'active'
@@ -625,10 +631,10 @@ On peut aussi changer le **style CSS directement** (sans passer par des classes)
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const couleurTexte = ref<string>('blue')    // La couleur du texte
-const taille = ref<number>(20)              // La taille en pixels
+const couleurTexte = ref<string>("blue"); // La couleur du texte
+const taille = ref<number>(20); // La taille en pixels
 </script>
 
 <template>
@@ -651,11 +657,11 @@ Depuis Vue 3.4, quand le **nom de l'attribut** et le **nom de la variable** sont
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const id = ref('mon-composant')
-const name = ref('Alice')
-const disabled = ref(false)
+const id = ref("mon-composant");
+const name = ref("Alice");
+const disabled = ref(false);
 </script>
 
 <template>
@@ -677,10 +683,10 @@ const disabled = ref(false)
 ```vue
 <!-- Exercice D.5 : Image dynamique -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const imageUrl = ref('/images/chat.jpg')
-const imageAlt = ref('Photo de chat')
+const imageUrl = ref("/images/chat.jpg");
+const imageAlt = ref("Photo de chat");
 </script>
 
 <template>
@@ -692,33 +698,29 @@ const imageAlt = ref('Photo de chat')
 ```vue
 <!-- Exercice D.6 : Bouton désactivé conditionnellement -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const formulaireValide = ref(false)
+const formulaireValide = ref(false);
 </script>
 
 <template>
   <!-- Le bouton est désactivé si le formulaire n'est pas valide -->
-  <button :disabled="???">
-    Envoyer
-  </button>
+  <button :disabled="???">Envoyer</button>
 </template>
 ```
 
 ```vue
 <!-- Exercice D.7 : Classes conditionnelles -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const estSelectionne = ref(true)
-const aErreur = ref(false)
+const estSelectionne = ref(true);
+const aErreur = ref(false);
 </script>
 
 <template>
   <!-- Ajoute la classe 'selected' si estSelectionne, 'error' si aErreur -->
-  <div :class="{ ??? }">
-    Carte
-  </div>
+  <div :class="{ ??? }">Carte</div>
 </template>
 ```
 
@@ -733,8 +735,9 @@ const aErreur = ref(false)
 <button :disabled="!formulaireValide">Envoyer</button>
 
 <!-- D.7 -->
-<div :class="{ selected: estSelectionne, error: aErreur }">
+<div :class="{ selected: estSelectionne, error: aErreur }"></div>
 ```
+
 </details>
 
 ---
@@ -746,6 +749,7 @@ const aErreur = ref(false)
 Un **événement** c'est quelque chose qui **se passe** dans la page. C'est comme une **sonnette** : quand quelqu'un appuie dessus, ça déclenche une action.
 
 Exemples d'événements :
+
 - **`click`** → l'utilisateur clique sur un élément (comme appuyer sur un bouton de sonnette)
 - **`submit`** → l'utilisateur envoie un formulaire
 - **`keyup`** → l'utilisateur relâche une touche du clavier
@@ -755,10 +759,10 @@ En JavaScript pur, on écoute un événement comme ça :
 
 ```ts
 // On dit au navigateur : "Quand on clique sur ce bouton, exécute cette fonction"
-const bouton: HTMLElement | null = document.querySelector('#monBouton')
-bouton?.addEventListener('click', () => {
-  console.log('Le bouton a été cliqué !')
-})
+const bouton: HTMLElement | null = document.querySelector("#monBouton");
+bouton?.addEventListener("click", () => {
+  console.log("Le bouton a été cliqué !");
+});
 ```
 
 ### En Vue avec `v-on` (raccourci `@`)
@@ -767,15 +771,15 @@ Vue simplifie énormément l'écoute des événements. Plus besoin de `querySele
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // Compteur qui commence à 0
-const compteur = ref<number>(0)
+const compteur = ref<number>(0);
 
 // Fonction appelée quand on clique sur le bouton "Salut"
 function direBonjour(): void {
   // alert() affiche une petite fenêtre popup dans le navigateur
-  alert('Bonjour ! 👋')
+  alert("Bonjour ! 👋");
 }
 </script>
 
@@ -789,9 +793,7 @@ function direBonjour(): void {
 
   <!-- === On peut aussi écrire du code directement (expression inline) === -->
   <!-- Ici, on incrémente le compteur directement dans le template -->
-  <button @click="compteur++">
-    Compteur : {{ compteur }}
-  </button>
+  <button @click="compteur++">Compteur : {{ compteur }}</button>
   <!-- Chaque clic → compteur passe de 0 à 1, puis 2, puis 3... -->
 </template>
 ```
@@ -805,6 +807,7 @@ Les **modificateurs** sont des suffixes qu'on ajoute après le nom de l'événem
 #### `.prevent` — Empêcher le comportement par défaut
 
 Le navigateur a des **comportements automatiques** pour certaines actions. Par exemple :
+
 - Quand on soumet un formulaire → le navigateur **recharge la page**
 - Quand on clique sur un lien → le navigateur **navigue vers l'URL**
 
@@ -815,7 +818,7 @@ Souvent, on ne veut **pas** ce comportement automatique. `.prevent` l'empêche.
 function envoyerFormulaire(): void {
   // On gère l'envoi nous-même (par exemple avec une requête API)
   // Sans .prevent, le navigateur rechargerait la page et notre code ne s'exécuterait pas !
-  console.log('Formulaire envoyé sans rechargement !')
+  console.log("Formulaire envoyé sans rechargement !");
 }
 </script>
 
@@ -868,11 +871,11 @@ On peut écouter des touches précises du clavier :
 ```vue
 <script setup lang="ts">
 function rechercher(): void {
-  console.log('Recherche lancée !')
+  console.log("Recherche lancée !");
 }
 
 function annuler(): void {
-  console.log('Action annulée')
+  console.log("Action annulée");
 }
 </script>
 
@@ -885,31 +888,28 @@ function annuler(): void {
   />
 
   <!-- .escape = seulement si c'est la touche Échap -->
-  <input
-    placeholder="Appuie sur Échap pour annuler"
-    @keyup.escape="annuler"
-  />
+  <input placeholder="Appuie sur Échap pour annuler" @keyup.escape="annuler" />
 </template>
 ```
 
 ### Résumé des modificateurs
 
-| Modificateur | Ce qu'il fait                                       | Exemple courant                     |
-| ------------ | --------------------------------------------------- | ----------------------------------- |
-| `.prevent`   | Empêche le comportement par défaut du navigateur    | Formulaire sans rechargement        |
-| `.stop`      | Empêche l'événement de remonter aux parents         | Bouton dans un conteneur cliquable  |
-| `.once`      | L'événement ne se déclenche qu'une seule fois       | Bouton d'initialisation             |
-| `.enter`     | Réagit uniquement à la touche Entrée                | Champ de recherche                  |
-| `.escape`    | Réagit uniquement à la touche Échap                 | Fermer un popup                     |
+| Modificateur | Ce qu'il fait                                    | Exemple courant                    |
+| ------------ | ------------------------------------------------ | ---------------------------------- |
+| `.prevent`   | Empêche le comportement par défaut du navigateur | Formulaire sans rechargement       |
+| `.stop`      | Empêche l'événement de remonter aux parents      | Bouton dans un conteneur cliquable |
+| `.once`      | L'événement ne se déclenche qu'une seule fois    | Bouton d'initialisation            |
+| `.enter`     | Réagit uniquement à la touche Entrée             | Champ de recherche                 |
+| `.escape`    | Réagit uniquement à la touche Échap              | Fermer un popup                    |
 
 ### 🎯 Pratique — v-on / @
 
 ```vue
 <!-- Exercice D.8 : Compteur avec boutons + et - -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const compteur = ref(0)
+const compteur = ref(0);
 </script>
 
 <template>
@@ -922,12 +922,12 @@ const compteur = ref(0)
 ```vue
 <!-- Exercice D.9 : Formulaire sans rechargement -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const email = ref('')
+const email = ref("");
 
 function envoyerFormulaire() {
-  console.log('Email envoyé :', email.value)
+  console.log("Email envoyé :", email.value);
 }
 </script>
 
@@ -942,20 +942,20 @@ function envoyerFormulaire() {
 ```vue
 <!-- Exercice D.10 : Recherche au clavier -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const recherche = ref('')
+const recherche = ref("");
 
 function lancerRecherche() {
-  console.log('Recherche :', recherche.value)
+  console.log("Recherche :", recherche.value);
 }
 </script>
 
 <template>
   <!-- Lance la recherche quand on appuie sur Entrée -->
-  <input 
-    v-model="recherche" 
-    placeholder="Rechercher..." 
+  <input
+    v-model="recherche"
+    placeholder="Rechercher..."
     @keyup.???="lancerRecherche"
   />
 </template>
@@ -976,32 +976,35 @@ function lancerRecherche() {
 <!-- D.10 -->
 <input ... @keyup.enter="lancerRecherche" />
 ```
+
 </details>
 
 ---
 
-## 7. `v-text` et `v-html` — alternatives à `{{ }}`
+## 7. `v-text` et `v-html` — alternatives à `&#123;&#123; &#125;&#125;`
 
 ### `v-text` — Afficher du texte
 
-`v-text` fait la même chose que les moustaches `{{ }}` :
+`v-text` fait la même chose que les moustaches `&#123;&#123; &#125;&#125;` :
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const message = ref<string>('Bonjour tout le monde !')
+const message = ref<string>("Bonjour tout le monde !");
 </script>
 
 <template>
   <!-- Ces deux lignes font EXACTEMENT la même chose -->
-  <p>{{ message }}</p>           <!-- Avec les moustaches (le plus courant) -->
-  <p v-text="message"></p>       <!-- Avec v-text (moins utilisé) -->
+  <p>{{ message }}</p>
+  <!-- Avec les moustaches (le plus courant) -->
+  <p v-text="message"></p>
+  <!-- Avec v-text (moins utilisé) -->
   <!-- Résultat identique : "Bonjour tout le monde !" -->
 </template>
 ```
 
-> 💡 En pratique, on utilise presque toujours `{{ }}`. `v-text` existe mais est rarement nécessaire.
+> 💡 En pratique, on utilise presque toujours `&#123;&#123; &#125;&#125;`. `v-text` existe mais est rarement nécessaire.
 
 ### `v-html` — Afficher du HTML brut
 
@@ -1009,10 +1012,12 @@ Parfois, une variable contient du **code HTML**. Par défaut, Vue affiche le HTM
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // Cette variable contient du code HTML (des balises)
-const contenuHtml = ref<string>('<strong>Texte en gras</strong> et <em>en italique</em>')
+const contenuHtml = ref<string>(
+  "<strong>Texte en gras</strong> et <em>en italique</em>",
+);
 </script>
 
 <template>
@@ -1032,18 +1037,18 @@ const contenuHtml = ref<string>('<strong>Texte en gras</strong> et <em>en italiq
 
 ## 8. Résumé de toutes les directives
 
-| Directive | Raccourci | Ce qu'elle fait | Exemple |
-| --------- | --------- | --------------- | ------- |
-| `v-if`    | —         | Affiche l'élément SI la condition est vraie (sinon le supprime) | `<p v-if="estConnecte">Bienvenue</p>` |
-| `v-else-if` | —      | Condition alternative (après un `v-if`) | `<p v-else-if="estAdmin">Admin</p>` |
-| `v-else`  | —         | Sinon (après un `v-if` ou `v-else-if`) | `<p v-else>Inconnu</p>` |
-| `v-show`  | —         | Cache/montre l'élément avec du CSS | `<p v-show="visible">Coucou</p>` |
-| `v-for`   | —         | Répète l'élément pour chaque item d'une liste | `<li v-for="f in fruits" :key="f">` |
-| `v-bind`  | `:`       | Connecte un attribut HTML à une variable | `<img :src="url" />` |
-| `v-on`    | `@`       | Exécute du code quand un événement arrive | `<button @click="sauver">OK</button>` |
-| `v-model` | —         | Liaison dans les deux sens (cours suivant !) | `<input v-model="nom" />` |
-| `v-text`  | —         | Affiche du texte (comme `{{ }}`) | `<p v-text="msg"></p>` |
-| `v-html`  | —         | Affiche du HTML brut (⚠️ danger XSS) | `<p v-html="html"></p>` |
+| Directive   | Raccourci | Ce qu'elle fait                                                 | Exemple                               |
+| ----------- | --------- | --------------------------------------------------------------- | ------------------------------------- |
+| `v-if`      | —         | Affiche l'élément SI la condition est vraie (sinon le supprime) | `<p v-if="estConnecte">Bienvenue</p>` |
+| `v-else-if` | —         | Condition alternative (après un `v-if`)                         | `<p v-else-if="estAdmin">Admin</p>`   |
+| `v-else`    | —         | Sinon (après un `v-if` ou `v-else-if`)                          | `<p v-else>Inconnu</p>`               |
+| `v-show`    | —         | Cache/montre l'élément avec du CSS                              | `<p v-show="visible">Coucou</p>`      |
+| `v-for`     | —         | Répète l'élément pour chaque item d'une liste                   | `<li v-for="f in fruits" :key="f">`   |
+| `v-bind`    | `:`       | Connecte un attribut HTML à une variable                        | `<img :src="url" />`                  |
+| `v-on`      | `@`       | Exécute du code quand un événement arrive                       | `<button @click="sauver">OK</button>` |
+| `v-model`   | —         | Liaison dans les deux sens (cours suivant !)                    | `<input v-model="nom" />`             |
+| `v-text`    | —         | Affiche du texte (comme `&#123;&#123; &#125;&#125;`)            | `<p v-text="msg"></p>`                |
+| `v-html`    | —         | Affiche du HTML brut (⚠️ danger XSS)                            | `<p v-html="html"></p>`               |
 
 ---
 

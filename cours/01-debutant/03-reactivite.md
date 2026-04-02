@@ -4,9 +4,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Quelle directive utilise-t-on pour afficher un élément conditionnellement ?
 > 2. Quelle est la syntaxe pour boucler sur un tableau dans le template ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -31,6 +32,7 @@ Maintenant, si tu changes **A1** de `10` à `15`... **A3 se met à jour toute se
 **Tu n'as rien eu à faire.** Le tableur a "réagi" au changement.
 
 **La réactivité dans Vue 3, c'est exactement ça :**
+
 > Quand une donnée change, tout ce qui en dépend (l'affichage, les calculs…) **se met à jour automatiquement**.
 
 Sans réactivité, tu devrais manuellement dire au navigateur "hey, la donnée a changé, re-dessine cette partie de la page". Avec Vue, c'est **automatique**.
@@ -40,20 +42,22 @@ Sans réactivité, tu devrais manuellement dire au navigateur "hey, la donnée a
 > **📖 Rappel JavaScript — Les objets**
 >
 > En JavaScript, un objet c'est un "sac" de propriétés :
+>
 > ```ts
 > // Un objet simple avec deux propriétés
 > const personne: { nom: string; age: number } = {
->   nom: "Alice",   // propriété "nom" qui vaut "Alice"
->   age: 25         // propriété "age" qui vaut 25
+>   nom: "Alice", // propriété "nom" qui vaut "Alice"
+>   age: 25, // propriété "age" qui vaut 25
 > };
 >
-> personne.nom;      // → "Alice" (on LIT la propriété)
+> personne.nom; // → "Alice" (on LIT la propriété)
 > personne.age = 26; // → on MODIFIE la propriété
 > ```
 
 Pour que Vue sache **quand** tu lis ou modifies une donnée, il place un **Proxy** autour de tes données.
 
 Imagine un **chien de garde invisible** devant ta boîte aux lettres :
+
 - Chaque fois que quelqu'un **regarde** dans la boîte (lire une donnée) → le chien note "telle personne a regardé"
 - Chaque fois que quelqu'un **met** ou **change** le courrier (modifier une donnée) → le chien prévient toutes les personnes qui avaient regardé : "hey, ça a changé !"
 
@@ -68,32 +72,34 @@ Imagine un **chien de garde invisible** devant ta boîte aux lettres :
 > **📖 Rappel JavaScript — Les variables**
 >
 > En JS moderne, on déclare des variables avec `const` ou `let` :
+>
 > ```ts
-> const nom: string = "Alice";  // const = ne peut PAS être réassigné (on ne peut pas faire nom = "Bob")
-> let age: number = 25;         // let = PEUT être réassigné (age = 26 → OK)
+> const nom: string = "Alice"; // const = ne peut PAS être réassigné (on ne peut pas faire nom = "Bob")
+> let age: number = 25; // let = PEUT être réassigné (age = 26 → OK)
 > ```
+>
 > Mais même avec `const`, si c'est un objet, on peut modifier ses propriétés internes.
 
 ### Exemple de base
 
 ```ts
 // On importe la fonction ref depuis Vue
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // On crée une variable réactive qui contient le nombre 0
 // <number> dit à TypeScript : "cette ref contient un nombre"
-const count = ref<number>(0)
+const count = ref<number>(0);
 
 // Pour LIRE la valeur, on utilise .value
-console.log(count.value) // → 0
+console.log(count.value); // → 0
 
 // Pour MODIFIER la valeur, on passe aussi par .value
-count.value = 5
-console.log(count.value) // → 5
+count.value = 5;
+console.log(count.value); // → 5
 
 // On peut faire des opérations
-count.value++             // équivaut à : count.value = count.value + 1
-console.log(count.value)  // → 6
+count.value++; // équivaut à : count.value = count.value + 1
+console.log(count.value); // → 6
 ```
 
 ### Pourquoi `.value` ? (le concept d'emballage) 🎁
@@ -104,9 +110,9 @@ En JavaScript, les types simples (`number`, `string`, `boolean`) sont des **vale
 
 ```ts
 // TypeScript normal (PAS Vue)
-let compteur: number = 0  // juste un nombre tout nu
-compteur = 5      // TypeScript ne peut pas "savoir" que ça a changé
-                   // Il n'y a aucun mécanisme de surveillance possible
+let compteur: number = 0; // juste un nombre tout nu
+compteur = 5; // TypeScript ne peut pas "savoir" que ça a changé
+// Il n'y a aucun mécanisme de surveillance possible
 ```
 
 La solution de Vue : **emballer** la valeur dans un petit objet (une boîte) :
@@ -116,15 +122,16 @@ La solution de Vue : **emballer** la valeur dans un petit objet (une boîte) :
 // Il crée un objet avec une propriété .value
 // Et il place le chien de garde (Proxy) sur cet objet
 
-const count = ref(0)
+const count = ref(0);
 // count est maintenant un OBJET qui ressemble à : { value: 0 }
 // Et cet objet est SURVEILLÉ par le Proxy
 
-count.value = 5  // Le chien de garde VOIT ce changement → il prévient Vue
-                  // → Vue met à jour l'affichage
+count.value = 5; // Le chien de garde VOIT ce changement → il prévient Vue
+// → Vue met à jour l'affichage
 ```
 
 **Pense à `ref` comme une boîte-cadeau 🎁 :**
+
 - La boîte = l'objet ref (surveillé)
 - Le cadeau à l'intérieur = ta valeur (accessible via `.value`)
 - Pour voir où changer le cadeau, tu dois **ouvrir la boîte** (`.value`)
@@ -136,15 +143,15 @@ Dans la partie `<template>` de Vue (le HTML), Vue **déballe automatiquement** l
 ```vue
 <script setup lang="ts">
 // On importe ref depuis Vue
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // On crée une ref avec le nombre 0
-const count = ref<number>(0)
+const count = ref<number>(0);
 
 // Fonction pour ajouter 1 au compteur
 // Ici on est dans le <script>, donc il FAUT .value
 function increment(): void {
-  count.value++
+  count.value++;
 }
 </script>
 
@@ -168,8 +175,8 @@ function increment(): void {
 - **Nombres** : `const age = ref<number>(0)`
 - **Textes** : `const nom = ref<string>('')`
 - **Booléens** (vrai/faux) : `const visible = ref<boolean>(false)`
-- **Valeur qui peut être null** : `const user = ref<User | null>(null)` *(null = "pas encore de valeur")*
-- **Tableaux** : `const items = ref<string[]>([])` *(un tableau vide au départ)*
+- **Valeur qui peut être null** : `const user = ref<User | null>(null)` _(null = "pas encore de valeur")_
+- **Tableaux** : `const items = ref<string[]>([])` _(un tableau vide au départ)_
 
 👉 En gros, **utilise `ref` pour TOUT**. C'est le choix par défaut.
 
@@ -217,11 +224,12 @@ function ajouterLike(): void {
 
 ```ts
 // R.2
-const nom = ref<string>("Alice")
-const estConnecte = ref<boolean>(false)
-const utilisateur = ref<User | null>(null)
-const produits = ref<Product[]>([])
+const nom = ref<string>("Alice");
+const estConnecte = ref<boolean>(false);
+const utilisateur = ref<User | null>(null);
+const produits = ref<Product[]>([]);
 ```
+
 </details>
 
 ---
@@ -234,52 +242,52 @@ const produits = ref<Product[]>([])
 
 ```ts
 // On importe reactive depuis Vue
-import { reactive } from 'vue'
+import { reactive } from "vue";
 
 // On définit la forme de notre formulaire avec une interface TypeScript
 // (= on décrit quelles propriétés il a et de quel type)
 interface FormulaireContact {
-  nom: string       // le nom est un texte
-  email: string     // l'email est un texte
-  age: number       // l'âge est un nombre
-  accepte: boolean  // la case "j'accepte" est vrai ou faux
+  nom: string; // le nom est un texte
+  email: string; // l'email est un texte
+  age: number; // l'âge est un nombre
+  accepte: boolean; // la case "j'accepte" est vrai ou faux
 }
 
 // On crée notre objet réactif avec des valeurs par défaut
 const formulaire = reactive<FormulaireContact>({
-  nom: '',          // vide au départ
-  email: '',        // vide au départ
-  age: 0,           // 0 au départ
-  accepte: false    // non coché au départ
-})
+  nom: "", // vide au départ
+  email: "", // vide au départ
+  age: 0, // 0 au départ
+  accepte: false, // non coché au départ
+});
 
 // Pour modifier : on accède DIRECTEMENT aux propriétés
 // PAS de .value ! L'objet entier est déjà surveillé
-formulaire.nom = 'Alice'
-formulaire.email = 'alice@example.com'
-formulaire.age = 28
-formulaire.accepte = true
+formulaire.nom = "Alice";
+formulaire.email = "alice@example.com";
+formulaire.age = 28;
+formulaire.accepte = true;
 ```
 
 ### Utilisation dans un composant
 
 ```vue
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive } from "vue";
 
 // Notre formulaire réactif
 const formulaire = reactive({
-  nom: '',
-  email: '',
-  message: ''
-})
+  nom: "",
+  email: "",
+  message: "",
+});
 
 // Fonction appelée quand l'utilisateur soumet le formulaire
 function envoyer(): void {
   // On affiche les valeurs dans la console
-  console.log('Nom :', formulaire.nom)
-  console.log('Email :', formulaire.email)
-  console.log('Message :', formulaire.message)
+  console.log("Nom :", formulaire.nom);
+  console.log("Email :", formulaire.email);
+  console.log("Message :", formulaire.message);
 }
 </script>
 
@@ -307,16 +315,16 @@ Mais attention aux pièges ci-dessous… 👇
 ### Piège 1 : ne JAMAIS réassigner l'objet entier
 
 ```ts
-let state = reactive({ count: 0 })
+let state = reactive({ count: 0 });
 
 // ❌ INTERDIT — on remplace l'objet par un NOUVEL objet
 // L'ancien objet (avec le chien de garde) est jeté à la poubelle
 // Le nouveau n'est pas surveillé → la réactivité est PERDUE
-state = reactive({ count: 1 })
+state = reactive({ count: 1 });
 
 // ✅ CORRECT — on modifie la propriété À L'INTÉRIEUR de l'objet
 // Le chien de garde voit le changement → Vue met à jour l'affichage
-state.count = 1
+state.count = 1;
 ```
 
 ### Piège 2 : le destructuring casse la réactivité
@@ -324,15 +332,16 @@ state.count = 1
 > **📖 Rappel JavaScript — Le destructuring (décomposition)**
 >
 > Le destructuring permet d'**extraire** des valeurs d'un objet vers des variables séparées :
+>
 > ```ts
-> const personne: { nom: string; age: number } = { nom: 'Alice', age: 25 }
+> const personne: { nom: string; age: number } = { nom: "Alice", age: 25 };
 >
 > // Sans destructuring (classique) :
-> const nom: string = personne.nom   // nom = 'Alice'
-> const age: number = personne.age   // age = 25
+> const nom: string = personne.nom; // nom = 'Alice'
+> const age: number = personne.age; // age = 25
 >
 > // Avec destructuring (raccourci) :
-> const { nom, age } = personne  // fait la même chose en une ligne !
+> const { nom, age } = personne; // fait la même chose en une ligne !
 > // nom = 'Alice', age = 25
 > ```
 >
@@ -343,46 +352,46 @@ state.count = 1
 Maintenant, le piège avec `reactive` :
 
 ```ts
-const state = reactive({ compteur: 0, nom: 'Alice' })
+const state = reactive({ compteur: 0, nom: "Alice" });
 
 // ❌ PROBLÈME — on extrait "compteur" dans une variable normale
 // C'est une COPIE du nombre 0, plus aucun lien avec state
-const { compteur } = state
-compteur++ // ← ça modifie la copie locale, PAS state.compteur
-            // Vue ne voit RIEN → pas de mise à jour de l'affichage
+const { compteur } = state;
+compteur++; // ← ça modifie la copie locale, PAS state.compteur
+// Vue ne voit RIEN → pas de mise à jour de l'affichage
 
 // ✅ CORRECT — on modifie via l'objet réactif directement
-state.compteur++  // le chien de garde voit le changement → Vue réagit
+state.compteur++; // le chien de garde voit le changement → Vue réagit
 ```
 
 ### Résumé des pièges
 
-| Action | Résultat |
-|---|---|
-| `state.compteur = 5` | ✅ Réactif — le Proxy voit le changement |
-| `state = { compteur: 5 }` | ❌ Cassé — on a remplacé l'objet surveillé |
-| `const { compteur } = state` puis `compteur++` | ❌ Cassé — c'est une copie déconnectée |
+| Action                                         | Résultat                                   |
+| ---------------------------------------------- | ------------------------------------------ |
+| `state.compteur = 5`                           | ✅ Réactif — le Proxy voit le changement   |
+| `state = { compteur: 5 }`                      | ❌ Cassé — on a remplacé l'objet surveillé |
+| `const { compteur } = state` puis `compteur++` | ❌ Cassé — c'est une copie déconnectée     |
 
 ### 🎯 Pratique — réactive
 
 ```vue
 <!-- Exercice R.3 : Formulaire avec reactive -->
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive } from "vue";
 
 interface LoginForm {
-  email: string
-  password: string
-  rememberMe: boolean
+  email: string;
+  password: string;
+  rememberMe: boolean;
 }
 
 const form = reactive<LoginForm>({
   // ??? complète les valeurs initiales
-})
+});
 
 function submit(): void {
-  console.log('Email:', form.email)
-  console.log('Password:', form.password)
+  console.log("Email:", form.email);
+  console.log("Password:", form.password);
 }
 </script>
 
@@ -399,10 +408,10 @@ function submit(): void {
 
 ```ts
 // Exercice R.4 : Trouve l'erreur dans ce code
-const state = reactive({ count: 0 })
+const state = reactive({ count: 0 });
 
 function reset() {
-  state = { count: 0 }  // ❌ Pourquoi ça ne marche pas ?
+  state = { count: 0 }; // ❌ Pourquoi ça ne marche pas ?
 }
 
 // Comment corriger ?
@@ -414,16 +423,17 @@ function reset() {
 ```ts
 // R.3
 const form = reactive<LoginForm>({
-  email: '',
-  password: '',
+  email: "",
+  password: "",
   rememberMe: false,
-})
+});
 
 // R.4 - On ne peut pas réassigner un reactive !
 function reset() {
-  state.count = 0  // ✅ Modifier la propriété, pas l'objet
+  state.count = 0; // ✅ Modifier la propriété, pas l'objet
 }
 ```
+
 </details>
 
 ---
@@ -433,6 +443,7 @@ function reset() {
 > **Utilise `ref` pour tout.** Utilise `reactive` uniquement pour un formulaire avec beaucoup de champs liés.
 
 Pourquoi ?
+
 - `ref` peut contenir n'importe quoi (nombre, texte, objet, tableau, null…)
 - `ref` peut être **réassigné** sans problème (`maRef.value = nouvelleValeur`)
 - `ref` n'a pas les pièges de `reactive` (destructuring, réassignation)
@@ -451,10 +462,12 @@ Tu te rappelles notre tableur du début ?
 - **A3** = formule `=A1 * A2` → affiche `30`
 
 En Vue :
+
 - **A1** et **A2** ce sont des `ref` (les données de base)
 - **A3** c'est un `computed` (la formule qui dépend des données de base)
 
 Un `computed` :
+
 1. **Calcule** un résultat à partir d'autres données réactives
 2. **Se recalcule automatiquement** quand ces données changent
 3. **Met en cache** le résultat (= il ne recalcule que si nécessaire, pas à chaque affichage)
@@ -463,11 +476,11 @@ Un `computed` :
 
 ```ts
 // On importe ref et computed depuis Vue
-import { ref, computed } from 'vue'
+import { ref, computed } from "vue";
 
 // Nos données de base (comme les cellules A1 et A2)
-const prix = ref<number>(10)       // prix d'un article : 10€
-const quantite = ref<number>(3)    // on en veut 3
+const prix = ref<number>(10); // prix d'un article : 10€
+const quantite = ref<number>(3); // on en veut 3
 
 // Notre formule calculée (comme la cellule A3)
 // computed() prend une FONCTION qui retourne le résultat du calcul
@@ -475,36 +488,36 @@ const total = computed<number>(() => {
   // Cette fonction est la "formule"
   // Elle UTILISE prix.value et quantite.value
   // → Vue sait donc que total DÉPEND de prix et quantite
-  return prix.value * quantite.value
-})
+  return prix.value * quantite.value;
+});
 
-console.log(total.value) // → 30 (10 × 3)
+console.log(total.value); // → 30 (10 × 3)
 
 // Si on change le prix...
-prix.value = 15
+prix.value = 15;
 // ... total se recalcule AUTOMATIQUEMENT !
-console.log(total.value) // → 45 (15 × 3)
+console.log(total.value); // → 45 (15 × 3)
 
 // Si on change la quantité...
-quantite.value = 5
-console.log(total.value) // → 75 (15 × 5)
+quantite.value = 5;
+console.log(total.value); // → 75 (15 × 5)
 ```
 
 ### Exemple dans un composant : nom complet
 
 ```vue
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed } from "vue";
 
 // Les données de base
-const prenom = ref<string>('Jean')
-const nomDeFamille = ref<string>('Dupont')
+const prenom = ref<string>("Jean");
+const nomDeFamille = ref<string>("Dupont");
 
 // La valeur calculée : le nom complet
 // Elle se recalcule dès que prenom OU nomDeFamille change
 const nomComplet = computed<string>(() => {
-  return `${prenom.value} ${nomDeFamille.value}`
-})
+  return `${prenom.value} ${nomDeFamille.value}`;
+});
 // nomComplet.value → "Jean Dupont"
 </script>
 
@@ -523,37 +536,38 @@ const nomComplet = computed<string>(() => {
 > **📖 Rappel JavaScript — Les fonctions**
 >
 > Une fonction est un bloc de code réutilisable :
+>
 > ```ts
 > // Déclarer une fonction
 > function additionner(a: number, b: number): number {
->   return a + b  // return = "renvoie ce résultat"
+>   return a + b; // return = "renvoie ce résultat"
 > }
 >
 > // Appeler la fonction
-> const resultat: number = additionner(3, 5) // → 8
+> const resultat: number = additionner(3, 5); // → 8
 > ```
 
 Voici la différence entre `computed` et une simple fonction :
 
 ```ts
-import { ref, computed } from 'vue'
+import { ref, computed } from "vue";
 
-const prenom = ref<string>('Jean')
-const nomDeFamille = ref<string>('Dupont')
+const prenom = ref<string>("Jean");
+const nomDeFamille = ref<string>("Dupont");
 
 // ✅ COMPUTED — le résultat est MIS EN CACHE
 // Il ne recalcule QUE si prenom ou nomDeFamille change
 // Si tu affiches nomComplet 100 fois dans le template,
 // le calcul n'est fait qu'UNE SEULE FOIS
 const nomComplet = computed<string>(() => {
-  return `${prenom.value} ${nomDeFamille.value}`
-})
+  return `${prenom.value} ${nomDeFamille.value}`;
+});
 
 // ⚠️ FONCTION — PAS de cache
 // Elle est ré-exécutée À CHAQUE FOIS qu'on l'appelle
 // Si tu appelles getNomComplet() 100 fois, le calcul est fait 100 fois
 function getNomComplet(): string {
-  return `${prenom.value} ${nomDeFamille.value}`
+  return `${prenom.value} ${nomDeFamille.value}`;
 }
 ```
 
@@ -568,10 +582,10 @@ function getNomComplet(): string {
 Normalement, un `computed` est en **lecture seule** : tu ne peux pas faire `nomComplet.value = '...'`. Mais dans de rares cas, tu peux créer un `computed` avec un getter ET un setter :
 
 ```ts
-import { ref, computed } from 'vue'
+import { ref, computed } from "vue";
 
-const prenom = ref<string>('Jean')
-const nomDeFamille = ref<string>('Dupont')
+const prenom = ref<string>("Jean");
+const nomDeFamille = ref<string>("Dupont");
 
 const nomComplet = computed({
   // get = comment LIRE la valeur (comme un computed normal)
@@ -580,14 +594,14 @@ const nomComplet = computed({
   // set = que faire quand on ÉCRIT une valeur
   // val = la nouvelle valeur qu'on essaie d'assigner
   set: (val: string) => {
-    const parties = val.split(' ')  // "Marie Martin" → ["Marie", "Martin"]
-    prenom.value = parties[0]       // "Marie"
-    nomDeFamille.value = parties[1] // "Martin"
-  }
-})
+    const parties = val.split(" "); // "Marie Martin" → ["Marie", "Martin"]
+    prenom.value = parties[0]; // "Marie"
+    nomDeFamille.value = parties[1]; // "Martin"
+  },
+});
 
 // On peut maintenant écrire dedans !
-nomComplet.value = 'Marie Martin'
+nomComplet.value = "Marie Martin";
 // → prenom.value est maintenant "Marie"
 // → nomDeFamille.value est maintenant "Martin"
 ```
@@ -599,41 +613,41 @@ nomComplet.value = 'Marie Martin'
 ```vue
 <!-- Exercice R.5 : Calcul du prix total -->
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed } from "vue";
 
-const prixUnitaire = ref(25)
-const quantite = ref(3)
-const codePromo = ref(false)  // 10% de réduction si true
+const prixUnitaire = ref(25);
+const quantite = ref(3);
+const codePromo = ref(false); // 10% de réduction si true
 
 // Crée un computed "total" qui calcule :
 // prixUnitaire * quantite, avec -10% si codePromo est activé
 const total = computed(() => {
   // ???
-})
+});
 </script>
 ```
 
 ```vue
 <!-- Exercice R.6 : Filtrage avec computed -->
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed } from "vue";
 
 interface Task {
-  id: number
-  title: string
-  done: boolean
+  id: number;
+  title: string;
+  done: boolean;
 }
 
 const tasks = ref<Task[]>([
-  { id: 1, title: 'Apprendre Vue', done: true },
-  { id: 2, title: 'Faire les exos', done: false },
-  { id: 3, title: 'Pratiquer', done: false },
-])
+  { id: 1, title: "Apprendre Vue", done: true },
+  { id: 2, title: "Faire les exos", done: false },
+  { id: 3, title: "Pratiquer", done: false },
+]);
 
 // Crée un computed qui retourne seulement les tâches non terminées
 const tachesRestantes = computed(() => {
   // ???
-})
+});
 </script>
 ```
 
@@ -643,15 +657,16 @@ const tachesRestantes = computed(() => {
 ```ts
 // R.5
 const total = computed(() => {
-  const sousTotal = prixUnitaire.value * quantite.value
-  return codePromo.value ? sousTotal * 0.9 : sousTotal
-})
+  const sousTotal = prixUnitaire.value * quantite.value;
+  return codePromo.value ? sousTotal * 0.9 : sousTotal;
+});
 
 // R.6
 const tachesRestantes = computed(() => {
-  return tasks.value.filter(t => !t.done)
-})
+  return tasks.value.filter((t) => !t.done);
+});
 ```
+
 </details>
 
 ---
@@ -663,18 +678,18 @@ const tachesRestantes = computed(() => {
 `shallowRef` est comme `ref`, mais le chien de garde ne surveille que la **surface** de la boîte, pas ce qu'il y a à l'intérieur. C'est utile pour de très grosses listes ou tu veux contrôler finement quand Vue recalcule.
 
 ```ts
-import { shallowRef } from 'vue'
+import { shallowRef } from "vue";
 
 // Crée une ref "superficielle" contenant un tableau
-const grosseListe = shallowRef<string[]>([])
+const grosseListe = shallowRef<string[]>([]);
 
 // ❌ Modifier l'intérieur du tableau ne déclenche RIEN
 // Le chien de garde ne surveille pas l'intérieur
-grosseListe.value.push('nouvel élément')
+grosseListe.value.push("nouvel élément");
 
 // ✅ Remplacer le tableau entier DÉCLENCHE la mise à jour
 // Car on change ce qui est dans la boîte (.value)
-grosseListe.value = [...grosseListe.value, 'nouvel élément']
+grosseListe.value = [...grosseListe.value, "nouvel élément"];
 ```
 
 ---
@@ -686,18 +701,18 @@ grosseListe.value = [...grosseListe.value, 'nouvel élément']
 Si tu as un objet `reactive` et que tu veux en extraire une propriété **en gardant la réactivité** (contrairement au destructuring qui la casse), tu utilises `toRef` ou `toRefs` :
 
 ```ts
-import { reactive, toRef, toRefs } from 'vue'
+import { reactive, toRef, toRefs } from "vue";
 
-const state = reactive({ nom: 'Alice', age: 30 })
+const state = reactive({ nom: "Alice", age: 30 });
 
 // Extraire UNE propriété en ref réactive (liée à l'original)
-const nomRef = toRef(state, 'nom')
-nomRef.value = 'Bob'     // ← modifie aussi state.nom !
+const nomRef = toRef(state, "nom");
+nomRef.value = "Bob"; // ← modifie aussi state.nom !
 
 // Extraire TOUTES les propriétés en refs réactives
-const { nom, age } = toRefs(state)
-nom.value = 'Charlie'    // ← modifie aussi state.nom !
-age.value = 31            // ← modifie aussi state.age !
+const { nom, age } = toRefs(state);
+nom.value = "Charlie"; // ← modifie aussi state.nom !
+age.value = 31; // ← modifie aussi state.age !
 ```
 
 **Contrairement au destructuring classique**, `toRef`/`toRefs` maintiennent le **lien** avec l'objet d'origine. La copie et l'original restent synchronisés.
@@ -706,13 +721,13 @@ age.value = 31            // ← modifie aussi state.age !
 
 ## Récapitulatif
 
-| API | C'est quoi | `.value` ? | Quand l'utiliser |
-|---|---|---|---|
-| `ref` | Une boîte réactive autour d'une valeur | ✅ Oui | **Partout — choix par défaut** |
-| `reactive` | Un objet directement réactif | ❌ Non | Formulaires avec beaucoup de champs |
-| `computed` | Une formule qui se recalcule auto | ✅ Oui (lecture seule) | Valeurs dérivées (total, nom complet…) |
-| `shallowRef` | Une ref qui ne surveille que la surface | ✅ Oui | Grosses listes, optimisation (avancé) |
-| `toRef/toRefs` | Extraire des refs depuis un `reactive` | ✅ Oui | Passer des props à des composables (avancé) |
+| API            | C'est quoi                              | `.value` ?             | Quand l'utiliser                            |
+| -------------- | --------------------------------------- | ---------------------- | ------------------------------------------- |
+| `ref`          | Une boîte réactive autour d'une valeur  | ✅ Oui                 | **Partout — choix par défaut**              |
+| `reactive`     | Un objet directement réactif            | ❌ Non                 | Formulaires avec beaucoup de champs         |
+| `computed`     | Une formule qui se recalcule auto       | ✅ Oui (lecture seule) | Valeurs dérivées (total, nom complet…)      |
+| `shallowRef`   | Une ref qui ne surveille que la surface | ✅ Oui                 | Grosses listes, optimisation (avancé)       |
+| `toRef/toRefs` | Extraire des refs depuis un `reactive`  | ✅ Oui                 | Passer des props à des composables (avancé) |
 
 ### Les 3 choses à retenir absolument
 
@@ -727,7 +742,7 @@ age.value = 31            // ← modifie aussi state.age !
 ## Ce qu'il faut retenir
 
 1. **`ref` est l'outil principal** — il emballe n'importe quelle valeur dans un objet réactif surveillé par Vue, accessible via `.value` dans le script.
-2. **`.value` dans le script, pas dans le template** — Vue déballe automatiquement les refs dans `<template>`, donc on écrit `{{ count }}` et non `{{ count.value }}`.
+2. **`.value` dans le script, pas dans le template** — Vue déballe automatiquement les refs dans `<template>`, donc on écrit `&#123;&#123; count &#125;&#125;` et non `&#123;&#123; count.value &#125;&#125;`.
 3. **`reactive` est réservé aux formulaires** — il rend un objet directement réactif sans `.value`, mais ne doit jamais être réassigné ni déstructuré sans `toRefs`.
 4. **`computed` = formule Excel** — une valeur calculée à partir d'autres refs, avec mise en cache automatique et recalcul uniquement quand les dépendances changent.
 5. **Préfère `ref` à `reactive`** — `ref` est plus flexible (accepte tout type, réassignable), et ses pièges sont moins nombreux que ceux de `reactive`.
