@@ -8,9 +8,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Quelle est la différence principale entre REST et GraphQL ?
 > 2. Comment s'appellent les opérations de lecture et d'écriture en GraphQL ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -24,11 +25,11 @@
 
 Imagine que ton **frontend** (l'interface utilisateur) et ton **backend** (le serveur) communiquent par talkie-walkie :
 
-| Technologie | Analogie |
-|---|---|
-| **REST** | Ton frontend envoie une **lettre** au serveur. Il faut connaître l'adresse exacte (`/api/users`), le format du courrier (`GET`, `POST`...), et espérer que la réponse corresponde à ce qu'on attend. |
-| **GraphQL** | Ton frontend remplit un **bon de commande détaillé** : "Je veux le nom et l'email, rien d'autre." Mieux, mais il faut quand même apprendre le langage GraphQL. |
-| **tRPC** | Ton frontend et ton backend parlent **la même langue** sur un talkie-walkie. Le frontend appelle directement les fonctions du serveur comme si elles étaient locales. Pas de traduction nécessaire ! |
+| Technologie | Analogie                                                                                                                                                                                             |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **REST**    | Ton frontend envoie une **lettre** au serveur. Il faut connaître l'adresse exacte (`/api/users`), le format du courrier (`GET`, `POST`...), et espérer que la réponse corresponde à ce qu'on attend. |
+| **GraphQL** | Ton frontend remplit un **bon de commande détaillé** : "Je veux le nom et l'email, rien d'autre." Mieux, mais il faut quand même apprendre le langage GraphQL.                                       |
+| **tRPC**    | Ton frontend et ton backend parlent **la même langue** sur un talkie-walkie. Le frontend appelle directement les fonctions du serveur comme si elles étaient locales. Pas de traduction nécessaire ! |
 
 **Le secret de tRPC :** comme le frontend ET le backend sont écrits en TypeScript, ils partagent les mêmes types. Pas besoin de schéma, pas besoin de génération de code.
 
@@ -41,7 +42,7 @@ En JavaScript/TypeScript, appeler une fonction c'est simple :
 ```ts
 // Définir une fonction
 function additionner(a: number, b: number): number {
-  return a + b;   // Renvoie la somme de a et b
+  return a + b; // Renvoie la somme de a et b
 }
 
 // Appeler la fonction
@@ -65,9 +66,9 @@ const users = await trpc.user.getAll.query();
 
 En tRPC, chaque opération du serveur est appelée une **procédure**. Il en existe 2 types :
 
-| Type | Rôle | Équivalent REST |
-|---|---|---|
-| **query** | Lire des données | `GET` |
+| Type         | Rôle                         | Équivalent REST         |
+| ------------ | ---------------------------- | ----------------------- |
+| **query**    | Lire des données             | `GET`                   |
 | **mutation** | Créer / modifier / supprimer | `POST`, `PUT`, `DELETE` |
 
 ### Zod = un outil pour valider les données
@@ -79,7 +80,7 @@ import { z } from "zod";
 
 // On décrit la forme attendue des données
 const UserInput = z.object({
-  name: z.string().min(1),   // name doit être un texte d'au moins 1 caractère
+  name: z.string().min(1), // name doit être un texte d'au moins 1 caractère
   email: z.string().email(), // email doit être un texte au format email
 });
 
@@ -100,14 +101,14 @@ const UserInput = z.object({
 // Ce fichier initialise tRPC et exporte les outils de base
 
 import { initTRPC } from "@trpc/server"; // L'outil principal de tRPC
-import { z } from "zod";                  // Pour valider les données entrantes
+import { z } from "zod"; // Pour valider les données entrantes
 
 // On initialise tRPC (une seule fois dans le projet)
 const t = initTRPC.create();
 
 // On exporte les outils qu'on va utiliser partout :
-export const router = t.router;               // Pour regrouper les procédures
-export const publicProcedure = t.procedure;   // Pour créer des procédures accessibles à tous
+export const router = t.router; // Pour regrouper les procédures
+export const publicProcedure = t.procedure; // Pour créer des procédures accessibles à tous
 ```
 
 ### Étape 2 : Créer des procédures (les "fonctions" du serveur)
@@ -116,28 +117,28 @@ export const publicProcedure = t.procedure;   // Pour créer des procédures acc
 // server/routers/user.ts
 // Ce fichier contient toutes les opérations liées aux utilisateurs
 
-import { z } from "zod";                            // Pour valider les données
-import { router, publicProcedure } from "../trpc";  // Nos outils tRPC
+import { z } from "zod"; // Pour valider les données
+import { router, publicProcedure } from "../trpc"; // Nos outils tRPC
 
 export const userRouter = router({
-
   // --- QUERY : lire tous les utilisateurs ---
-  getAll: publicProcedure
-    .query(async () => {
-      // En vrai, on irait chercher en base de données
-      // Ici on retourne des données fictives pour l'exemple
-      return [
-        { id: 1, name: "Alice", email: "alice@test.com" },
-        { id: 2, name: "Bob", email: "bob@test.com" },
-      ];
-    }),
+  getAll: publicProcedure.query(async () => {
+    // En vrai, on irait chercher en base de données
+    // Ici on retourne des données fictives pour l'exemple
+    return [
+      { id: 1, name: "Alice", email: "alice@test.com" },
+      { id: 2, name: "Bob", email: "bob@test.com" },
+    ];
+  }),
 
   // --- QUERY : lire UN utilisateur par son id ---
   getById: publicProcedure
-    .input(                          // .input() = "quelles données j'attends en entrée ?"
-      z.object({ id: z.number() })   // On attend un objet avec un id numérique
+    .input(
+      // .input() = "quelles données j'attends en entrée ?"
+      z.object({ id: z.number() }), // On attend un objet avec un id numérique
     )
-    .query(async ({ input }) => {    // input contient les données validées
+    .query(async ({ input }) => {
+      // input contient les données validées
       // input.id est garanti d'être un nombre grâce à Zod
       return { id: input.id, name: "Alice", email: "alice@test.com" };
     }),
@@ -146,8 +147,8 @@ export const userRouter = router({
   create: publicProcedure
     .input(
       z.object({
-        name: z.string().min(1),     // Le nom doit avoir au moins 1 caractère
-        email: z.string().email(),   // L'email doit être un vrai email
+        name: z.string().min(1), // Le nom doit avoir au moins 1 caractère
+        email: z.string().email(), // L'email doit être un vrai email
       }),
     )
     .mutation(async ({ input }) => {
@@ -165,12 +166,12 @@ export const userRouter = router({
 // server/index.ts
 // Ce fichier assemble tous les routeurs en un seul
 
-import { router } from "./trpc";                // L'outil router
-import { userRouter } from "./routers/user";    // Le routeur des utilisateurs
+import { router } from "./trpc"; // L'outil router
+import { userRouter } from "./routers/user"; // Le routeur des utilisateurs
 
 // On crée le routeur principal de l'application
 export const appRouter = router({
-  user: userRouter,   // Toutes les procédures "user" sont regroupées ici
+  user: userRouter, // Toutes les procédures "user" sont regroupées ici
   // On pourrait ajouter : post: postRouter, comment: commentRouter, etc.
 });
 
@@ -208,7 +209,7 @@ import type { AppRouter } from "../server";
 export const trpc = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "/api/trpc",   // L'URL ou le serveur tRPC écoute
+      url: "/api/trpc", // L'URL ou le serveur tRPC écoute
     }),
   ],
 });
@@ -224,7 +225,7 @@ export const trpc = createTRPCProxyClient<AppRouter>({
 ```vue
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { trpc } from "@/utils/trpc";  // Notre client tRPC
+import { trpc } from "@/utils/trpc"; // Notre client tRPC
 
 // Le tableau d'utilisateurs (vide au départ)
 // Awaited<ReturnType<...>> = "le type que renvoie cette fonction"
@@ -236,7 +237,7 @@ const isLoading = ref(false);
 
 // Fonction pour charger les utilisateurs depuis le serveur
 async function loadUsers(): Promise<void> {
-  isLoading.value = true;       // On commence à charger
+  isLoading.value = true; // On commence à charger
   try {
     // ✨ LA MAGIE DE tRPC :
     // On appelle trpc.user.getAll.query() comme une fonction locale
@@ -244,7 +245,7 @@ async function loadUsers(): Promise<void> {
     users.value = await trpc.user.getAll.query();
     // TypeScript sait que users.value est un tableau de { id, name, email }
   } finally {
-    isLoading.value = false;    // Chargement terminé (même si erreur)
+    isLoading.value = false; // Chargement terminé (même si erreur)
   }
 }
 
@@ -255,7 +256,7 @@ async function createUser(name: string, email: string): Promise<void> {
   // TypeScript sait que newUser a les propriétés id, name, email
   // Pas besoin de deviner ou de lire la doc de l'API !
 
-  users.value.push(newUser);   // On ajoute le nouvel utilisateur à la liste
+  users.value.push(newUser); // On ajoute le nouvel utilisateur à la liste
 }
 
 // onMounted = "quand le composant apparaît à l'écran, exécute cette fonction"
@@ -288,16 +289,16 @@ import type { Ref } from "vue";
 // Ce composable prend une fonction qui renvoie une Promise
 // et gère automatiquement le chargement, les erreurs, etc.
 export function useTrpcQuery<T>(queryFn: () => Promise<T>) {
-  const data = ref<T | null>(null) as Ref<T | null>;  // Les données reçues
-  const error = ref<string | null>(null);              // Le message d'erreur éventuel
-  const isLoading = ref(false);                        // Est-ce qu'on charge ?
+  const data = ref<T | null>(null) as Ref<T | null>; // Les données reçues
+  const error = ref<string | null>(null); // Le message d'erreur éventuel
+  const isLoading = ref(false); // Est-ce qu'on charge ?
 
   // Fonction qui exécute la requête
   async function execute(): Promise<void> {
-    isLoading.value = true;    // Début du chargement
-    error.value = null;        // On efface l'erreur précédente
+    isLoading.value = true; // Début du chargement
+    error.value = null; // On efface l'erreur précédente
     try {
-      data.value = await queryFn();   // On exécute la fonction passée en paramètre
+      data.value = await queryFn(); // On exécute la fonction passée en paramètre
     } catch (err) {
       // Si erreur, on récupère le message
       error.value = err instanceof Error ? err.message : "Erreur inconnue";
@@ -322,9 +323,11 @@ import { useTrpcQuery } from "@/composables/useTrpcQuery";
 import { trpc } from "@/utils/trpc";
 
 // Une seule ligne pour charger les données avec gestion d'erreur + loading !
-const { data: users, isLoading, error } = useTrpcQuery(
-  () => trpc.user.getAll.query()
-);
+const {
+  data: users,
+  isLoading,
+  error,
+} = useTrpcQuery(() => trpc.user.getAll.query());
 </script>
 
 <template>
@@ -340,16 +343,17 @@ const { data: users, isLoading, error } = useTrpcQuery(
 
 ## 📊 REST vs GraphQL vs tRPC — Le tableau comparatif
 
-| | REST | GraphQL | tRPC |
-|---|---|---|---|
-| **Difficulté** | Facile | Moyen | Moyen |
-| **Type safety** | Manuelle (tu écris les types toi-même) | Avec code génération (outil externe) | **Native** (automatique !) |
-| **Langages backend** | Tous (PHP, Python, Java, Node...) | Tous | **TypeScript uniquement** |
-| **Complexité à mettre en place** | Faible | Élevée (schéma, resolvers...) | Faible |
-| **Écosystème** | Énorme (partout) | Large | En croissance |
-| **Quand l'utiliser** | Par défaut, partout | Gros projets, données complexes | Projets full-stack TypeScript |
+|                                  | REST                                   | GraphQL                              | tRPC                          |
+| -------------------------------- | -------------------------------------- | ------------------------------------ | ----------------------------- |
+| **Difficulté**                   | Facile                                 | Moyen                                | Moyen                         |
+| **Type safety**                  | Manuelle (tu écris les types toi-même) | Avec code génération (outil externe) | **Native** (automatique !)    |
+| **Langages backend**             | Tous (PHP, Python, Java, Node...)      | Tous                                 | **TypeScript uniquement**     |
+| **Complexité à mettre en place** | Faible                                 | Élevée (schéma, resolvers...)        | Faible                        |
+| **Écosystème**                   | Énorme (partout)                       | Large                                | En croissance                 |
+| **Quand l'utiliser**             | Par défaut, partout                    | Gros projets, données complexes      | Projets full-stack TypeScript |
 
 ### En résumé :
+
 - **REST** → Le standard. Commence toujours par là.
 - **GraphQL** → Utile quand tu as beaucoup de données imbriquées et des clients variés (web, mobile).
 - **tRPC** → Le rêve du développeur full-stack TypeScript. Parfait quand tu contrôles le frontend ET le backend.
@@ -364,30 +368,31 @@ Crée un router tRPC avec une procédure `getAll` qui retourne une liste d'utili
 
 ```ts
 // server/routers/user.ts
-import { router, publicProcedure } from '../trpc'
+import { router, publicProcedure } from "../trpc";
 
 export const userRouter = router({
   // getAll : retourne tous les utilisateurs
   // ???
-})
+});
 ```
 
 <details>
 <summary>Solution</summary>
 
 ```ts
-import { router, publicProcedure } from '../trpc'
+import { router, publicProcedure } from "../trpc";
 
 export const userRouter = router({
   getAll: publicProcedure.query(async () => {
     // En vrai : appel à la base de données
     return [
-      { id: 1, name: 'Alice', email: 'alice@test.com' },
-      { id: 2, name: 'Bob', email: 'bob@test.com' }
-    ]
-  })
-})
+      { id: 1, name: "Alice", email: "alice@test.com" },
+      { id: 2, name: "Bob", email: "bob@test.com" },
+    ];
+  }),
+});
 ```
+
 </details>
 
 ---
@@ -397,29 +402,30 @@ export const userRouter = router({
 Ajoute une procédure `getById` qui prend un ID en paramètre :
 
 ```ts
-import { z } from 'zod'
+import { z } from "zod";
 
-getById: publicProcedure
-  // Définis le schéma de validation
-  // ???
-  // Puis la query
-  // ???
+getById: publicProcedure;
+// Définis le schéma de validation
+// ???
+// Puis la query
+// ???
 ```
 
 <details>
 <summary>Solution</summary>
 
 ```ts
-import { z } from 'zod'
+import { z } from "zod";
 
 getById: publicProcedure
   .input(z.object({ id: z.number() }))
   .query(async ({ input }) => {
-    const user = users.find(u => u.id === input.id)
-    if (!user) throw new Error('User not found')
-    return user
-  })
+    const user = users.find((u) => u.id === input.id);
+    if (!user) throw new Error("User not found");
+    return user;
+  });
 ```
+
 </details>
 
 ---
@@ -429,8 +435,8 @@ getById: publicProcedure
 Crée une mutation `create` pour ajouter un utilisateur :
 
 ```ts
-create: publicProcedure
-  // ???
+create: publicProcedure;
+// ???
 ```
 
 <details>
@@ -438,20 +444,23 @@ create: publicProcedure
 
 ```ts
 create: publicProcedure
-  .input(z.object({
-    name: z.string().min(2),
-    email: z.string().email()
-  }))
+  .input(
+    z.object({
+      name: z.string().min(2),
+      email: z.string().email(),
+    }),
+  )
   .mutation(async ({ input }) => {
     const newUser = {
       id: Date.now(),
       name: input.name,
-      email: input.email
-    }
-    users.push(newUser)
-    return newUser
-  })
+      email: input.email,
+    };
+    users.push(newUser);
+    return newUser;
+  });
 ```
+
 </details>
 
 ---
@@ -479,21 +488,26 @@ async function createUser() {
 
 ```vue
 <script setup lang="ts">
-import { trpc } from '@/utils/trpc'
+import { trpc } from "@/utils/trpc";
 
-const users = await trpc.user.getAll.query()
+const users = await trpc.user.getAll.query();
 
 async function createUser() {
   await trpc.user.create.mutate({
-    name: 'Charlie',
-    email: 'charlie@test.com'
-  })
+    name: "Charlie",
+    email: "charlie@test.com",
+  });
 }
 </script>
 ```
+
 </details>
 
 ---
+
+## Exercice
+
+→ `exercices/23-client-api-type/ENONCE.md`
 
 ## Suite
 
@@ -504,5 +518,6 @@ async function createUser() {
 <!-- parcours-recommande -->
 
 ::: tip Parcours recommandé
+
 1. **Exercice** : [23-client-api-type](../../exercices/23-client-api-type/ENONCE)
-:::
+   :::

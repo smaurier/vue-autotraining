@@ -1052,6 +1052,10 @@ const contenuHtml = ref<string>(
 
 ---
 
+## Exercice
+
+→ `exercices/03-liste-de-taches/ENONCE.md`
+
 ## Suite
 
 → `cours/01-debutant/03-reactivite.md`

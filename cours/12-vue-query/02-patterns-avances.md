@@ -8,9 +8,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. À quoi sert la `queryKey` dans `useQuery` ?
 > 2. Quelle est la différence entre `useQuery` et `useMutation` ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -27,6 +28,7 @@
 **Analogie** : tu envoies un message sur WhatsApp. L'application affiche ton message IMMÉDIATEMENT avec une petite horloge ⏳, **avant même** que le serveur confirme l'envoi. Si l'envoi échoue, le message passe en rouge ❌ et tu peux réessayer.
 
 C'est exactement ça une **mise à jour optimiste** :
+
 1. On met à jour l'écran **tout de suite** (on suppose que ça va marcher)
 2. On envoie la requête au serveur en parallèle
 3. Si ça marche → parfait, rien à faire
@@ -40,41 +42,41 @@ Avec optimistic update : tu cliques → l'écran change INSTANTANÉMENT. L'utili
 ### Exemple commenté pas à pas
 
 ```ts
-import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { useMutation, useQueryClient } from "@tanstack/vue-query";
 
 // On récupère le gestionnaire de cache
-const queryClient = useQueryClient()
+const queryClient = useQueryClient();
 
 const { mutate: updateUser } = useMutation({
   // --- Étape 1 : la fonction qui envoie au serveur ---
   mutationFn: (updated: User) =>
     fetch(`/api/users/${updated.id}`, {
-      method: 'PUT',                                    // PUT = modifier
-      body: JSON.stringify(updated),                     // L'utilisateur modifié, en JSON
-      headers: { 'Content-Type': 'application/json' },
-    }).then(r => r.json()),
+      method: "PUT", // PUT = modifier
+      body: JSON.stringify(updated), // L'utilisateur modifié, en JSON
+      headers: { "Content-Type": "application/json" },
+    }).then((r) => r.json()),
 
   // --- Étape 2 : AVANT l'envoi au serveur (onMutate) ---
   // C'est ici qu'on fait la mise à jour optimiste
   onMutate: async (updated) => {
     // 2a. On annule les requêtes GET en cours sur 'users'
     // Pourquoi ? Pour éviter qu'un ancien GET écrase notre mise à jour optimiste
-    await queryClient.cancelQueries({ queryKey: ['users'] })
+    await queryClient.cancelQueries({ queryKey: ["users"] });
 
     // 2b. On sauvegarde l'état actuel du cache (comme un "point de sauvegarde")
     // Si ça plante, on pourra revenir à cet état
-    const previousUsers = queryClient.getQueryData<User[]>(['users'])
+    const previousUsers = queryClient.getQueryData<User[]>(["users"]);
 
     // 2c. On modifie le cache DIRECTEMENT (sans attendre le serveur)
     // setQueryData = "Change les données en cache pour cette clé"
     queryClient.setQueryData<User[]>(
-      ['users'],
+      ["users"],
       // .map parcourt chaque user : si c'est celui qu'on modifie, on le remplace
-      (old) => old?.map(u => u.id === updated.id ? updated : u) ?? []
-    )
+      (old) => old?.map((u) => (u.id === updated.id ? updated : u)) ?? [],
+    );
 
     // 2d. On retourne la sauvegarde pour pouvoir faire un rollback si nécessaire
-    return { previousUsers }
+    return { previousUsers };
   },
 
   // --- Étape 3 : SI ÇA ÉCHOUE → on remet l'ancien état ---
@@ -82,16 +84,16 @@ const { mutate: updateUser } = useMutation({
   onError: (_err, _updated, context) => {
     // Si on a une sauvegarde, on remet les anciennes données
     if (context?.previousUsers) {
-      queryClient.setQueryData(['users'], context.previousUsers)
+      queryClient.setQueryData(["users"], context.previousUsers);
     }
   },
 
   // --- Étape 4 : DANS TOUS LES CAS (succès OU erreur) ---
   // On demande un rechargement depuis le serveur pour être sûr d'être synchronisé
   onSettled: () => {
-    queryClient.invalidateQueries({ queryKey: ['users'] })
+    queryClient.invalidateQueries({ queryKey: ["users"] });
   },
-})
+});
 ```
 
 ### Schéma simplifié
@@ -123,7 +125,7 @@ La pagination, c'est **découper une grande liste en petites pages**.
 ```ts
 // computed = une valeur calculée automatiquement à partir d'autres valeurs
 // Elle se met à jour toute seule quand ses dépendances changent
-const totalPages = computed(() => data.value?.totalPages ?? 0)
+const totalPages = computed(() => data.value?.totalPages ?? 0);
 // ça veut dire : "totalPages = le nombre de pages dans data, ou 0 si data n'existe pas encore"
 // ?? = "si c'est null ou undefined, utilise la valeur après ??"
 ```
@@ -131,56 +133,58 @@ const totalPages = computed(() => data.value?.totalPages ?? 0)
 ### Exemple avec TanStack Query
 
 ```ts
-import { useQuery, keepPreviousData } from '@tanstack/vue-query'
-import { ref, computed } from 'vue'
+import { useQuery, keepPreviousData } from "@tanstack/vue-query";
+import { ref, computed } from "vue";
 
 // La page actuelle (commence à 1)
-const page = ref(1)
+const page = ref(1);
 
 // Nombre d'éléments par page
-const pageSize = ref(10)
+const pageSize = ref(10);
 
 // On décrit la forme de la réponse du serveur
 // Le <T> est un "générique" = un type variable (ici T sera User)
 interface PaginatedResponse<T> {
-  items: T[]        // Les éléments de CETTE page
-  total: number     // Nombre total d'éléments (toutes pages confondues)
-  page: number      // La page actuelle
-  totalPages: number // Le nombre total de pages
+  items: T[]; // Les éléments de CETTE page
+  total: number; // Nombre total d'éléments (toutes pages confondues)
+  page: number; // La page actuelle
+  totalPages: number; // Le nombre total de pages
 }
 
 const { data, isLoading, isPlaceholderData } = useQuery({
   // La clé contient la page et la taille → change de clé = nouvelle requête
-  queryKey: ['users', { page, pageSize }],
+  queryKey: ["users", { page, pageSize }],
 
   queryFn: async (): Promise<PaginatedResponse<User>> => {
     // On ajoute les paramètres de pagination dans l'URL
     // Exemple : /api/users?page=2&limit=10
     const res = await fetch(
-      `/api/users?page=${page.value}&limit=${pageSize.value}`
-    )
-    return res.json()    // On convertit la réponse en objet JavaScript
+      `/api/users?page=${page.value}&limit=${pageSize.value}`,
+    );
+    return res.json(); // On convertit la réponse en objet JavaScript
   },
 
   // keepPreviousData = garder l'ancienne page visible pendant le chargement de la nouvelle
   // Sans ça : tu verrais un écran vide à chaque changement de page (pas agréable)
   placeholderData: keepPreviousData,
-})
+});
 
 // Nombre total de pages (calculé automatiquement depuis la réponse)
-const totalPages = computed(() => data.value?.totalPages ?? 0)
+const totalPages = computed(() => data.value?.totalPages ?? 0);
 
 // Fonction pour aller à la page suivante
 function nextPage(): void {
-  if (page.value < totalPages.value) {  // On ne peut pas dépasser la dernière page
-    page.value++                         // page passe de 1 à 2 → TanStack Query refait la requête
+  if (page.value < totalPages.value) {
+    // On ne peut pas dépasser la dernière page
+    page.value++; // page passe de 1 à 2 → TanStack Query refait la requête
   }
 }
 
 // Fonction pour aller à la page précédente
 function prevPage(): void {
-  if (page.value > 1) {                  // On ne peut pas aller avant la page 1
-    page.value--
+  if (page.value > 1) {
+    // On ne peut pas aller avant la page 1
+    page.value--;
   }
 }
 ```
@@ -226,22 +230,22 @@ C'est comme la pagination, mais au lieu de cliquer « Suivant », les données s
 
 ```ts
 // useInfiniteQuery = version spéciale de useQuery pour le scroll infini
-import { useInfiniteQuery } from '@tanstack/vue-query'
-import { computed } from 'vue'
+import { useInfiniteQuery } from "@tanstack/vue-query";
+import { computed } from "vue";
 
 const {
-  data,                // Toutes les pages chargées
-  fetchNextPage,       // Fonction pour charger la page suivante
-  hasNextPage,         // true/false : est-ce qu'il reste des pages ?
-  isFetchingNextPage,  // true/false : est-ce qu'on est en train de charger la suite ?
+  data, // Toutes les pages chargées
+  fetchNextPage, // Fonction pour charger la page suivante
+  hasNextPage, // true/false : est-ce qu'il reste des pages ?
+  isFetchingNextPage, // true/false : est-ce qu'on est en train de charger la suite ?
 } = useInfiniteQuery({
-  queryKey: ['users', 'infinite'],
+  queryKey: ["users", "infinite"],
 
   // pageParam = le numéro de la page à charger (fourni automatiquement par TanStack Query)
   queryFn: async ({ pageParam }): Promise<PaginatedResponse<User>> => {
     // On demande 20 utilisateurs à partir du curseur (= position dans la liste)
-    const res = await fetch(`/api/users?cursor=${pageParam}&limit=20`)
-    return res.json()
+    const res = await fetch(`/api/users?cursor=${pageParam}&limit=20`);
+    return res.json();
   },
 
   // La première page commence à 0
@@ -252,18 +256,18 @@ const {
   // Si elle en contenait moins de 20 → c'était la dernière page (on retourne undefined)
   getNextPageParam: (lastPage) =>
     lastPage.items.length === 20
-      ? lastPage.page + 1    // Il y a une page suivante
-      : undefined,           // undefined = plus de pages → hasNextPage devient false
-})
+      ? lastPage.page + 1 // Il y a une page suivante
+      : undefined, // undefined = plus de pages → hasNextPage devient false
+});
 
 // On "aplatit" toutes les pages en un seul tableau
 // Exemple : page 1 = [user1, user2], page 2 = [user3, user4]
 // → allUsers = [user1, user2, user3, user4]
 const allUsers = computed(
-  () => data.value?.pages.flatMap(p => p.items) ?? []
+  () => data.value?.pages.flatMap((p) => p.items) ?? [],
   // .flatMap = comme .map mais "aplatit" les tableaux imbriqués
   // ?? [] = si pas encore de données, tableau vide
-)
+);
 ```
 
 ### Le template
@@ -282,7 +286,7 @@ const allUsers = computed(
     @click="fetchNextPage"
   >
     <!-- Texte adapté selon l'état -->
-    {{ isFetchingNextPage ? 'Chargement...' : 'Charger plus' }}
+    {{ isFetchingNextPage ? "Chargement..." : "Charger plus" }}
   </button>
 </template>
 ```
@@ -296,6 +300,7 @@ const allUsers = computed(
 ### C'est quoi ?
 
 **Analogie** : tu veux afficher les commandes d'un client. Mais pour ça, tu dois d'abord savoir QUI est le client. Donc :
+
 1. D'abord → charger le client
 2. Ensuite seulement → charger ses commandes
 
@@ -304,28 +309,28 @@ C'est une **chaîne de requêtes** : la deuxième attend que la première soit t
 ### Exemple commenté
 
 ```ts
-import { useQuery } from '@tanstack/vue-query'
-import { computed } from 'vue'
+import { useQuery } from "@tanstack/vue-query";
+import { computed } from "vue";
 
 // --- Requête 1 : charger l'utilisateur ---
 // Celle-ci se lance immédiatement
 const { data: user } = useQuery({
-  queryKey: ['user', userId],                  // Clé de cache pour cet utilisateur
-  queryFn: () => fetchUser(userId.value),      // Appel API
-})
+  queryKey: ["user", userId], // Clé de cache pour cet utilisateur
+  queryFn: () => fetchUser(userId.value), // Appel API
+});
 
 // --- Requête 2 : charger ses commandes ---
 // Celle-ci attend que la première soit terminée
 const { data: orders } = useQuery({
-  queryKey: ['orders', { userId }],            // Clé de cache pour ses commandes
-  queryFn: () => fetchOrders(userId.value),    // Appel API
+  queryKey: ["orders", { userId }], // Clé de cache pour ses commandes
+  queryFn: () => fetchOrders(userId.value), // Appel API
 
   // enabled = activer ou désactiver cette requête
   // !!user.value = convertit en true/false
   //   - Si user.value existe → true → la requête se lance
   //   - Si user.value est undefined (pas encore chargé) → false → la requête attend
   enabled: computed(() => !!user.value),
-})
+});
 
 // Résultat :
 // 1. La page s'ouvre → requête 1 se lance → on charge le user
@@ -337,14 +342,14 @@ const { data: orders } = useQuery({
 
 ```ts
 // !! transforme n'importe quelle valeur en true ou false
-!!undefined    // → false (pas de valeur)
-!!null         // → false (pas de valeur)
-!!''           // → false (texte vide)
-!!0            // → false (zéro)
+!!undefined; // → false (pas de valeur)
+!!null; // → false (pas de valeur)
+!!""; // → false (texte vide)
+!!0; // → false (zéro)
 
-!!'Alice'      // → true (il y a une valeur)
-!!42           // → true (il y a une valeur)
-!!{ id: 1 }   // → true (il y a un objet)
+!!"Alice"; // → true (il y a une valeur)
+!!42; // → true (il y a une valeur)
+!!{ id: 1 }; // → true (il y a un objet)
 ```
 
 ---
@@ -360,19 +365,19 @@ Le **prefetching**, c'est charger des données **avant que l'utilisateur en ait 
 ### Exemple : précharger au survol de la souris
 
 ```ts
-import { useQueryClient } from '@tanstack/vue-query'
+import { useQueryClient } from "@tanstack/vue-query";
 
 // On récupère le gestionnaire de cache
-const queryClient = useQueryClient()
+const queryClient = useQueryClient();
 
 // Cette fonction sera appelée quand la souris survole un lien
 function prefetchUser(userId: number): void {
   // prefetchQuery = "charge ces données en arrière-plan et mets-les en cache"
   queryClient.prefetchQuery({
-    queryKey: ['users', userId],           // Clé de cache
-    queryFn: () => fetchUser(userId),      // Comment aller chercher
-    staleTime: 5 * 60 * 1000,             // Garder "frais" pendant 5 min
-  })
+    queryKey: ["users", userId], // Clé de cache
+    queryFn: () => fetchUser(userId), // Comment aller chercher
+    staleTime: 5 * 60 * 1000, // Garder "frais" pendant 5 min
+  });
   // Quand l'utilisateur cliquera sur le lien, les données seront DÉJÀ en cache
   // → La page s'affichera instantanément !
 }
@@ -417,18 +422,18 @@ L'**invalidation**, c'est dire à TanStack Query : « ces données ne sont plus 
 Après une **mutation** (création, modification, suppression). Exemple : tu crées un nouvel utilisateur → tu invalides la liste des utilisateurs → TanStack Query recharge la liste → le nouvel utilisateur apparaît.
 
 ```ts
-const queryClient = useQueryClient()
+const queryClient = useQueryClient();
 
 // Invalider une clé précise
-queryClient.invalidateQueries({ queryKey: ['users'] })
+queryClient.invalidateQueries({ queryKey: ["users"] });
 // → Toutes les requêtes dont la clé commence par 'users' seront rechargées
 
 // Invalider une clé plus précise
-queryClient.invalidateQueries({ queryKey: ['users', 42] })
+queryClient.invalidateQueries({ queryKey: ["users", 42] });
 // → Seule la requête de l'utilisateur 42 sera rechargée
 
 // Tout invalider (rare, mais possible)
-queryClient.invalidateQueries()
+queryClient.invalidateQueries();
 // → TOUT le cache est invalidé, TOUT est rechargé
 ```
 
@@ -441,32 +446,34 @@ Au lieu de répéter les mêmes options dans chaque `useQuery`, on peut les déf
 ```ts
 // main.ts — le fichier de démarrage
 
-import { VueQueryPlugin, type VueQueryPluginOptions } from '@tanstack/vue-query'
+import {
+  VueQueryPlugin,
+  type VueQueryPluginOptions,
+} from "@tanstack/vue-query";
 
 // Les options par défaut pour TOUTES les requêtes de l'application
 const queryConfig: VueQueryPluginOptions = {
   queryClientConfig: {
     defaultOptions: {
-
       // Options pour les lectures (useQuery)
       queries: {
-        staleTime: 2 * 60 * 1000,      // Données fraîches pendant 2 min par défaut
-        gcTime: 10 * 60 * 1000,         // Gardées en cache 10 min
-        retry: 2,                        // 2 tentatives en cas d'erreur
-        refetchOnWindowFocus: true,      // Recharger quand on revient sur l'onglet
-        refetchOnReconnect: true,        // Recharger quand Internet revient
+        staleTime: 2 * 60 * 1000, // Données fraîches pendant 2 min par défaut
+        gcTime: 10 * 60 * 1000, // Gardées en cache 10 min
+        retry: 2, // 2 tentatives en cas d'erreur
+        refetchOnWindowFocus: true, // Recharger quand on revient sur l'onglet
+        refetchOnReconnect: true, // Recharger quand Internet revient
       },
 
       // Options pour les écritures (useMutation)
       mutations: {
-        retry: 1,                        // 1 seule tentative en cas d'erreur
+        retry: 1, // 1 seule tentative en cas d'erreur
       },
     },
   },
-}
+};
 
 // On passe cette configuration au plugin
-app.use(VueQueryPlugin, queryConfig)
+app.use(VueQueryPlugin, queryConfig);
 ```
 
 > **Astuce** : chaque `useQuery` individuel peut toujours surcharger ces options. La config globale donne juste des valeurs par défaut.
@@ -489,7 +496,7 @@ pnpm add @tanstack/vue-query-devtools
 <!-- App.vue — le composant racine de l'application -->
 <script setup lang="ts">
 // On importe le composant Devtools
-import { VueQueryDevtools } from '@tanstack/vue-query-devtools'
+import { VueQueryDevtools } from "@tanstack/vue-query-devtools";
 </script>
 
 <template>
@@ -515,15 +522,15 @@ import { VueQueryDevtools } from '@tanstack/vue-query-devtools'
 
 ## 9. Quand utiliser quoi ? TanStack Query vs Pinia vs composable maison
 
-| Critère                          | Composable maison       | Pinia        | TanStack Query          |
-| -------------------------------- | ----------------------- | ------------ | ----------------------- |
-| Cache automatique                | ❌ À faire soi-même     | ❌ Manuel    | ✅ Automatique          |
-| Déduplique les requêtes          | ❌ Non                  | ❌ Non       | ✅ Oui                  |
-| Données périmées → recharge      | ❌ Non                  | ❌ Non       | ✅ Oui                  |
-| Retry automatique                | ❌ Non                  | ❌ Non       | ✅ Oui                  |
-| Devtools                         | ❌ Non                  | ✅ Oui       | ✅ Oui                  |
-| État client (formulaires, UI)    | ❌ Pas fait pour ça     | ✅ Parfait   | ❌ Pas fait pour ça     |
-| Complexité                       | 🔴 Beaucoup de code    | 🟡 Modéré   | 🟢 Très peu de code    |
+| Critère                       | Composable maison   | Pinia      | TanStack Query      |
+| ----------------------------- | ------------------- | ---------- | ------------------- |
+| Cache automatique             | ❌ À faire soi-même | ❌ Manuel  | ✅ Automatique      |
+| Déduplique les requêtes       | ❌ Non              | ❌ Non     | ✅ Oui              |
+| Données périmées → recharge   | ❌ Non              | ❌ Non     | ✅ Oui              |
+| Retry automatique             | ❌ Non              | ❌ Non     | ✅ Oui              |
+| Devtools                      | ❌ Non              | ✅ Oui     | ✅ Oui              |
+| État client (formulaires, UI) | ❌ Pas fait pour ça | ✅ Parfait | ❌ Pas fait pour ça |
+| Complexité                    | 🔴 Beaucoup de code | 🟡 Modéré  | 🟢 Très peu de code |
 
 ### La règle simple
 
@@ -535,14 +542,14 @@ import { VueQueryDevtools } from '@tanstack/vue-query-devtools'
 
 ## Résumé de ce chapitre avancé
 
-| Concept               | En une phrase                                                       |
-| --------------------- | ------------------------------------------------------------------- |
-| Optimistic Updates    | Modifier l'écran avant la confirmation du serveur                   |
-| Pagination            | Découper une grande liste en pages avec boutons Précédent/Suivant   |
-| Infinite Scroll       | Charger la suite automatiquement quand on scrolle                   |
-| Dependent Queries     | Attendre qu'une requête finisse avant d'en lancer une autre         |
-| Prefetching           | Charger des données à l'avance pour que l'affichage soit instantané |
-| Query Invalidation    | Dire au cache de se rafraîchir après une modification               |
+| Concept            | En une phrase                                                       |
+| ------------------ | ------------------------------------------------------------------- |
+| Optimistic Updates | Modifier l'écran avant la confirmation du serveur                   |
+| Pagination         | Découper une grande liste en pages avec boutons Précédent/Suivant   |
+| Infinite Scroll    | Charger la suite automatiquement quand on scrolle                   |
+| Dependent Queries  | Attendre qu'une requête finisse avant d'en lancer une autre         |
+| Prefetching        | Charger des données à l'avance pour que l'affichage soit instantané |
+| Query Invalidation | Dire au cache de se rafraîchir après une modification               |
 
 > **Rappel** : ces patterns sont avancés. Commence par bien maîtriser `useQuery` et `useMutation` du chapitre précédent. Tu reviendras ici quand tu en auras besoin.
 
@@ -557,7 +564,7 @@ Ajoute une mise à jour optimiste pour cette mutation de like :
 ```ts
 export function useLikePost() {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: (postId: number) => fetch(`/api/posts/${postId}/like`, { method: 'POST' }),
     onMutate: async (postId) => {
@@ -590,6 +597,7 @@ onError: (err, postId, context) => {
   queryClient.setQueryData(['posts'], context?.previousPosts)
 }
 ```
+
 </details>
 
 ---
@@ -612,16 +620,18 @@ const { data } = useQuery({
 <summary>Solution</summary>
 
 ```ts
-import { keepPreviousData } from '@tanstack/vue-query'
+import { keepPreviousData } from "@tanstack/vue-query";
 
-const page = ref(1)
+const page = ref(1);
 
 const { data } = useQuery({
-  queryKey: ['products', page],
-  queryFn: () => fetch(`/api/products?page=${page.value}`).then(r => r.json()),
-  placeholderData: keepPreviousData
-})
+  queryKey: ["products", page],
+  queryFn: () =>
+    fetch(`/api/products?page=${page.value}`).then((r) => r.json()),
+  placeholderData: keepPreviousData,
+});
 ```
+
 </details>
 
 ---
@@ -650,34 +660,41 @@ const { data: orders } = useQuery({
 
 ```ts
 const { data: orders } = useQuery({
-  queryKey: ['orders', user.value?.id],
-  queryFn: () => fetch(`/api/users/${user.value!.id}/orders`).then(r => r.json()),
-  enabled: !!user.value
-})
+  queryKey: ["orders", user.value?.id],
+  queryFn: () =>
+    fetch(`/api/users/${user.value!.id}/orders`).then((r) => r.json()),
+  enabled: !!user.value,
+});
 ```
+
 </details>
 
 ---
 
+## Exercice
+
+→ `exercices/27-vue-query-crud/ENONCE.md`
+
 ## Suite
 
-→ [cours/09-accessibilité/01-fondamentaux-wcag.md](../09-accessibilite/01-fondamentaux-wcag.md) (où module suivant selon le parcours)
+→ [Consulte le projet fil rouge](../../projet-fil-rouge/README.md)
 
 ---
 
 <!-- parcours-recommande -->
 
 ::: tip Parcours recommandé
+
 1. **Exercice** : [27-vue-query-crud](../../exercices/27-vue-query-crud/ENONCE)
 2. **Projet fil rouge** : [README](../../projet-fil-rouge/README)
-:::
+   :::
 
 ---
 
 <!-- navigation-inter-cours -->
 
 ::: info Cours suivant
-Bravo, tu as termine le cours **Vue.js** ! 
+Bravo, tu as termine le cours **Vue.js** !
 Le prochain cours du curriculum est **Angular**.
 
 [Commencer Angular →](../../../03-angular/cours/00-de-vue-a-angular/01-vue-vs-angular-mental-model.md)

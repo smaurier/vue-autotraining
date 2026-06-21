@@ -4,9 +4,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Qu'est-ce qu'une attaque XSS et comment s'en protéger en Vue ?
 > 2. Qu'est-ce qu'une attaque CSRF ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -33,10 +34,10 @@
 
 ### La différence entre rôle et permission
 
-| Concept | C'est quoi ? | Exemple |
-| --- | --- | --- |
-| **Rôle** | Une "étiquette" donnée à un utilisateur | `admin`, `editor`, `viewer` |
-| **Permission** | Un droit précis d'effectuer une action | `users:delete`, `products:write` |
+| Concept        | C'est quoi ?                            | Exemple                          |
+| -------------- | --------------------------------------- | -------------------------------- |
+| **Rôle**       | Une "étiquette" donnée à un utilisateur | `admin`, `editor`, `viewer`      |
+| **Permission** | Un droit précis d'effectuer une action  | `users:delete`, `products:write` |
 
 Un **rôle** regroupe plusieurs **permissions** :
 
@@ -62,48 +63,44 @@ et de dire **quel rôle** peut faire quoi.
 // Ce fichier définit les types pour les rôles et les permissions
 
 // Les 3 rôles possibles dans notre application
-export type Role = 'admin' | 'editor' | 'viewer'
+export type Role = "admin" | "editor" | "viewer";
 // "type" crée un alias de type en TypeScript
 // Ici, Role ne peut être QUE 'admin', 'editor' ou 'viewer' (union type)
 
 // Toutes les permissions possibles
 // Le format est "ressource:action" (convention courante)
 export type Permission =
-  | 'users:read'       // Lire la liste des utilisateurs
-  | 'users:write'      // Créer / modifier un utilisateur
-  | 'users:delete'     // Supprimer un utilisateur
-  | 'products:read'    // Lire les produits
-  | 'products:write'   // Créer / modifier un produit
-  | 'products:delete'  // Supprimer un produit
-  | 'settings:read'    // Lire les paramètres
-  | 'settings:write'   // Modifier les paramètres
+  | "users:read" // Lire la liste des utilisateurs
+  | "users:write" // Créer / modifier un utilisateur
+  | "users:delete" // Supprimer un utilisateur
+  | "products:read" // Lire les produits
+  | "products:write" // Créer / modifier un produit
+  | "products:delete" // Supprimer un produit
+  | "settings:read" // Lire les paramètres
+  | "settings:write"; // Modifier les paramètres
 
 // Quelle permission a chaque rôle ?
 // Record<Role, Permission[]> = un objet avec une clé par rôle,
 // et pour chaque rôle un tableau de permissions
 export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
-
   // L'admin peut TOUT faire
   admin: [
-    'users:read', 'users:write', 'users:delete',
-    'products:read', 'products:write', 'products:delete',
-    'settings:read', 'settings:write',
+    "users:read",
+    "users:write",
+    "users:delete",
+    "products:read",
+    "products:write",
+    "products:delete",
+    "settings:read",
+    "settings:write",
   ],
 
   // L'éditeur peut lire les users, lire + écrire les produits, et lire les paramètres
-  editor: [
-    'users:read',
-    'products:read', 'products:write',
-    'settings:read',
-  ],
+  editor: ["users:read", "products:read", "products:write", "settings:read"],
 
   // Le viewer peut uniquement LIRE (pas modifier, pas supprimer)
-  viewer: [
-    'users:read',
-    'products:read',
-    'settings:read',
-  ],
-}
+  viewer: ["users:read", "products:read", "settings:read"],
+};
 ```
 
 ### Visualisation des permissions
@@ -131,26 +128,25 @@ de faire quelque chose. Tu l'utiliseras partout dans ton app.
 ```ts
 // composables/usePermissions.ts
 
-import { computed } from 'vue'
-import { useAuth } from './useAuth'               // Notre composable d'authentification
-import { ROLE_PERMISSIONS, type Permission } from '@/types/permissions'
+import { computed } from "vue";
+import { useAuth } from "./useAuth"; // Notre composable d'authentification
+import { ROLE_PERMISSIONS, type Permission } from "@/types/permissions";
 // On importe la table des permissions et le type Permission
 
 export function usePermissions() {
-
   // On récupère le rôle de l'utilisateur connecté
-  const { role } = useAuth()
+  const { role } = useAuth();
 
   // On calcule les permissions de l'utilisateur à partir de son rôle
   const permissions = computed<Permission[]>(() => {
-    if (!role.value) return []               // Pas connecté → aucune permission
-    return ROLE_PERMISSIONS[role.value]       // On cherche dans la table
+    if (!role.value) return []; // Pas connecté → aucune permission
+    return ROLE_PERMISSIONS[role.value]; // On cherche dans la table
     // Ex: si role = 'editor', on obtient ['users:read', 'products:read', 'products:write', 'settings:read']
-  })
+  });
 
   // Vérifie si l'utilisateur a UNE permission précise
   function hasPermission(permission: Permission): boolean {
-    return permissions.value.includes(permission)
+    return permissions.value.includes(permission);
     // .includes() vérifie si le tableau contient cette valeur
     // Ex: ['users:read', 'products:read'].includes('users:delete') → false
   }
@@ -159,22 +155,22 @@ export function usePermissions() {
   function hasAnyPermission(...perms: Permission[]): boolean {
     // "...perms" = rest parameter → on peut passer autant d'arguments qu'on veut
     // Ex: hasAnyPermission('users:write', 'users:delete')
-    return perms.some(p => permissions.value.includes(p))
+    return perms.some((p) => permissions.value.includes(p));
     // .some() retourne true si AU MOINS UN élément passe le test
   }
 
   // Vérifie si l'utilisateur a TOUTES les permissions listées
   function hasAllPermissions(...perms: Permission[]): boolean {
-    return perms.every(p => permissions.value.includes(p))
+    return perms.every((p) => permissions.value.includes(p));
     // .every() retourne true si TOUS les éléments passent le test
   }
 
   return {
-    permissions,        // La liste complète des permissions
-    hasPermission,      // Vérifier 1 permission
-    hasAnyPermission,   // Vérifier au moins 1 parmi plusieurs
-    hasAllPermissions,  // Vérifier toutes
-  }
+    permissions, // La liste complète des permissions
+    hasPermission, // Vérifier 1 permission
+    hasAnyPermission, // Vérifier au moins 1 parmi plusieurs
+    hasAllPermissions, // Vérifier toutes
+  };
 }
 ```
 
@@ -192,31 +188,31 @@ ou cache son contenu selon les permissions de l'utilisateur.
 ```vue
 <!-- components/CanAccess.vue -->
 <script setup lang="ts">
-import { computed } from 'vue'
-import { usePermissions } from '@/composables/usePermissions'
-import type { Permission } from '@/types/permissions'
+import { computed } from "vue";
+import { usePermissions } from "@/composables/usePermissions";
+import type { Permission } from "@/types/permissions";
 
 // Les props (paramètres) du composant
 // On peut lui passer UNE permission, OU un tableau avec anyOf/allOf
 const props = defineProps<{
-  permission?: Permission     // Vérifier UNE permission (optionnel)
-  anyOf?: Permission[]        // Vérifier si l'utilisateur a AU MOINS UNE de ces permissions
-  allOf?: Permission[]        // Vérifier si l'utilisateur a TOUTES ces permissions
-}>()
+  permission?: Permission; // Vérifier UNE permission (optionnel)
+  anyOf?: Permission[]; // Vérifier si l'utilisateur a AU MOINS UNE de ces permissions
+  allOf?: Permission[]; // Vérifier si l'utilisateur a TOUTES ces permissions
+}>();
 
-const { hasPermission, hasAnyPermission, hasAllPermissions } = usePermissions()
+const { hasPermission, hasAnyPermission, hasAllPermissions } = usePermissions();
 
 // On calcule si l'utilisateur est autorisé
 const allowed = computed(() => {
   // Si on a passé une seule permission → on vérifie celle-là
-  if (props.permission) return hasPermission(props.permission)
+  if (props.permission) return hasPermission(props.permission);
   // Si on a passé "anyOf" → au moins une suffit
-  if (props.anyOf) return hasAnyPermission(...props.anyOf)
+  if (props.anyOf) return hasAnyPermission(...props.anyOf);
   // Si on a passé "allOf" → il faut toutes les avoir
-  if (props.allOf) return hasAllPermissions(...props.allOf)
+  if (props.allOf) return hasAllPermissions(...props.allOf);
   // Si rien n'est passé → par sécurité, on refuse
-  return false
-})
+  return false;
+});
 </script>
 
 <template>
@@ -274,9 +270,9 @@ const allowed = computed(() => {
 ```ts
 // directives/vCan.ts
 
-import type { Directive } from 'vue'
-import { usePermissions } from '@/composables/usePermissions'
-import type { Permission } from '@/types/permissions'
+import type { Directive } from "vue";
+import { usePermissions } from "@/composables/usePermissions";
+import type { Permission } from "@/types/permissions";
 
 // On crée une directive personnalisée
 // Directive<HTMLElement, Permission> signifie :
@@ -284,28 +280,27 @@ import type { Permission } from '@/types/permissions'
 // - La valeur qu'on lui passe est de type Permission
 
 export const vCan: Directive<HTMLElement, Permission> = {
-
   // "mounted" s'exécute quand l'élément est ajouté au DOM (à la page)
   mounted(el, binding) {
     // el      = l'élément HTML sur lequel on a mis v-can
     // binding = contient la valeur passée (ex: 'users:delete')
 
-    const { hasPermission } = usePermissions()
+    const { hasPermission } = usePermissions();
 
     // Si l'utilisateur N'A PAS la permission → on cache l'élément
     if (!hasPermission(binding.value)) {
-      el.style.display = 'none'  // display: none rend l'élément invisible
+      el.style.display = "none"; // display: none rend l'élément invisible
     }
   },
 
   // "updated" s'exécute quand les données changent (ex: l'utilisateur change de rôle)
   updated(el, binding) {
-    const { hasPermission } = usePermissions()
+    const { hasPermission } = usePermissions();
     // On montre ou cache selon la permission
-    el.style.display = hasPermission(binding.value) ? '' : 'none'
+    el.style.display = hasPermission(binding.value) ? "" : "none";
     // '' = valeur par défaut → l'élément est visible
   },
-}
+};
 ```
 
 ### Comment l'utiliser
@@ -340,27 +335,27 @@ les **permissions** avant d'accéder à une page.
 ```ts
 // router/guards.ts
 
-import type { RouteLocationNormalized } from 'vue-router'
-import { usePermissions } from '@/composables/usePermissions'
-import type { Permission } from '@/types/permissions'
+import type { RouteLocationNormalized } from "vue-router";
+import { usePermissions } from "@/composables/usePermissions";
+import type { Permission } from "@/types/permissions";
 
 export function permissionGuard(
-  to: RouteLocationNormalized,  // La page ou l'utilisateur veut aller
+  to: RouteLocationNormalized, // La page ou l'utilisateur veut aller
 ): boolean | { name: string } {
   // Cette fonction retourne :
   // - true              → OK, l'utilisateur peut accéder à la page
   // - { name: 'forbidden' } → INTERDIT, on le redirige vers la page "Accès refusé"
 
   // On récupère la permission requise depuis les "meta" de la route
-  const requiredPermission = to.meta.permission as Permission | undefined
+  const requiredPermission = to.meta.permission as Permission | undefined;
   // "as Permission | undefined" = on dit à TypeScript le type attendu
 
   // Si la route ne demande pas de permission particulière → OK
-  if (!requiredPermission) return true
+  if (!requiredPermission) return true;
 
   // On vérifie si l'utilisateur a la permission
-  const { hasPermission } = usePermissions()
-  return hasPermission(requiredPermission) || { name: 'forbidden' }
+  const { hasPermission } = usePermissions();
+  return hasPermission(requiredPermission) || { name: "forbidden" };
   // Si hasPermission retourne true → true (accès OK)
   // Si hasPermission retourne false → { name: 'forbidden' } (redirection)
 }
@@ -373,26 +368,26 @@ export function permissionGuard(
 
 const routes = [
   {
-    path: '/admin/users',
+    path: "/admin/users",
     component: UserManagement,
     meta: {
-      requiresAuth: true,                    // Il faut être connecté
-      permission: 'users:write' as const,    // ET il faut avoir la permission users:write
+      requiresAuth: true, // Il faut être connecté
+      permission: "users:write" as const, // ET il faut avoir la permission users:write
       // "as const" dit à TypeScript que c'est une valeur exacte, pas juste un string
     },
   },
   {
-    path: '/products',
+    path: "/products",
     component: ProductList,
     meta: {
       requiresAuth: true,
-      permission: 'products:read' as const,  // Juste besoin de lire les produits
+      permission: "products:read" as const, // Juste besoin de lire les produits
     },
   },
-]
+];
 
 // On active le guard pour toutes les routes
-router.beforeEach(permissionGuard)
+router.beforeEach(permissionGuard);
 ```
 
 ---
@@ -410,26 +405,26 @@ Elles viennent du **serveur** (l'API les envoie en même temps que les infos de 
 
 // La réponse de l'API de connexion contient les permissions
 interface AuthResponse {
-  user: User
-  accessToken: string
-  permissions: string[]  // Les permissions viennent du serveur !
+  user: User;
+  accessToken: string;
+  permissions: string[]; // Les permissions viennent du serveur !
   // Ex: ['users:read', 'products:read', 'products:write']
 }
 
 async function login(credentials: LoginCredentials): Promise<void> {
   // On appelle l'API de connexion
-  const data: AuthResponse = await authFetch('/api/auth/login', {
-    method: 'POST',
+  const data: AuthResponse = await authFetch("/api/auth/login", {
+    method: "POST",
     body: JSON.stringify(credentials),
-  }).then(r => r.json())
+  }).then((r) => r.json());
   // .then(r => r.json()) transforme la réponse HTTP en objet JavaScript
 
   // On stocke TOUT dans l'état : user, token ET permissions
   state.value = {
     user: data.user,
     accessToken: data.accessToken,
-    permissions: data.permissions,  // Les permissions du serveur !
-  }
+    permissions: data.permissions, // Les permissions du serveur !
+  };
   // Plus besoin de la table ROLE_PERMISSIONS côté front
   // Le serveur décide de tout
 }
@@ -439,16 +434,16 @@ async function login(credentials: LoginCredentials): Promise<void> {
 
 ## 📝 Résumé
 
-| Concept | En une phrase |
-| --- | --- |
-| **Rôle** | Une étiquette (admin, editor, viewer) attribuée à un utilisateur |
-| **Permission** | Un droit précis (users:delete, products:write) |
-| **RBAC** | Chaque rôle à un ensemble de permissions prédéfinies |
-| **usePermissions** | Composable pour vérifier les permissions de l'utilisateur connecté |
-| **`<CanAccess>`** | Composant qui affiche ou cache du contenu selon les permissions |
-| **`v-can`** | Directive pour cacher un élément selon une permission |
-| **permissionGuard** | Guard de route qui bloque l'accès aux pages non autorisées |
-| **Permissions dynamiques** | Les permissions viennent du serveur (plus flexible) |
+| Concept                    | En une phrase                                                      |
+| -------------------------- | ------------------------------------------------------------------ |
+| **Rôle**                   | Une étiquette (admin, editor, viewer) attribuée à un utilisateur   |
+| **Permission**             | Un droit précis (users:delete, products:write)                     |
+| **RBAC**                   | Chaque rôle à un ensemble de permissions prédéfinies               |
+| **usePermissions**         | Composable pour vérifier les permissions de l'utilisateur connecté |
+| **`<CanAccess>`**          | Composant qui affiche ou cache du contenu selon les permissions    |
+| **`v-can`**                | Directive pour cacher un élément selon une permission              |
+| **permissionGuard**        | Guard de route qui bloque l'accès aux pages non autorisées         |
+| **Permissions dynamiques** | Les permissions viennent du serveur (plus flexible)                |
 
 ---
 
@@ -465,7 +460,7 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   viewer: ???
 }
 
-type Permission = 'users:read' | 'users:write' | 'users:delete' 
+type Permission = 'users:read' | 'users:write' | 'users:delete'
                 | 'products:read' | 'products:write'
 ```
 
@@ -474,11 +469,18 @@ type Permission = 'users:read' | 'users:write' | 'users:delete'
 
 ```ts
 const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
-  admin: ['users:read', 'users:write', 'users:delete', 'products:read', 'products:write'],
-  editor: ['users:read', 'products:read', 'products:write'],
-  viewer: ['users:read', 'products:read']
-}
+  admin: [
+    "users:read",
+    "users:write",
+    "users:delete",
+    "products:read",
+    "products:write",
+  ],
+  editor: ["users:read", "products:read", "products:write"],
+  viewer: ["users:read", "products:read"],
+};
 ```
+
 </details>
 
 ---
@@ -489,17 +491,17 @@ Crée un composable pour vérifier les permissions :
 
 ```ts
 export function usePermissions() {
-  const { user } = useAuth()
-  
+  const { user } = useAuth();
+
   function hasPermission(permission: Permission): boolean {
     // ???
   }
-  
+
   function hasAnyPermission(permissions: Permission[]): boolean {
     // ???
   }
-  
-  return { hasPermission, hasAnyPermission }
+
+  return { hasPermission, hasAnyPermission };
 }
 ```
 
@@ -508,21 +510,22 @@ export function usePermissions() {
 
 ```ts
 export function usePermissions() {
-  const { user } = useAuth()
-  
+  const { user } = useAuth();
+
   function hasPermission(permission: Permission): boolean {
-    if (!user.value) return false
-    const userPermissions = ROLE_PERMISSIONS[user.value.role]
-    return userPermissions.includes(permission)
+    if (!user.value) return false;
+    const userPermissions = ROLE_PERMISSIONS[user.value.role];
+    return userPermissions.includes(permission);
   }
-  
+
   function hasAnyPermission(permissions: Permission[]): boolean {
-    return permissions.some(p => hasPermission(p))
+    return permissions.some((p) => hasPermission(p));
   }
-  
-  return { hasPermission, hasAnyPermission }
+
+  return { hasPermission, hasAnyPermission };
 }
 ```
+
 </details>
 
 ---
@@ -533,14 +536,12 @@ Crée un composant qui affiche son contenu seulement si l'utilisateur à la perm
 
 ```vue
 <!-- CanAccess.vue -->
-<template>
-  ???
-</template>
+<template>???</template>
 
 <script setup lang="ts">
 defineProps<{
-  permission: Permission
-}>()
+  permission: Permission;
+}>();
 </script>
 ```
 
@@ -553,25 +554,31 @@ defineProps<{
 </template>
 
 <script setup lang="ts">
-import { usePermissions } from '@/composables/usePermissions'
+import { usePermissions } from "@/composables/usePermissions";
 
 const props = defineProps<{
-  permission: Permission
-}>()
+  permission: Permission;
+}>();
 
-const { hasPermission } = usePermissions()
+const { hasPermission } = usePermissions();
 </script>
 ```
 
 Utilisation :
+
 ```vue
 <CanAccess permission="users:delete">
   <button>Supprimer l'utilisateur</button>
 </CanAccess>
 ```
+
 </details>
 
 ---
+
+## Exercice
+
+→ `exercices/26-auth-securite/ENONCE.md`
 
 ## Suite
 
@@ -582,5 +589,6 @@ Utilisation :
 <!-- parcours-recommande -->
 
 ::: tip Parcours recommandé
+
 1. **Exercice** : [26-auth-sécurité](../../exercices/26-auth-securite/ENONCE)
-:::
+   :::

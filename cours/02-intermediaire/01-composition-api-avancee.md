@@ -95,11 +95,12 @@ Par défaut, `watch` attend que la donnée change. Avec `immediate: true`, il s'
 
 ```ts
 watch(
-  search,                    // 1. Quoi surveiller
-  (val) => {                 // 2. Que faire (val = la valeur actuelle)
-    fetchResults(val);       //    → on lance la recherche
+  search, // 1. Quoi surveiller
+  (val) => {
+    // 2. Que faire (val = la valeur actuelle)
+    fetchResults(val); //    → on lance la recherche
   },
-  { immediate: true },       // 3. Option : exécuter aussi immédiatement
+  { immediate: true }, // 3. Option : exécuter aussi immédiatement
 );
 // Sans immediate, il faudrait attendre que search change
 // Avec immediate, la recherche se lance dès le chargement de la page
@@ -116,17 +117,18 @@ import { reactive, watch } from "vue";
 
 // Un objet réactif avec plusieurs filtres
 const filters = reactive({
-  category: "tous",          // filtre par catégorie
-  minPrice: 0,               // prix minimum
-  maxPrice: 100,             // prix maximum
+  category: "tous", // filtre par catégorie
+  minPrice: 0, // prix minimum
+  maxPrice: 100, // prix maximum
 });
 
 watch(
-  filters,                   // 1. On surveille l'objet filters
-  (val) => {                 // 2. Que faire quand ça change
-    applyFilters(val);       //    → on applique les nouveaux filtres
+  filters, // 1. On surveille l'objet filters
+  (val) => {
+    // 2. Que faire quand ça change
+    applyFilters(val); //    → on applique les nouveaux filtres
   },
-  { deep: true },            // 3. Surveiller AUSSI les changements internes
+  { deep: true }, // 3. Surveiller AUSSI les changements internes
 );
 // Maintenant, si filters.minPrice passe de 0 à 20, le watch réagit
 ```
@@ -140,14 +142,15 @@ Tu peux donner un **tableau** de données à surveiller. Le callback recevra des
 ```ts
 import { ref, watch } from "vue";
 
-const search = ref<string>("");   // Le texte de recherche
-const page = ref<number>(1);      // Le numéro de page actuel
+const search = ref<string>(""); // Le texte de recherche
+const page = ref<number>(1); // Le numéro de page actuel
 
 // On surveille search ET page en même temps
 // Les valeurs arrivent sous forme de tableaux : [valeur1, valeur2]
 watch(
-  [search, page],                                        // Tableau de sources
-  ([newSearch, newPage], [oldSearch, oldPage]) => {       // Tableaux de valeurs
+  [search, page], // Tableau de sources
+  ([newSearch, newPage], [oldSearch, oldPage]) => {
+    // Tableaux de valeurs
     // newSearch = nouvelle valeur de search
     // oldSearch = ancienne valeur de search
     // newPage = nouvelle valeur de page
@@ -158,7 +161,7 @@ watch(
       page.value = 1;
     }
     fetchResults(newSearch, newPage); // On relance la recherche
-  }
+  },
 );
 ```
 
@@ -172,8 +175,8 @@ Si tu veux surveiller UNE SEULE propriété d'un objet `reactive`, il faut passe
 import { reactive, watch } from "vue";
 
 const state = reactive({
-  count: 0,     // Un compteur
-  name: "",     // Un nom
+  count: 0, // Un compteur
+  name: "", // Un nom
 });
 
 // ⚠️ On ne peut pas écrire watch(state.count, ...)
@@ -182,8 +185,9 @@ const state = reactive({
 // ✅ On utilise une "fonction getter" : () => state.count
 //    C'est une fonction qui retourne la valeur qu'on veut surveiller
 watch(
-  () => state.count,         // Fonction qui retourne la valeur à surveiller
-  (newVal) => {              // Callback quand ça change
+  () => state.count, // Fonction qui retourne la valeur à surveiller
+  (newVal) => {
+    // Callback quand ça change
     console.log("count:", newVal);
   },
 );
@@ -202,8 +206,8 @@ Tu n'as **pas besoin de lui dire quoi surveiller**. Elle le devine toute seule e
 ```ts
 import { ref, watchEffect } from "vue";
 
-const search = ref<string>("");   // Texte de recherche
-const page = ref<number>(1);      // Numéro de page
+const search = ref<string>(""); // Texte de recherche
+const page = ref<number>(1); // Numéro de page
 
 // watchEffect exécute cette fonction immédiatement,
 // et la ré-exécute automatiquement chaque fois que search OU page change.
@@ -219,12 +223,12 @@ watchEffect(() => {
 
 ### `watch` vs `watchEffect` — lequel choisir ?
 
-| Critère              | `watch` 🎥                          | `watchEffect` 🤖                     |
-| -------------------- | ----------------------------------- | ------------------------------------- |
-| Dépendances          | Tu les déclares toi-même            | Détectées automatiquement             |
-| Accès ancien/nouveau | ✅ Oui (`oldVal`, `newVal`)          | ❌ Non                                 |
-| Exécution au départ  | ❌ Non (sauf `immediate: true`)      | ✅ Oui, toujours                       |
-| Utilise quand...     | Tu veux comparer avant/après        | Tu veux juste réagir sans comparer    |
+| Critère              | `watch` 🎥                      | `watchEffect` 🤖                   |
+| -------------------- | ------------------------------- | ---------------------------------- |
+| Dépendances          | Tu les déclares toi-même        | Détectées automatiquement          |
+| Accès ancien/nouveau | ✅ Oui (`oldVal`, `newVal`)     | ❌ Non                             |
+| Exécution au départ  | ❌ Non (sauf `immediate: true`) | ✅ Oui, toujours                   |
+| Utilise quand...     | Tu veux comparer avant/après    | Tu veux juste réagir sans comparer |
 
 **Conseil :** commence par `watch` si tu as besoin de l'ancienne ET de la nouvelle valeur. Sinon, `watchEffect` est souvent plus simple.
 
@@ -238,7 +242,7 @@ C'est utile pour économiser de la mémoire quand tu n'en as plus besoin.
 ```ts
 // watch() retourne une fonction "stop"
 const stop = watch(search, (val) => {
-  fetchResults(val);          // Se lance à chaque changement de search
+  fetchResults(val); // Se lance à chaque changement de search
 });
 
 // Plus tard, quand on n'en a plus besoin...
@@ -264,7 +268,7 @@ stopEffect(); // Arrête cet effet
 const controller: AbortController = new AbortController(); // On crée un "interrupteur"
 
 fetch("/api/data", {
-  signal: controller.signal,  // On branche l'interrupteur sur la requête
+  signal: controller.signal, // On branche l'interrupteur sur la requête
 });
 
 controller.abort(); // On appuie sur l'interrupteur → la requête est annulée
@@ -321,9 +325,9 @@ import type { InjectionKey, Ref } from "vue";
 
 // On définit la forme de nos données utilisateur
 export interface AuthUser {
-  id: number;       // Identifiant unique
-  name: string;     // Nom de l'utilisateur
-  role: string;     // Rôle (admin, user, etc.)
+  id: number; // Identifiant unique
+  name: string; // Nom de l'utilisateur
+  role: string; // Rôle (admin, user, etc.)
 }
 
 // InjectionKey est une clé unique qui dit à TypeScript :
@@ -338,7 +342,7 @@ export const AuthKey: InjectionKey<Ref<AuthUser | null>> = Symbol("auth");
 <!-- GrandParent.vue — Le composant qui ENVOIE les données -->
 <script setup lang="ts">
 import { provide, ref } from "vue";
-import { AuthKey } from "./types";       // On importe la clé
+import { AuthKey } from "./types"; // On importe la clé
 import type { AuthUser } from "./types"; // On importe le type
 
 // On crée la donnée utilisateur
@@ -478,14 +482,14 @@ scope.stop(); // Arrête TOUS les watchers/effets/computed du groupe en une seul
 
 ## Récapitulatif
 
-| Outil          | Rôle                                                   | Analogie                                |
-| -------------- | ------------------------------------------------------ | --------------------------------------- |
-| `watch`        | Surveille une donnée précise et réagit au changement   | 🎥 Caméra braquée sur une porte         |
-| `watchEffect`  | Surveille automatiquement tout ce qui est utilisé      | 🤖 Caméra à détection de mouvement      |
-| `provide`      | Fournit des données à tous les descendants             | 🚇 Met un colis dans l'ascenseur        |
-| `inject`       | Récupère les données fournies par un ancêtre           | 🚇 Récupère le colis de l'ascenseur     |
-| `nextTick`     | Attend que Vue ait fini de mettre à jour le DOM        | 🖌️ Attendre que le peintre ait fini    |
-| `effectScope`  | Regroupe plusieurs effets pour les nettoyer ensemble   | 👷 Chef d'équipe qui gère les caméras   |
+| Outil         | Rôle                                                 | Analogie                              |
+| ------------- | ---------------------------------------------------- | ------------------------------------- |
+| `watch`       | Surveille une donnée précise et réagit au changement | 🎥 Caméra braquée sur une porte       |
+| `watchEffect` | Surveille automatiquement tout ce qui est utilisé    | 🤖 Caméra à détection de mouvement    |
+| `provide`     | Fournit des données à tous les descendants           | 🚇 Met un colis dans l'ascenseur      |
+| `inject`      | Récupère les données fournies par un ancêtre         | 🚇 Récupère le colis de l'ascenseur   |
+| `nextTick`    | Attend que Vue ait fini de mettre à jour le DOM      | 🖌️ Attendre que le peintre ait fini   |
+| `effectScope` | Regroupe plusieurs effets pour les nettoyer ensemble | 👷 Chef d'équipe qui gère les caméras |
 
 ---
 
@@ -496,9 +500,9 @@ scope.stop(); // Arrête TOUS les watchers/effets/computed du groupe en une seul
 Complète ce code pour afficher un message quand `count` change :
 
 ```ts
-import { ref, watch } from 'vue'
+import { ref, watch } from "vue";
 
-const count = ref(0)
+const count = ref(0);
 
 // Affiche "count: ancienne valeur → nouvelle valeur" quand count change
 // ???
@@ -508,14 +512,15 @@ const count = ref(0)
 <summary>Solution</summary>
 
 ```ts
-import { ref, watch } from 'vue'
+import { ref, watch } from "vue";
 
-const count = ref(0)
+const count = ref(0);
 
 watch(count, (newVal, oldVal) => {
-  console.log(`count: ${oldVal} → ${newVal}`)
-})
+  console.log(`count: ${oldVal} → ${newVal}`);
+});
 ```
+
 </details>
 
 ---
@@ -523,16 +528,17 @@ watch(count, (newVal, oldVal) => {
 ### Exercice CA.2 — Watch avec options
 
 Complète ce code pour que la recherche soit lancée :
+
 1. **Immédiatement** au chargement (pas besoin d'attendre un changement)
 2. À chaque changement ultérieur de `search`
 
 ```ts
-import { ref, watch } from 'vue'
+import { ref, watch } from "vue";
 
-const search = ref('')
+const search = ref("");
 
 function doSearch(term: string) {
-  console.log('Recherche:', term)
+  console.log("Recherche:", term);
 }
 
 // ???
@@ -542,18 +548,23 @@ function doSearch(term: string) {
 <summary>Solution</summary>
 
 ```ts
-import { ref, watch } from 'vue'
+import { ref, watch } from "vue";
 
-const search = ref('')
+const search = ref("");
 
 function doSearch(term: string) {
-  console.log('Recherche:', term)
+  console.log("Recherche:", term);
 }
 
-watch(search, (val) => {
-  doSearch(val)
-}, { immediate: true })
+watch(
+  search,
+  (val) => {
+    doSearch(val);
+  },
+  { immediate: true },
+);
 ```
+
 </details>
 
 ---
@@ -563,30 +574,35 @@ watch(search, (val) => {
 Réécris ce code en utilisant `watchEffect` au lieu de `watch` :
 
 ```ts
-import { ref, watch } from 'vue'
+import { ref, watch } from "vue";
 
-const firstName = ref('Jean')
-const lastName = ref('Dupont')
+const firstName = ref("Jean");
+const lastName = ref("Dupont");
 
-watch([firstName, lastName], ([first, last]) => {
-  document.title = `${first} ${last}`
-}, { immediate: true })
+watch(
+  [firstName, lastName],
+  ([first, last]) => {
+    document.title = `${first} ${last}`;
+  },
+  { immediate: true },
+);
 ```
 
 <details>
 <summary>Solution</summary>
 
 ```ts
-import { ref, watchEffect } from 'vue'
+import { ref, watchEffect } from "vue";
 
-const firstName = ref('Jean')
-const lastName = ref('Dupont')
+const firstName = ref("Jean");
+const lastName = ref("Dupont");
 
 // watchEffect s'exécute immédiatement et détecte automatiquement les dépendances
 watchEffect(() => {
-  document.title = `${firstName.value} ${lastName.value}`
-})
+  document.title = `${firstName.value} ${lastName.value}`;
+});
 ```
+
 </details>
 
 ---
@@ -628,27 +644,28 @@ const theme = ???
 ```vue
 <!-- Parent.vue -->
 <script setup lang="ts">
-import { ref, provide } from 'vue'
-import Child from './Child.vue'
+import { ref, provide } from "vue";
+import Child from "./Child.vue";
 
-const theme = ref<'light' | 'dark'>('dark')
+const theme = ref<"light" | "dark">("dark");
 
-provide('theme', theme)
+provide("theme", theme);
 </script>
 ```
 
 ```vue
 <!-- Child.vue -->
 <script setup lang="ts">
-import { inject, type Ref } from 'vue'
+import { inject, type Ref } from "vue";
 
-const theme = inject<Ref<'light' | 'dark'>>('theme', ref('light'))
+const theme = inject<Ref<"light" | "dark">>("theme", ref("light"));
 </script>
 
 <template>
   <p>Thème actuel : {{ theme }}</p>
 </template>
 ```
+
 </details>
 
 ---
@@ -658,39 +675,44 @@ const theme = inject<Ref<'light' | 'dark'>>('theme', ref('light'))
 Complète ce code pour arrêter le watcher après 5 secondes :
 
 ```ts
-import { ref, watchEffect } from 'vue'
+import { ref, watchEffect } from "vue";
 
-const count = ref(0)
+const count = ref(0);
 
 // ???
 
 // Arrête le watcher après 5 secondes
 setTimeout(() => {
   // ???
-  console.log('Watcher arrêté')
-}, 5000)
+  console.log("Watcher arrêté");
+}, 5000);
 ```
 
 <details>
 <summary>Solution</summary>
 
 ```ts
-import { ref, watchEffect } from 'vue'
+import { ref, watchEffect } from "vue";
 
-const count = ref(0)
+const count = ref(0);
 
 const stopWatcher = watchEffect(() => {
-  console.log('count =', count.value)
-})
+  console.log("count =", count.value);
+});
 
 setTimeout(() => {
-  stopWatcher()
-  console.log('Watcher arrêté')
-}, 5000)
+  stopWatcher();
+  console.log("Watcher arrêté");
+}, 5000);
 ```
+
 </details>
 
 ---
+
+## Exercice
+
+→ `exercices/08-theme-injection/ENONCE.md`
 
 ## Suite
 

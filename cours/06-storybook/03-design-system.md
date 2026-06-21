@@ -4,9 +4,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Quelle est la structure de base d'un fichier `.stories.ts` ?
 > 2. À quoi servent les `args` dans une story Storybook ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -66,43 +67,44 @@ En CSS, on utilise des **variables CSS** (aussi appelées "custom properties") p
   /* Les variables définies ici sont disponibles PARTOUT    */
 
   /* === COULEURS === */
-  --color-primary: #3b82f6;         /* Bleu principal (boutons, liens)           */
-  --color-primary-hover: #2563eb;   /* Bleu plus foncé quand on survole          */
-  --color-secondary: #64748b;       /* Gris pour les éléments secondaires        */
-  --color-danger: #ef4444;          /* Rouge pour les erreurs et suppressions     */
-  --color-success: #22c55e;         /* Vert pour les confirmations               */
-  --color-text: #1f2937;            /* Couleur du texte principal (presque noir)  */
-  --color-text-muted: #6b7280;      /* Texte atténué (informations secondaires)  */
-  --color-bg: #ffffff;              /* Fond de page (blanc)                      */
-  --color-bg-muted: #f8fafc;        /* Fond légèrement grisé (pour les zones)    */
-  --color-border: #e5e7eb;          /* Couleur des bordures                      */
+  --color-primary: #3b82f6; /* Bleu principal (boutons, liens)           */
+  --color-primary-hover: #2563eb; /* Bleu plus foncé quand on survole          */
+  --color-secondary: #64748b; /* Gris pour les éléments secondaires        */
+  --color-danger: #ef4444; /* Rouge pour les erreurs et suppressions     */
+  --color-success: #22c55e; /* Vert pour les confirmations               */
+  --color-text: #1f2937; /* Couleur du texte principal (presque noir)  */
+  --color-text-muted: #6b7280; /* Texte atténué (informations secondaires)  */
+  --color-bg: #ffffff; /* Fond de page (blanc)                      */
+  --color-bg-muted: #f8fafc; /* Fond légèrement grisé (pour les zones)    */
+  --color-border: #e5e7eb; /* Couleur des bordures                      */
 
   /* === ESPACEMENTS === */
   /* Au lieu de mettre des pixels au hasard, on utilise une échelle cohérente */
-  --space-xs: 4px;   /* Très petit espace   (ex : entre une icône et son texte)    */
-  --space-sm: 8px;   /* Petit espace        (ex : padding intérieur d'un badge)    */
-  --space-md: 16px;  /* Espace moyen        (ex : padding d'un bouton, marge)      */
-  --space-lg: 24px;  /* Grand espace        (ex : séparation entre deux sections)  */
-  --space-xl: 32px;  /* Très grand espace   (ex : marge d'une page)                */
+  --space-xs: 4px; /* Très petit espace   (ex : entre une icône et son texte)    */
+  --space-sm: 8px; /* Petit espace        (ex : padding intérieur d'un badge)    */
+  --space-md: 16px; /* Espace moyen        (ex : padding d'un bouton, marge)      */
+  --space-lg: 24px; /* Grand espace        (ex : séparation entre deux sections)  */
+  --space-xl: 32px; /* Très grand espace   (ex : marge d'une page)                */
 
   /* === TYPOGRAPHIE (polices de caractères) === */
-  --font-sans: "Inter", system-ui, sans-serif;    /* Police principale (texte)      */
-  --font-mono: "JetBrains Mono", monospace;        /* Police à chasse fixe (code)    */
-  --text-sm: 0.875rem;   /* Petite taille de texte (14px)    */
-  --text-base: 1rem;     /* Taille de texte normale (16px)   */
-  --text-lg: 1.125rem;   /* Grande taille de texte (18px)    */
-  --text-xl: 1.25rem;    /* Très grande taille (20px)        */
+  --font-sans:
+    "Inter", system-ui, sans-serif; /* Police principale (texte)      */
+  --font-mono: "JetBrains Mono", monospace; /* Police à chasse fixe (code)    */
+  --text-sm: 0.875rem; /* Petite taille de texte (14px)    */
+  --text-base: 1rem; /* Taille de texte normale (16px)   */
+  --text-lg: 1.125rem; /* Grande taille de texte (18px)    */
+  --text-xl: 1.25rem; /* Très grande taille (20px)        */
   /* rem = unité relative à la taille de base du navigateur (souvent 16px) */
 
   /* === COINS ARRONDIS (border-radius) === */
-  --radius-sm: 4px;       /* Légèrement arrondi  (ex : badge, tag)      */
-  --radius-md: 8px;       /* Arrondi moyen       (ex : bouton, carte)   */
-  --radius-lg: 12px;      /* Bien arrondi        (ex : modale, panneau) */
-  --radius-full: 9999px;  /* Complètement rond   (ex : avatar, pastille)*/
+  --radius-sm: 4px; /* Légèrement arrondi  (ex : badge, tag)      */
+  --radius-md: 8px; /* Arrondi moyen       (ex : bouton, carte)   */
+  --radius-lg: 12px; /* Bien arrondi        (ex : modale, panneau) */
+  --radius-full: 9999px; /* Complètement rond   (ex : avatar, pastille)*/
 
   /* === OMBRES === */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);   /* Ombre légère (carte discrète)   */
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);     /* Ombre moyenne (carte surélevée) */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05); /* Ombre légère (carte discrète)   */
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre moyenne (carte surélevée) */
   /* rgba(0, 0, 0, 0.1) = noir avec 10% d'opacité = un gris très transparent */
 }
 ```
@@ -112,14 +114,14 @@ En CSS, on utilise des **variables CSS** (aussi appelées "custom properties") p
 ```css
 /* Au lieu d'écrire : */
 .btn {
-  background-color: #3b82f6;   /* ❌ Couleur "en dur" */
-  padding: 16px;               /* ❌ Valeur arbitraire */
+  background-color: #3b82f6; /* ❌ Couleur "en dur" */
+  padding: 16px; /* ❌ Valeur arbitraire */
 }
 
 /* On écrit : */
 .btn {
-  background-color: var(--color-primary);   /* ✅ On utilise le token */
-  padding: var(--space-md);                 /* ✅ On utilise le token */
+  background-color: var(--color-primary); /* ✅ On utilise le token */
+  padding: var(--space-md); /* ✅ On utilise le token */
 }
 ```
 
@@ -231,15 +233,15 @@ const emit = defineEmits<{
 <script setup lang="ts">
 // Les props de notre composant
 interface Props {
-  label?: string;        // Le texte au-dessus du champ (ex: "Email")
-  error?: string;        // Le message d'erreur (ex: "Email invalide")
-  placeholder?: string;  // Le texte grisé dans le champ vide (ex: "Entrez votre email")
-  type?: "text" | "email" | "password" | "number";  // Le type du champ
+  label?: string; // Le texte au-dessus du champ (ex: "Email")
+  error?: string; // Le message d'erreur (ex: "Email invalide")
+  placeholder?: string; // Le texte grisé dans le champ vide (ex: "Entrez votre email")
+  type?: "text" | "email" | "password" | "number"; // Le type du champ
 }
 
 // Valeurs par défaut
 const props = withDefaults(defineProps<Props>(), {
-  type: "text",  // Par défaut, c'est un champ texte
+  type: "text", // Par défaut, c'est un champ texte
 });
 
 // defineModel : crée un v-model automatique
@@ -318,8 +320,8 @@ export { default as AppInput } from "./components/AppInput.vue";
 ```json
 // packages/ui/package.json
 {
-  "name": "@monrepo/ui",          // Le nom du package (préfixé par @monrepo/)
-  "main": "./src/index.ts",       // Le point d'entrée principal
+  "name": "@monrepo/ui", // Le nom du package (préfixé par @monrepo/)
+  "main": "./src/index.ts", // Le point d'entrée principal
   "exports": {
     // Quand quelqu'un fait: import { AppButton } from "@monrepo/ui"
     ".": "./src/index.ts",
@@ -334,23 +336,23 @@ export { default as AppInput } from "./components/AppInput.vue";
 
 ```ts
 // Dans une application qui utilise le design system
-import { AppButton, AppInput } from "@monrepo/ui";  // Les composants
-import "@monrepo/ui/tokens.css";                      // Les tokens CSS
+import { AppButton, AppInput } from "@monrepo/ui"; // Les composants
+import "@monrepo/ui/tokens.css"; // Les tokens CSS
 ```
 
 ---
 
 ## ✅ Résumé
 
-| Concept              | C'est quoi                                                         |
-| -------------------- | ------------------------------------------------------------------ |
-| **Design system**    | Un guide de style + composants réutilisables pour toute l'app      |
-| **Design token**     | Une variable CSS qui stocke une valeur de design (couleur, taille) |
-| **Atome**            | Le plus petit composant (bouton, input, icône)                     |
-| **Molécule**         | Un assemblage de quelques atomes (champ de formulaire)             |
-| **Organisme**        | Un assemblage de molécules (formulaire complet, header)            |
-| **Barrel export**    | Un fichier index.ts qui réexporte tout le contenu d'un package     |
-| **Monorepo**         | Un seul dépôt Git avec plusieurs projets qui partagent du code     |
+| Concept           | C'est quoi                                                         |
+| ----------------- | ------------------------------------------------------------------ |
+| **Design system** | Un guide de style + composants réutilisables pour toute l'app      |
+| **Design token**  | Une variable CSS qui stocke une valeur de design (couleur, taille) |
+| **Atome**         | Le plus petit composant (bouton, input, icône)                     |
+| **Molécule**      | Un assemblage de quelques atomes (champ de formulaire)             |
+| **Organisme**     | Un assemblage de molécules (formulaire complet, header)            |
+| **Barrel export** | Un fichier index.ts qui réexporte tout le contenu d'un package     |
+| **Monorepo**      | Un seul dépôt Git avec plusieurs projets qui partagent du code     |
 
 ---
 
@@ -365,10 +367,10 @@ Crée des design tokens CSS pour les couleurs principales :
 :root {
   /* Couleurs primaires : bleu #3b82f6, hover #2563eb */
   /* ???
-  
+
   /* Couleurs de succès : vert #22c55e */
   /* ???
-  
+
   /* Couleurs d'erreur : rouge #ef4444 */
   /* ???
 }
@@ -381,12 +383,13 @@ Crée des design tokens CSS pour les couleurs principales :
 :root {
   --color-primary: #3b82f6;
   --color-primary-hover: #2563eb;
-  
+
   --color-success: #22c55e;
-  
+
   --color-error: #ef4444;
 }
 ```
+
 </details>
 
 ---
@@ -416,6 +419,7 @@ Organismes (assemblage de molécules) :
   - ProductCard.vue (image + texte + Button)
   - Header.vue (logo + nav + SearchInput + avatar)
 ```
+
 </details>
 
 ---
@@ -438,22 +442,24 @@ components/
 
 ```ts
 // components/ui/index.ts
-export { default as Button } from './Button.vue'
-export { default as Input } from './Input.vue'
-export { default as Badge } from './Badge.vue'
+export { default as Button } from "./Button.vue";
+export { default as Input } from "./Input.vue";
+export { default as Badge } from "./Badge.vue";
 ```
 
 Utilisation :
+
 ```ts
-import { Button, Input, Badge } from '@/components/ui'
+import { Button, Input, Badge } from "@/components/ui";
 ```
+
 </details>
 
 ---
 
 ## Exercice
 
-→ `exercices/15-storybook-ui/ENONCE.md`
+→ `exercices/21-ui-kit-composants/ENONCE.md`
 
 ## Suite
 
@@ -464,6 +470,7 @@ import { Button, Input, Badge } from '@/components/ui'
 <!-- parcours-recommande -->
 
 ::: tip Parcours recommandé
+
 1. **Exercice** : [21-ui-kit-storybook](../../exercices/21-ui-kit-storybook/ENONCE)
 2. **Exercice** : [21-ui-kit-composants](../../exercices/21-ui-kit-composants/ENONCE)
-:::
+   :::

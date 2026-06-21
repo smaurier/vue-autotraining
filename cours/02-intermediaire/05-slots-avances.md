@@ -4,9 +4,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Quelle librairie utilise-t-on pour valider des formulaires en Vue 3 ?
 > 2. Comment définir un schéma de validation avec Zod ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -77,6 +78,7 @@ Et si le parent ne met rien dans le trou ? On peut prévoir un **contenu par dé
 ### L'analogie de la maison 🏠
 
 Imagine que ton composant est une **maison** avec plusieurs pièces :
+
 - La **cuisine** (slot "header")
 - Le **salon** (slot par défaut)
 - La **chambre** (slot "sidebar")
@@ -127,10 +129,10 @@ Chaque pièce est un trou différent, et le parent décide quoi mettre dans chaq
 
 ```vue
 <!-- Écriture longue -->
-<template v-slot:header> ... </template>
+<template v-slot:header>...</template>
 
 <!-- Écriture courte (raccourci) — on utilise toujours celle-ci -->
-<template #header> ... </template>
+<template #header>...</template>
 ```
 
 ---
@@ -154,21 +156,24 @@ Avant de voir le code, un rappel important. En JavaScript, on peut **extraire de
 
 ```ts
 // Sans destructuring — on accède chaque propriété une par une
-interface Personne { nom: string; age: number }
+interface Personne {
+  nom: string;
+  age: number;
+}
 
-const personne: Personne = { nom: 'Alice', age: 30 }
-const nom: string = personne.nom     // 'Alice'
-const age: number = personne.age     // 30
+const personne: Personne = { nom: "Alice", age: 30 };
+const nom: string = personne.nom; // 'Alice'
+const age: number = personne.age; // 30
 
 // Avec destructuring — on extrait tout d'un coup avec { }
-const { nom, age } = personne
+const { nom, age } = personne;
 // nom vaut 'Alice', age vaut 30
 
 // On peut aussi le faire dans les paramètres d'une fonction :
 function saluer({ nom, age }: Personne): void {
-  console.log(`Bonjour ${nom}, tu as ${age} ans`)
+  console.log(`Bonjour ${nom}, tu as ${age} ans`);
 }
-saluer(personne) // "Bonjour Alice, tu as 30 ans"
+saluer(personne); // "Bonjour Alice, tu as 30 ans"
 ```
 
 > **Pourquoi c'est important ?** Parce que les scoped slots utilisent exactement cette syntaxe `{ item, index }` pour récupérer les données que l'enfant envoie.
@@ -180,9 +185,9 @@ saluer(personne) // "Bonjour Alice, tu as 30 ans"
 <script setup lang="ts">
 // On définit les props : ce composant reçoit un tableau d'éléments
 interface Props {
-  items: any[]   // any[] = un tableau qui peut contenir n'importe quoi
+  items: any[]; // any[] = un tableau qui peut contenir n'importe quoi
 }
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 </script>
 
 <template>
@@ -250,14 +255,14 @@ On peut dire à TypeScript **exactement quelles données** le slot va recevoir :
 // par le vrai type quand on utilise le composant
 
 const props = defineProps<{
-  items: T[]   // Un tableau de T (T sera défini à l'utilisation)
-}>()
+  items: T[]; // Un tableau de T (T sera défini à l'utilisation)
+}>();
 
 // defineSlots dit : "le slot par défaut reçoit un objet
 // avec item de type T et index de type number"
 defineSlots<{
-  default(props: { item: T; index: number }): any
-}>()
+  default(props: { item: T; index: number }): any;
+}>();
 </script>
 ```
 
@@ -277,22 +282,22 @@ C'est un exemple plus complet qui combine tout ce qu'on a vu. Ne t'inquiète pas
 
 // Interface pour décrire une colonne du tableau
 interface Column<T> {
-  key: keyof T    // keyof T = une des clés de T (ex: 'name', 'price'...)
-  label: string   // Le titre affiché en haut de la colonne
+  key: keyof T; // keyof T = une des clés de T (ex: 'name', 'price'...)
+  label: string; // Le titre affiché en haut de la colonne
 }
 
 const props = defineProps<{
-  items: T[]           // Les données (lignes du tableau)
-  columns: Column<T>[] // La description des colonnes
-}>()
+  items: T[]; // Les données (lignes du tableau)
+  columns: Column<T>[]; // La description des colonnes
+}>();
 
 // On définit 2 slots :
 // - "cell" : pour personnaliser l'affichage d'une cellule
 // - "empty" : pour personnaliser le message "aucune donnée"
 defineSlots<{
-  cell(props: { item: T; column: Column<T>; value: T[keyof T] }): any
-  empty(): any
-}>()
+  cell(props: { item: T; column: Column<T>; value: T[keyof T] }): any;
+  empty(): any;
+}>();
 </script>
 
 <template>
@@ -367,13 +372,13 @@ Un **renderless component** est un composant qui ne produit **aucun HTML**. Il c
 ```vue
 <!-- UseCounter.vue — Le "moteur" sans affichage -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // Toute la logique est ici
-const count = ref(0)                          // La valeur du compteur
-const increment = () => count.value++         // Fonction pour ajouter 1
-const decrement = () => count.value--         // Fonction pour enlever 1
-const reset = () => (count.value = 0)         // Fonction pour remettre à 0
+const count = ref(0); // La valeur du compteur
+const increment = () => count.value++; // Fonction pour ajouter 1
+const decrement = () => count.value--; // Fonction pour enlever 1
+const reset = () => (count.value = 0); // Fonction pour remettre à 0
 </script>
 
 <template>
@@ -411,19 +416,19 @@ const reset = () => (count.value = 0)         // Fonction pour remettre à 0
 Pour des cas très rares ou le template ne suffit pas, on peut créer du HTML avec du JavaScript pur :
 
 ```ts
-import { h, defineComponent } from 'vue'
+import { h, defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    level: { type: Number, required: true },  // 1, 2, 3... pour h1, h2, h3...
+    level: { type: Number, required: true }, // 1, 2, 3... pour h1, h2, h3...
     text: { type: String, required: true },
   },
   setup(props) {
     // h() crée un élément HTML
     // h('h2', 'Bonjour') → <h2>Bonjour</h2>
-    return () => h(`h${props.level}`, props.text)
+    return () => h(`h${props.level}`, props.text);
   },
-})
+});
 ```
 
 > ⚠️ **En pratique, les render functions sont très rares.** Ne t'en préoccupe pas pour l'instant. Utilise-les uniquement si le template devient vraiment trop complexe.
@@ -432,12 +437,12 @@ export default defineComponent({
 
 ## Résumé
 
-| Concept | Description | Analogie |
-|---------|-------------|----------|
-| **Slot par défaut** | Un trou que le parent remplit | Un cadre photo |
-| **Slot nommé** | Plusieurs trous avec des noms | Les pièces d'une maison |
-| **Scoped slot** | L'enfant passe des données au parent via le slot | Une fenêtre pour passer des objets |
-| **Renderless component** | Composant sans HTML, que de la logique | Un moteur sans carrosserie |
+| Concept                  | Description                                      | Analogie                           |
+| ------------------------ | ------------------------------------------------ | ---------------------------------- |
+| **Slot par défaut**      | Un trou que le parent remplit                    | Un cadre photo                     |
+| **Slot nommé**           | Plusieurs trous avec des noms                    | Les pièces d'une maison            |
+| **Scoped slot**          | L'enfant passe des données au parent via le slot | Une fenêtre pour passer des objets |
+| **Renderless component** | Composant sans HTML, que de la logique           | Un moteur sans carrosserie         |
 
 ---
 
@@ -468,6 +473,7 @@ Crée un composant `AlertBox` avec un contenu par défaut :
   </div>
 </template>
 ```
+
 </details>
 
 ---
@@ -517,6 +523,7 @@ Crée un composant `Modal` avec un header, un body et un footer :
   </div>
 </template>
 ```
+
 </details>
 
 ---
@@ -561,6 +568,7 @@ Utilise le composant `Modal` précédent :
   </Modal>
 </template>
 ```
+
 </details>
 
 ---
@@ -573,9 +581,9 @@ Crée un composant `UserCard` qui expose les données de l'utilisateur au parent
 <!-- UserCard.vue -->
 <script setup lang="ts">
 defineProps<{
-  name: string
-  email: string
-}>()
+  name: string;
+  email: string;
+}>();
 </script>
 
 <template>
@@ -608,9 +616,9 @@ Et utilise-le :
 <!-- UserCard.vue -->
 <script setup lang="ts">
 defineProps<{
-  name: string
-  email: string
-}>()
+  name: string;
+  email: string;
+}>();
 </script>
 
 <template>
@@ -631,6 +639,7 @@ defineProps<{
   </UserCard>
 </template>
 ```
+
 </details>
 
 ---
@@ -643,8 +652,8 @@ Crée un composant `DataList` qui affiche une liste et laisse le parent décider
 <!-- DataList.vue -->
 <script setup lang="ts" generic="T">
 defineProps<{
-  items: T[]
-}>()
+  items: T[];
+}>();
 </script>
 
 <template>
@@ -664,8 +673,8 @@ defineProps<{
 <!-- DataList.vue -->
 <script setup lang="ts" generic="T">
 defineProps<{
-  items: T[]
-}>()
+  items: T[];
+}>();
 </script>
 
 <template>
@@ -686,13 +695,14 @@ Utilisation :
   </template>
 </DataList>
 ```
+
 </details>
 
 ---
 
 ## Exercice
 
-→ `exercices/09-tableau-reutilisable/ENONCE.md`
+→ `exercices/12-carte-profil-slots/ENONCE.md`
 
 ## Suite
 

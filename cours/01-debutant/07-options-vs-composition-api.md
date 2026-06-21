@@ -14,9 +14,10 @@ dans ce parcours.
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Quel hook utilise-t-on pour exécuter du code quand un composant apparaît dans le DOM ?
 > 2. Dans quel hook doit-on nettoyer un `setInterval` ou un event listener ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -72,13 +73,13 @@ au moins **reconnaître** l'Options API même si on code en Composition API.
 >
 > ```ts
 > const personne = {
->   nom: 'Alice',
+>   nom: "Alice",
 >   direBonjour() {
 >     // Ici, "this" = l'objet "personne"
->     console.log('Bonjour, je suis ' + this.nom)
->   }
-> }
-> personne.direBonjour()  // "Bonjour, je suis Alice"
+>     console.log("Bonjour, je suis " + this.nom);
+>   },
+> };
+> personne.direBonjour(); // "Bonjour, je suis Alice"
 > ```
 >
 > En Options API, **`this`** fait référence au **composant Vue**.
@@ -94,13 +95,13 @@ au moins **reconnaître** l'Options API même si on code en Composition API.
 ```vue
 <script lang="ts">
 // En Options API, on exporte un objet avec des "options" prédéfinies
-import { defineComponent } from 'vue'
+import { defineComponent } from "vue";
 
 // On définit le type d'une tâche
 interface Todo {
-  id: number       // Identifiant unique
-  label: string    // Le texte de la tâche
-  done: boolean    // true = terminée, false = pas encore
+  id: number; // Identifiant unique
+  label: string; // Le texte de la tâche
+  done: boolean; // true = terminée, false = pas encore
 }
 
 export default defineComponent({
@@ -109,9 +110,9 @@ export default defineComponent({
   // ╚══════════════════════════════════════════╝
   data() {
     return {
-      todos: [] as Todo[],      // La liste des tâches (tableau vide au départ)
-      newLabel: '',              // Le texte tapé par l'utilisateur
-    }
+      todos: [] as Todo[], // La liste des tâches (tableau vide au départ)
+      newLabel: "", // Le texte tapé par l'utilisateur
+    };
   },
 
   // ╔══════════════════════════════════════════╗
@@ -121,7 +122,7 @@ export default defineComponent({
     remaining(): number {
       // "this" = le composant Vue
       // this.todos = la liste définie dans data()
-      return this.todos.filter((t) => !t.done).length
+      return this.todos.filter((t) => !t.done).length;
     },
   },
 
@@ -131,18 +132,19 @@ export default defineComponent({
   methods: {
     addTodo(): void {
       // this.newLabel = accéder à la donnée "newLabel" du composant
-      if (!this.newLabel.trim()) return    // Si le texte est vide, on ne fait rien
-      this.todos.push({                    // On ajoute une tâche à la liste
-        id: Date.now(),                    // Identifiant unique (timestamp)
-        label: this.newLabel.trim(),       // Le texte nettoyé
-        done: false,                       // Pas encore terminée
-      })
-      this.newLabel = ''                   // On vide le champ de saisie
+      if (!this.newLabel.trim()) return; // Si le texte est vide, on ne fait rien
+      this.todos.push({
+        // On ajoute une tâche à la liste
+        id: Date.now(), // Identifiant unique (timestamp)
+        label: this.newLabel.trim(), // Le texte nettoyé
+        done: false, // Pas encore terminée
+      });
+      this.newLabel = ""; // On vide le champ de saisie
     },
 
     removeTodo(id: number): void {
       // On garde toutes les tâches SAUF celle avec cet id
-      this.todos = this.todos.filter((t) => t.id !== id)
+      this.todos = this.todos.filter((t) => t.id !== id);
     },
   },
 
@@ -150,15 +152,19 @@ export default defineComponent({
   // ║  📦 Tiroir "CYCLE DE VIE"              ║
   // ╚══════════════════════════════════════════╝
   mounted() {
-    console.log('Composant monté')   // S'exécute quand le composant apparaît
+    console.log("Composant monté"); // S'exécute quand le composant apparaît
   },
-})
+});
 </script>
 
 <template>
   <div>
     <!-- v-model connecte l'input à newLabel (Options API utilise this en interne) -->
-    <input v-model="newLabel" @keyup.enter="addTodo" placeholder="Nouvelle tâche..." />
+    <input
+      v-model="newLabel"
+      @keyup.enter="addTodo"
+      placeholder="Nouvelle tâche..."
+    />
     <button @click="addTodo">Ajouter</button>
 
     <p>{{ remaining }} tâche(s) restante(s)</p>
@@ -189,13 +195,13 @@ export default defineComponent({
 ```vue
 <script setup lang="ts">
 // En Composition API, on importe les outils et on organise le code librement
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from "vue";
 
 // On définit le type d'une tâche (identique)
 interface Todo {
-  id: number       // Identifiant unique
-  label: string    // Le texte de la tâche
-  done: boolean    // true = terminée, false = pas encore
+  id: number; // Identifiant unique
+  label: string; // Le texte de la tâche
+  done: boolean; // true = terminée, false = pas encore
 }
 
 // ╔══════════════════════════════════════════════════════╗
@@ -203,40 +209,45 @@ interface Todo {
 // ╚══════════════════════════════════════════════════════╝
 
 // --- Données ---
-const todos = ref<Todo[]>([])          // Liste des tâches (tableau vide au départ)
-const newLabel = ref<string>('')       // Texte tapé par l'utilisateur
+const todos = ref<Todo[]>([]); // Liste des tâches (tableau vide au départ)
+const newLabel = ref<string>(""); // Texte tapé par l'utilisateur
 
 // --- Calcul dérivé ---
 const remaining = computed<number>(
-  () => todos.value.filter((t) => !t.done).length
+  () => todos.value.filter((t) => !t.done).length,
   // .value car c'est une ref (on l'a vu dans les leçons précédentes)
-)
+);
 
 // --- Actions ---
 function addTodo(): void {
-  if (!newLabel.value.trim()) return    // Si vide, on ne fait rien
-  todos.value.push({                    // On ajoute une tâche
-    id: Date.now(),                     // Identifiant unique
-    label: newLabel.value.trim(),       // Texte nettoyé
-    done: false,                        // Pas encore terminée
-  })
-  newLabel.value = ''                   // On vide le champ
+  if (!newLabel.value.trim()) return; // Si vide, on ne fait rien
+  todos.value.push({
+    // On ajoute une tâche
+    id: Date.now(), // Identifiant unique
+    label: newLabel.value.trim(), // Texte nettoyé
+    done: false, // Pas encore terminée
+  });
+  newLabel.value = ""; // On vide le champ
 }
 
 function removeTodo(id: number): void {
   // On garde toutes les tâches SAUF celle avec cet id
-  todos.value = todos.value.filter((t) => t.id !== id)
+  todos.value = todos.value.filter((t) => t.id !== id);
 }
 
 // --- Cycle de vie ---
 onMounted(() => {
-  console.log('Composant monté')       // S'exécute quand le composant apparaît
-})
+  console.log("Composant monté"); // S'exécute quand le composant apparaît
+});
 </script>
 
 <template>
   <div>
-    <input v-model="newLabel" @keyup.enter="addTodo" placeholder="Nouvelle tâche..." />
+    <input
+      v-model="newLabel"
+      @keyup.enter="addTodo"
+      placeholder="Nouvelle tâche..."
+    />
     <button @click="addTodo">Ajouter</button>
 
     <p>{{ remaining }} tâche(s) restante(s)</p>
@@ -290,26 +301,26 @@ onMounted(() => {
 
 ## Tableau comparatif
 
-| Critère                  | Options API                        | Composition API              |
-| ------------------------ | ---------------------------------- | ---------------------------- |
-| **Organisation du code** | Par type (data, methods, computed) | Par feature (todo, search…)  |
-| **TypeScript**           | Fonctionne mais verbeux            | Naturel et agréable          |
-| **Réutilisation**        | Mixins (source de bugs)            | Composables (propre et clair)|
-| **`this`**               | Obligatoire et parfois piégeux     | **Pas de `this` !** 🎉      |
-| **Testabilité**          | Moyenne                            | Excellente                   |
-| **Apprentissage**        | Plus facile au tout début           | Un peu plus abstrait         |
-| **Gros composants**      | Code éparpillé, dur à suivre       | Code regroupé, facile à lire |
+| Critère                  | Options API                        | Composition API               |
+| ------------------------ | ---------------------------------- | ----------------------------- |
+| **Organisation du code** | Par type (data, methods, computed) | Par feature (todo, search…)   |
+| **TypeScript**           | Fonctionne mais verbeux            | Naturel et agréable           |
+| **Réutilisation**        | Mixins (source de bugs)            | Composables (propre et clair) |
+| **`this`**               | Obligatoire et parfois piégeux     | **Pas de `this` !** 🎉        |
+| **Testabilité**          | Moyenne                            | Excellente                    |
+| **Apprentissage**        | Plus facile au tout début          | Un peu plus abstrait          |
+| **Gros composants**      | Code éparpillé, dur à suivre       | Code regroupé, facile à lire  |
 
 ---
 
 ## Quand utiliser quoi ?
 
-| Contexte                                    | Choix recommandé                       |
-| ------------------------------------------- | -------------------------------------- |
-| 🆕 Nouveau projet Vue 3                    | **Composition API**                    |
-| 🏚️ Code existant Vue 2 à maintenir        | Options API (c'est déjà écrit ainsi)   |
-| 📏 Composant très simple (< 30 lignes)     | Les deux se valent                     |
-| 🧩 Logique complexe partagée entre composants | **Composition API** (composables)   |
+| Contexte                                      | Choix recommandé                     |
+| --------------------------------------------- | ------------------------------------ |
+| 🆕 Nouveau projet Vue 3                       | **Composition API**                  |
+| 🏚️ Code existant Vue 2 à maintenir            | Options API (c'est déjà écrit ainsi) |
+| 📏 Composant très simple (< 30 lignes)        | Les deux se valent                   |
+| 🧩 Logique complexe partagée entre composants | **Composition API** (composables)    |
 
 ---
 
@@ -330,6 +341,7 @@ export default defineComponent({      import { ref, computed } from 'vue'
 ```
 
 **Indices rapides :**
+
 - Tu vois `<script setup>` → c'est la **Composition API**
 - Tu vois `export default defineComponent({` → c'est l'**Options API**
 - Tu vois `this.` partout → c'est l'**Options API**
@@ -345,6 +357,7 @@ export default defineComponent({      import { ref, computed } from 'vue'
   facilement comprendre l'Options API si tu la croises
 
 > 💡 **Pourquoi la Composition API ?**
+>
 > - Meilleur support TypeScript
 > - Code mieux organisé quand le composant grandit
 > - Pas de `this` (moins de bugs)
@@ -360,35 +373,35 @@ export default defineComponent({      import { ref, computed } from 'vue'
 ```vue
 <!-- Options API (à convertir) -->
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent } from "vue";
 
 export default defineComponent({
   data() {
     return {
       count: 0,
-      name: 'Vue'
-    }
+      name: "Vue",
+    };
   },
   computed: {
     greeting(): string {
-      return `Hello ${this.name}!`
+      return `Hello ${this.name}!`;
     },
     doubleCount(): number {
-      return this.count * 2
-    }
+      return this.count * 2;
+    },
   },
   methods: {
     increment(): void {
-      this.count++
+      this.count++;
     },
     reset(): void {
-      this.count = 0
-    }
+      this.count = 0;
+    },
   },
   mounted() {
-    console.log('Component mounted!')
-  }
-})
+    console.log("Component mounted!");
+  },
+});
 </script>
 
 <template>
@@ -403,7 +416,7 @@ Réécris-le en Composition API (`<script setup lang="ts">`) :
 
 ```vue
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from "vue";
 
 // ??? Convertis data en refs
 // ??? Convertis computed
@@ -417,35 +430,39 @@ import { ref, computed, onMounted } from 'vue'
 
 ```vue
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from "vue";
 
 // data → refs
-const count = ref(0)
-const name = ref('Vue')
+const count = ref(0);
+const name = ref("Vue");
 
 // computed
-const greeting = computed(() => `Hello ${name.value}!`)
-const doubleCount = computed(() => count.value * 2)
+const greeting = computed(() => `Hello ${name.value}!`);
+const doubleCount = computed(() => count.value * 2);
 
 // methods → functions
 function increment(): void {
-  count.value++
+  count.value++;
 }
 
 function reset(): void {
-  count.value = 0
+  count.value = 0;
 }
 
 // mounted → onMounted
 onMounted(() => {
-  console.log('Component mounted!')
-})
+  console.log("Component mounted!");
+});
 </script>
 ```
 
 </details>
 
 ---
+
+## Exercice
+
+→ `exercices/07-options-vs-composition/ENONCE.md`
 
 ## Suite
 
@@ -456,10 +473,11 @@ onMounted(() => {
 <!-- parcours-recommande -->
 
 ::: tip Parcours recommandé
+
 1. **Exercice** : [02-compteur-réactif](../../exercices/02-compteur-reactif/ENONCE)
 2. **Exercice** : [03-liste-de-taches](../../exercices/03-liste-de-taches/ENONCE)
 3. **Exercice** : [04-formulaire-contact](../../exercices/04-formulaire-contact/ENONCE)
 4. **Exercice** : [05-catalogue-produits](../../exercices/05-catalogue-produits/ENONCE)
 5. **Exercice** : [06-chronometre](../../exercices/06-chronometre/ENONCE)
 6. **Exercice** : [07-options-vs-composition](../../exercices/07-options-vs-composition/ENONCE)
-:::
+   :::

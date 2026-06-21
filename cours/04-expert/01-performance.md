@@ -28,12 +28,14 @@ La **performance**, c'est tout simplement **la vitesse à laquelle ton applicati
 > 🎯 **Analogie — L'autoroute** :
 >
 > Imagine une autoroute :
+>
 > - **Route vide** = ton app est rapide, tout est fluide, l'utilisateur est content
 > - **Embouteillage** = ton app est lente, l'utilisateur attend, il s'énerve et quitte la page
 >
 > L'objectif de l'optimisation de performance, c'est **garder l'autoroute aussi vide que possible** pour que tout circule bien.
 
 Concrètement, une app performante c'est :
+
 - La page s'affiche **vite** (moins de 2 secondes)
 - Les boutons **répondent instantanément** quand on clique
 - Le défilement (scroll) est **fluide**, sans saccade
@@ -59,12 +61,12 @@ Un **re-render** (re-rendu), c'est quand le navigateur doit **refaire tout ce tr
 
 ## Les 4 grands problèmes de performance en Vue 3
 
-| # | Problème | Analogie |
-|---|----------|----------|
-| 1 | **Re-rendus inutiles** | Refaire la route alors qu'elle est déjà construite |
-| 2 | **Bundle trop gros** | Charger un camion entier alors qu'il te faut juste un colis |
-| 3 | **Listes très longues** sans optimisation | Afficher 10 000 panneaux sur l'autoroute d'un coup |
-| 4 | **Watchers en cascade** | Un bouchon qui en provoque un autre, puis un autre… |
+| #   | Problème                                  | Analogie                                                    |
+| --- | ----------------------------------------- | ----------------------------------------------------------- |
+| 1   | **Re-rendus inutiles**                    | Refaire la route alors qu'elle est déjà construite          |
+| 2   | **Bundle trop gros**                      | Charger un camion entier alors qu'il te faut juste un colis |
+| 3   | **Listes très longues** sans optimisation | Afficher 10 000 panneaux sur l'autoroute d'un coup          |
+| 4   | **Watchers en cascade**                   | Un bouchon qui en provoque un autre, puis un autre…         |
 
 ---
 
@@ -112,11 +114,7 @@ Avec `v-once`, tu dis à Vue : "rends ce HTML une seule fois, ne le recalcule pl
   <!-- v-memo="[item.id, item.selected]" = recalcule cet élément UNIQUEMENT -->
   <!--   si item.id OU item.selected changent -->
   <!-- Si rien ne change → Vue saute cet élément = plus rapide ! -->
-  <div
-    v-for="item in list"
-    :key="item.id"
-    v-memo="[item.id, item.selected]"
-  >
+  <div v-for="item in list" :key="item.id" v-memo="[item.id, item.selected]">
     <ExpensiveComponent :item="item" />
   </div>
 </template>
@@ -135,18 +133,18 @@ Rappel : `ref()` en Vue surveille **toutes** les modifications de ta donnée, m�
 `shallowRef` ne surveille que le **premier niveau** : il détecte quand tu remplaces l'objet entier, mais pas quand tu modifies une propriété interne.
 
 ```ts
-import { shallowRef } from 'vue'
+import { shallowRef } from "vue";
 
 // shallowRef = surveille SEULEMENT le remplacement complet de la valeur
 // Si on a une liste de 10 000 éléments, c'est beaucoup plus rapide que ref()
-const hugeList = shallowRef<DataPoint[]>([])
+const hugeList = shallowRef<DataPoint[]>([]);
 
 // ❌ Ceci ne déclenche PAS de mise à jour (mutation interne)
 // hugeList.value.push(newItem)
 
 // ✅ Ceci DÉCLENCHE la mise à jour (remplacement complet)
 // On crée une nouvelle liste avec tous les anciens éléments + le nouveau
-hugeList.value = [...hugeList.value, newItem]
+hugeList.value = [...hugeList.value, newItem];
 ```
 
 > 🎯 **Analogie** : `ref` c'est un vigile qui fouille chaque sac en détail. `shallowRef` c'est un vigile qui regarde seulement si la personne a changé, sans fouiller son sac.
@@ -160,6 +158,7 @@ hugeList.value = [...hugeList.value, newItem]
 > 🎯 **Analogie — Le restaurant** :
 >
 > Imagine que tu arrives au restaurant. Deux options :
+>
 > - **Sans lazy loading** : le serveur t'apporte TOUS les plats du menu d'un coup dès que tu t'assieds. C'est très long et la table déborde.
 > - **Avec lazy loading** : tu commandes un plat à la fois, le serveur t'apporte **seulement ce que tu as demandé**, quand tu en as besoin.
 >
@@ -173,11 +172,11 @@ En JavaScript, il existe deux façons d'importer du code :
 
 ```ts
 // Import STATIQUE — tout est chargé au démarrage
-import MonComposant from './MonComposant.vue'
+import MonComposant from "./MonComposant.vue";
 
 // Import DYNAMIQUE — chargé uniquement quand cette ligne s'exécute
 // Le () après import signifie "charge ce fichier maintenant"
-const MonComposant = () => import('./MonComposant.vue')
+const MonComposant = () => import("./MonComposant.vue");
 ```
 
 L'import dynamique est la base du lazy loading !
@@ -221,13 +220,13 @@ Pour les composants lourds (graphiques, éditeurs, cartes…), on peut les charg
 ```vue
 <script setup lang="ts">
 // defineAsyncComponent = "définis un composant qui sera chargé plus tard"
-import { defineAsyncComponent } from 'vue'
+import { defineAsyncComponent } from "vue";
 
 // HeavyChart ne sera PAS inclus dans le chargement initial
 // Il sera téléchargé seulement quand il apparaît dans la page
 const HeavyChart = defineAsyncComponent(
-  () => import('@/components/HeavyChart.vue')  // Chargement à la demande
-)
+  () => import("@/components/HeavyChart.vue"), // Chargement à la demande
+);
 </script>
 
 <template>
@@ -238,9 +237,7 @@ const HeavyChart = defineAsyncComponent(
     <HeavyChart />
 
     <!-- #fallback = ce qui s'affiche PENDANT le chargement -->
-    <template #fallback>
-      Chargement du graphique...
-    </template>
+    <template #fallback> Chargement du graphique... </template>
   </Suspense>
 </template>
 ```
@@ -256,7 +253,7 @@ Tu peux configurer le comportement du chargement avec plus de détails :
 ```ts
 const AsyncModal = defineAsyncComponent({
   // loader = la fonction qui charge le composant
-  loader: () => import('@/components/Modal.vue'),
+  loader: () => import("@/components/Modal.vue"),
 
   // loadingComponent = composant affiché PENDANT le chargement
   loadingComponent: LoadingSpinner,
@@ -270,7 +267,7 @@ const AsyncModal = defineAsyncComponent({
 
   // timeout = si le chargement dépasse 10 secondes, affiche errorComponent
   timeout: 10000,
-})
+});
 ```
 
 ---
@@ -280,6 +277,7 @@ const AsyncModal = defineAsyncComponent({
 > 🎯 **Analogie — Le brouillon et la copie finale** :
 >
 > Imagine que tu dois modifier une lettre :
+>
 > - **Sans Virtual DOM** : tu effaces TOUTE la lettre et tu la réécris entièrement, même si tu n'avais qu'un mot à changer
 > - **Avec Virtual DOM** : tu fais d'abord les modifications sur un **brouillon**, tu compares le brouillon avec la version actuelle, et tu ne modifies **que les mots qui ont changé** sur la copie finale
 >
@@ -307,24 +305,24 @@ pnpm add @tanstack/vue-virtual
 ```vue
 <script setup lang="ts">
 // useVirtualizer = un composable qui gère la virtualisation
-import { useVirtualizer } from '@tanstack/vue-virtual'
-import { ref } from 'vue'
+import { useVirtualizer } from "@tanstack/vue-virtual";
+import { ref } from "vue";
 
 // ref pour l'élément HTML qui contient la liste scrollable
-const parentRef = ref<HTMLDivElement | null>(null)
+const parentRef = ref<HTMLDivElement | null>(null);
 
 // Notre liste de 10 000 éléments (imaginez une liste de contacts)
 const items = ref<string[]>(
-  Array.from({ length: 10000 }, (_, i) => `Item ${i}`)
+  Array.from({ length: 10000 }, (_, i) => `Item ${i}`),
   // Array.from crée un tableau de 10 000 éléments : "Item 0", "Item 1"...
-)
+);
 
 // Le virtualizer calcule quels éléments sont visibles
 const virtualizer = useVirtualizer({
-  count: items.value.length,              // nombre total d'éléments
+  count: items.value.length, // nombre total d'éléments
   getScrollElement: () => parentRef.value, // l'élément scrollable
-  estimateSize: () => 35,                  // hauteur estimée de chaque ligne (35px)
-})
+  estimateSize: () => 35, // hauteur estimée de chaque ligne (35px)
+});
 </script>
 
 <template>
@@ -332,10 +330,12 @@ const virtualizer = useVirtualizer({
   <div ref="parentRef" style="height: 400px; overflow: auto">
     <!-- Un div "fantôme" qui a la hauteur totale de tous les éléments -->
     <!-- Ceci permet d'avoir une barre de scroll correcte -->
-    <div :style="{
-      height: `${virtualizer.getTotalSize()}px`,
-      position: 'relative'
-    }">
+    <div
+      :style="{
+        height: `${virtualizer.getTotalSize()}px`,
+        position: 'relative',
+      }"
+    >
       <!-- On boucle UNIQUEMENT sur les éléments visibles (pas les 10 000 !) -->
       <div
         v-for="row in virtualizer.getVirtualItems()"
@@ -346,7 +346,7 @@ const virtualizer = useVirtualizer({
           left: 0,
           width: '100%',
           height: `${row.size}px`,
-          transform: `translateY(${row.start}px)`
+          transform: `translateY(${row.start}px)`,
         }"
       >
         {{ items[row.index] }}
@@ -371,7 +371,7 @@ pnpm add -D rollup-plugin-visualizer
 
 ```ts
 // vite.config.ts
-import { visualizer } from 'rollup-plugin-visualizer'
+import { visualizer } from "rollup-plugin-visualizer";
 
 export default defineConfig({
   plugins: [
@@ -379,9 +379,9 @@ export default defineConfig({
     // visualizer génère une carte visuelle de ton bundle
     // open: true = ouvre automatiquement le résultat dans le navigateur
     // gzipSize: true = montre la taille après compression
-    visualizer({ open: true, gzipSize: true })
+    visualizer({ open: true, gzipSize: true }),
   ],
-})
+});
 ```
 
 ```bash
@@ -397,12 +397,12 @@ pnpm build
 
 Voici les critères utilisés en entreprise (ESN) pour savoir si une app est performante :
 
-| Métrique | Objectif | En français |
-|----------|----------|-------------|
-| First Contentful Paint (FCP) | < 1.5s | Premier contenu visible en moins de 1.5 secondes |
-| Largest Contentful Paint (LCP) | < 2.5s | Le plus gros élément visible en moins de 2.5 secondes |
-| Total Blocking Time (TBT) | < 200ms | Le navigateur n'est pas "bloqué" plus de 200 millisecondes |
-| Bundle JS initial | < 200 Ko gzip | Le fichier JavaScript principal fait moins de 200 Ko compressé |
+| Métrique                       | Objectif      | En français                                                    |
+| ------------------------------ | ------------- | -------------------------------------------------------------- |
+| First Contentful Paint (FCP)   | < 1.5s        | Premier contenu visible en moins de 1.5 secondes               |
+| Largest Contentful Paint (LCP) | < 2.5s        | Le plus gros élément visible en moins de 2.5 secondes          |
+| Total Blocking Time (TBT)      | < 200ms       | Le navigateur n'est pas "bloqué" plus de 200 millisecondes     |
+| Bundle JS initial              | < 200 Ko gzip | Le fichier JavaScript principal fait moins de 200 Ko compressé |
 
 ---
 
@@ -429,32 +429,32 @@ Quand tu changes d'onglet dans une app, normalement le composant de l'ancien ong
 Les composants gardés en cache ont deux hooks spéciaux :
 
 ```ts
-import { onActivated, onDeactivated } from 'vue'
+import { onActivated, onDeactivated } from "vue";
 
 // onActivated = le composant REVIENT du cache (l'utilisateur revient sur cet onglet)
 onActivated(() => {
-  refreshData()  // On peut rafraîchir les données à ce moment
-})
+  refreshData(); // On peut rafraîchir les données à ce moment
+});
 
 // onDeactivated = le composant PART en cache (l'utilisateur quitte cet onglet)
 onDeactivated(() => {
   // Le composant est mis en pause, pas détruit
-})
+});
 ```
 
 ---
 
 ## Résumé
 
-| Technique | Quand l'utiliser | Difficulté |
-|-----------|-----------------|------------|
-| `v-once` | Contenu qui ne change jamais | ⭐ Facile |
-| `v-memo` | Listes ou peu d'éléments changent | ⭐⭐ Moyen |
-| Lazy loading des routes | Toujours ! C'est une bonne pratique | ⭐ Facile |
-| `defineAsyncComponent` | Composants lourds (graphiques, éditeurs) | ⭐⭐ Moyen |
-| `KeepAlive` | Navigation par onglets | ⭐ Facile |
-| `shallowRef` | Gros objets / grosses listes | ⭐⭐⭐ Avancé |
-| Virtualisation | Listes de 1000+ éléments | ⭐⭐⭐ Avancé |
+| Technique               | Quand l'utiliser                         | Difficulté    |
+| ----------------------- | ---------------------------------------- | ------------- |
+| `v-once`                | Contenu qui ne change jamais             | ⭐ Facile     |
+| `v-memo`                | Listes ou peu d'éléments changent        | ⭐⭐ Moyen    |
+| Lazy loading des routes | Toujours ! C'est une bonne pratique      | ⭐ Facile     |
+| `defineAsyncComponent`  | Composants lourds (graphiques, éditeurs) | ⭐⭐ Moyen    |
+| `KeepAlive`             | Navigation par onglets                   | ⭐ Facile     |
+| `shallowRef`            | Gros objets / grosses listes             | ⭐⭐⭐ Avancé |
+| Virtualisation          | Listes de 1000+ éléments                 | ⭐⭐⭐ Avancé |
 
 ---
 
@@ -504,6 +504,7 @@ Identifie ou ajouter `v-once` dans ce template :
   </div>
 </template>
 ```
+
 </details>
 
 ---
@@ -514,15 +515,15 @@ Transforme ces imports statiques en lazy loading :
 
 ```ts
 // Avant : tout est chargé au démarrage
-import Home from '@/views/Home.vue'
-import Dashboard from '@/views/Dashboard.vue'
-import Settings from '@/views/Settings.vue'
+import Home from "@/views/Home.vue";
+import Dashboard from "@/views/Dashboard.vue";
+import Settings from "@/views/Settings.vue";
 
 const routes = [
-  { path: '/', component: Home },
-  { path: '/dashboard', component: Dashboard },
-  { path: '/settings', component: Settings }
-]
+  { path: "/", component: Home },
+  { path: "/dashboard", component: Dashboard },
+  { path: "/settings", component: Settings },
+];
 ```
 
 <details>
@@ -531,11 +532,12 @@ const routes = [
 ```ts
 // Après : chaque page est chargée seulement quand on y accède
 const routes = [
-  { path: '/', component: () => import('@/views/Home.vue') },
-  { path: '/dashboard', component: () => import('@/views/Dashboard.vue') },
-  { path: '/settings', component: () => import('@/views/Settings.vue') }
-]
+  { path: "/", component: () => import("@/views/Home.vue") },
+  { path: "/dashboard", component: () => import("@/views/Dashboard.vue") },
+  { path: "/settings", component: () => import("@/views/Settings.vue") },
+];
 ```
+
 </details>
 
 ---
@@ -555,16 +557,17 @@ const AsyncChart = ???
 <summary>Solution</summary>
 
 ```ts
-import { defineAsyncComponent } from 'vue'
+import { defineAsyncComponent } from "vue";
 
 const AsyncChart = defineAsyncComponent({
-  loader: () => import('./ChartComponent.vue'),
+  loader: () => import("./ChartComponent.vue"),
   loadingComponent: {
-    template: '<p>Chargement du graphique...</p>'
+    template: "<p>Chargement du graphique...</p>",
   },
-  delay: 200
-})
+  delay: 200,
+});
 ```
+
 </details>
 
 ---
@@ -574,14 +577,14 @@ const AsyncChart = defineAsyncComponent({
 Optimise ce code qui gère une grosse liste :
 
 ```ts
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // Cette liste peut contenir 10 000+ éléments
 // On ne modifie jamais les propriétés internes, on remplace la liste entière
-const bigList = ref<User[]>([])
+const bigList = ref<User[]>([]);
 
 function updateList(newList: User[]) {
-  bigList.value = newList
+  bigList.value = newList;
 }
 ```
 
@@ -589,21 +592,22 @@ function updateList(newList: User[]) {
 <summary>Solution</summary>
 
 ```ts
-import { shallowRef, triggerRef } from 'vue'
+import { shallowRef, triggerRef } from "vue";
 
-const bigList = shallowRef<User[]>([])
+const bigList = shallowRef<User[]>([]);
 
 function updateList(newList: User[]) {
-  bigList.value = newList
+  bigList.value = newList;
   // Pas besoin de triggerRef ici car on remplace la référence
 }
 
 // Si on modifie en place (rare), il faut notifier Vue :
 function addItem(item: User) {
-  bigList.value.push(item)
-  triggerRef(bigList)  // Force Vue à voir le changement
+  bigList.value.push(item);
+  triggerRef(bigList); // Force Vue à voir le changement
 }
 ```
+
 </details>
 
 ---
@@ -659,7 +663,7 @@ Vapor est le nouveau mode de compilation de Vue qui **elimine le Virtual DOM** p
 
 ## Exercice
 
-→ `exercices/13-performance-audit/ENONCE.md`
+→ `exercices/18-performance-audit/ENONCE.md`
 
 ## Suite
 

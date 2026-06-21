@@ -4,9 +4,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Pourquoi utilise-t-on `async/await` dans un composable de fetch ?
 > 2. Quels 3 états gère-t-on généralement lors d'un appel API ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -100,24 +101,24 @@ import { reactive, computed, ref } from "vue";
 // On définit la FORME de notre formulaire avec une interface TypeScript
 // Cela décrit quels champs existent et leur type
 interface ContactForm {
-  name: string;      // Le nom (texte)
-  email: string;     // L'email (texte)
-  message: string;   // Le message (texte)
+  name: string; // Le nom (texte)
+  email: string; // L'email (texte)
+  message: string; // Le message (texte)
 }
 
 // On définit la FORME des erreurs possibles
 // Chaque champ peut avoir une erreur (string) ou pas (undefined)
 interface FormErrors {
-  name?: string;     // "?" veut dire "ce champ est optionnel"
+  name?: string; // "?" veut dire "ce champ est optionnel"
   email?: string;
   message?: string;
 }
 
 // reactive() crée un OBJET réactif (quand on modifie une propriété, Vue met à jour l'affichage)
 const form = reactive<ContactForm>({
-  name: "",       // Vide au départ
-  email: "",      // Vide au départ
-  message: "",    // Vide au départ
+  name: "", // Vide au départ
+  email: "", // Vide au départ
+  message: "", // Vide au départ
 });
 
 // computed() crée une valeur CALCULÉE qui se recalcule automatiquement
@@ -155,7 +156,7 @@ const submitted = ref(false);
 
 // La fonction appelée quand on soumet le formulaire
 function handleSubmit(): void {
-  submitted.value = true;     // On note qu'on a essayé de soumettre
+  submitted.value = true; // On note qu'on a essayé de soumettre
 
   if (!isValid.value) return; // Si le formulaire est invalide, on ARRÊTE ici
 
@@ -168,7 +169,6 @@ function handleSubmit(): void {
 <template>
   <!-- @submit.prevent empêche le rechargement de la page -->
   <form @submit.prevent="handleSubmit">
-
     <!-- Champ NOM -->
     <div>
       <label>Nom</label>
@@ -201,9 +201,7 @@ function handleSubmit(): void {
     </div>
 
     <!-- Bouton de soumission (désactivé si on a essayé de soumettre mais c'est invalide) -->
-    <button type="submit" :disabled="submitted && !isValid">
-      Envoyer
-    </button>
+    <button type="submit" :disabled="submitted && !isValid">Envoyer</button>
   </form>
 </template>
 ```
@@ -223,8 +221,8 @@ Une **regex** (expression régulière), c'est un **motif de recherche** — une 
 const motif: RegExp = /bonjour/;
 
 // .test() vérifie si le texte correspond au motif
-motif.test("bonjour le monde");  // true  (le mot "bonjour" est dedans)
-motif.test("au revoir");          // false (pas de "bonjour" dedans)
+motif.test("bonjour le monde"); // true  (le mot "bonjour" est dedans)
+motif.test("au revoir"); // false (pas de "bonjour" dedans)
 ```
 
 ### Les regex les plus courantes en validation
@@ -238,8 +236,8 @@ const regexEmail: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // \.        = un point (le \ "échappe" le point qui a un sens spécial en regex)
 // $         = fin du texte
 
-regexEmail.test("jean@email.com");   // true ✅
-regexEmail.test("pas un email");      // false ❌
+regexEmail.test("jean@email.com"); // true ✅
+regexEmail.test("pas un email"); // false ❌
 
 // Vérifier un numéro de téléphone français : 10 chiffres commençant par 0
 const regexTel: RegExp = /^0[1-9]\d{8}$/;
@@ -248,8 +246,8 @@ const regexTel: RegExp = /^0[1-9]\d{8}$/;
 // \d{8}     = suivi de exactement 8 chiffres
 // $         = fin du texte
 
-regexTel.test("0612345678");  // true ✅
-regexTel.test("1234");         // false ❌
+regexTel.test("0612345678"); // true ✅
+regexTel.test("1234"); // false ❌
 ```
 
 ---
@@ -277,21 +275,20 @@ type ValidationRules<T> = { [K in keyof T]?: ValidationRule<T[K]>[] };
 
 // Ce que le composable retourne
 interface UseFormReturn<T extends Record<string, any>> {
-  form: T;                                           // Les données du formulaire
+  form: T; // Les données du formulaire
   errors: ComputedRef<Partial<Record<keyof T, string>>>; // Les erreurs calculées
-  isValid: ComputedRef<boolean>;                     // Est-ce que tout est valide ?
-  touched: Record<keyof T, boolean>;                 // Quels champs l'utilisateur a touchés
-  touch: (field: keyof T) => void;                   // Fonction pour "toucher" un champ
-  reset: () => void;                                 // Fonction pour tout remettre à zéro
+  isValid: ComputedRef<boolean>; // Est-ce que tout est valide ?
+  touched: Record<keyof T, boolean>; // Quels champs l'utilisateur a touchés
+  touch: (field: keyof T) => void; // Fonction pour "toucher" un champ
+  reset: () => void; // Fonction pour tout remettre à zéro
 }
 
 // --- Le composable ---
 
 export function useForm<T extends Record<string, any>>(
-  initialValues: T,          // Les valeurs initiales du formulaire
+  initialValues: T, // Les valeurs initiales du formulaire
   rules: ValidationRules<T>, // Les règles de validation
 ): UseFormReturn<T> {
-
   // On crée l'objet réactif du formulaire (copie des valeurs initiales)
   const form = reactive<T>({ ...initialValues }) as T;
 
@@ -299,7 +296,7 @@ export function useForm<T extends Record<string, any>>(
   // Utile pour n'afficher les erreurs que sur les champs déjà touchés
   const touched = reactive(
     Object.fromEntries(
-      Object.keys(initialValues).map((k) => [k, false]) // Tous à false au départ
+      Object.keys(initialValues).map((k) => [k, false]), // Tous à false au départ
     ),
   ) as Record<keyof T, boolean>;
 
@@ -313,10 +310,10 @@ export function useForm<T extends Record<string, any>>(
 
       // On teste chaque règle une par une
       for (const rule of fieldRules as ValidationRule<any>[]) {
-        const error = rule(value);  // On appelle la règle avec la valeur
+        const error = rule(value); // On appelle la règle avec la valeur
         if (error) {
           result[field as keyof T] = error; // Si erreur, on la stocke
-          break;  // On s'arrête à la PREMIÈRE erreur (pas besoin d'afficher plusieurs)
+          break; // On s'arrête à la PREMIÈRE erreur (pas besoin d'afficher plusieurs)
         }
       }
     }
@@ -333,9 +330,9 @@ export function useForm<T extends Record<string, any>>(
 
   // Remettre le formulaire à zéro
   function reset(): void {
-    Object.assign(form, initialValues);     // Remet les valeurs initiales
+    Object.assign(form, initialValues); // Remet les valeurs initiales
     for (const key of Object.keys(touched)) {
-      touched[key as keyof T] = false;       // Remet tous les "touched" à false
+      touched[key as keyof T] = false; // Remet tous les "touched" à false
     }
   }
 
@@ -354,18 +351,21 @@ Au lieu d'écrire les conditions à la main à chaque fois, on crée des **petit
 
 // Champ requis (ne doit pas être vide)
 export const required =
-  (msg = "Champ requis") =>              // On peut personnaliser le message
-  (value: string): string | undefined =>  // La fonction prend une valeur string
-    value.trim() ? undefined : msg;       // Si le texte n'est pas vide → OK, sinon → erreur
+  (
+    msg = "Champ requis", // On peut personnaliser le message
+  ) =>
+  (value: string): string | undefined =>
+    // La fonction prend une valeur string
+    value.trim() ? undefined : msg; // Si le texte n'est pas vide → OK, sinon → erreur
 
 // Longueur minimale
 export const minLength =
   (min: number, msg?: string) =>
   (value: string): string | undefined =>
     value.length >= min
-      ? undefined                                     // Assez long → OK
-      : (msg ?? `Minimum ${min} caractères`);         // Trop court → erreur
-    // ?? signifie "si msg est null/undefined, utilise le texte par défaut"
+      ? undefined // Assez long → OK
+      : (msg ?? `Minimum ${min} caractères`); // Trop court → erreur
+// ?? signifie "si msg est null/undefined, utilise le texte par défaut"
 
 // Email valide (utilise la regex qu'on a vue plus haut)
 export const email =
@@ -375,9 +375,12 @@ export const email =
 
 // Correspond à un motif regex personnalisé
 export const pattern =
-  (regex: RegExp, msg: string) =>          // On passe la regex et le message
+  (
+    regex: RegExp,
+    msg: string, // On passe la regex et le message
+  ) =>
   (value: string): string | undefined =>
-    regex.test(value) ? undefined : msg;    // Si ça correspond → OK, sinon → erreur
+    regex.test(value) ? undefined : msg; // Si ça correspond → OK, sinon → erreur
 ```
 
 ### Comment lire ces fonctions ?
@@ -414,9 +417,9 @@ const { form, errors, isValid, touched, touch, reset } = useForm(
   { name: "", email: "", message: "" },
   // Les règles de validation pour chaque champ
   {
-    name: [required()],                      // Le nom est requis
-    email: [required(), email()],            // L'email est requis ET doit être valide
-    message: [required(), minLength(10)],    // Le message est requis ET minimum 10 caractères
+    name: [required()], // Le nom est requis
+    email: [required(), email()], // L'email est requis ET doit être valide
+    message: [required(), minLength(10)], // Le message est requis ET minimum 10 caractères
   },
 );
 
@@ -493,7 +496,6 @@ function handleSubmit(): void {
 
 <template>
   <form @submit.prevent="handleSubmit">
-
     <!-- On affiche UN SEUL bloc à la fois selon l'étape -->
     <div v-if="step === 1">
       <h3>Étape 1 : Informations personnelles</h3>
@@ -524,9 +526,7 @@ function handleSubmit(): void {
 
       <!-- Bouton "Valider" (visible seulement à la dernière étape) -->
       <!-- C'est un type="submit", donc il déclenche le @submit.prevent du form -->
-      <button type="submit" v-else>
-        Valider
-      </button>
+      <button type="submit" v-else>Valider</button>
     </div>
   </form>
 </template>
@@ -536,16 +536,16 @@ function handleSubmit(): void {
 
 ## Récapitulatif
 
-| Concept | À quoi ça sert |
-|---------|----------------|
-| `@submit.prevent` | Empêcher le rechargement de page et gérer l'envoi soi-même |
-| `v-model` | Lier un champ de formulaire à une variable réactive |
-| `computed()` | Calculer les erreurs automatiquement quand le formulaire change |
-| Validation manuelle | Vérifier les données avec des conditions `if` |
-| Composable `useForm` | Réutiliser la logique de validation dans tous les formulaires |
-| Règles réutilisables | `required()`, `email()`, `minLength()` — des briques de validation |
-| Regex | Un motif pour vérifier le format d'un texte (email, téléphone...) |
-| Formulaire multi-étapes | Découper un long formulaire en plusieurs écrans |
+| Concept                 | À quoi ça sert                                                     |
+| ----------------------- | ------------------------------------------------------------------ |
+| `@submit.prevent`       | Empêcher le rechargement de page et gérer l'envoi soi-même         |
+| `v-model`               | Lier un champ de formulaire à une variable réactive                |
+| `computed()`            | Calculer les erreurs automatiquement quand le formulaire change    |
+| Validation manuelle     | Vérifier les données avec des conditions `if`                      |
+| Composable `useForm`    | Réutiliser la logique de validation dans tous les formulaires      |
+| Règles réutilisables    | `required()`, `email()`, `minLength()` — des briques de validation |
+| Regex                   | Un motif pour vérifier le format d'un texte (email, téléphone...)  |
+| Formulaire multi-étapes | Découper un long formulaire en plusieurs écrans                    |
 
 ---
 
@@ -557,14 +557,14 @@ Complète ce code pour valider que le champ `email` contient un "@" :
 
 ```vue
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed } from "vue";
 
-const email = ref('')
+const email = ref("");
 
 // Retourne un message d'erreur si l'email est invalide, sinon undefined
 const emailError = computed(() => {
   // ???
-})
+});
 </script>
 ```
 
@@ -573,17 +573,18 @@ const emailError = computed(() => {
 
 ```vue
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed } from "vue";
 
-const email = ref('')
+const email = ref("");
 
 const emailError = computed(() => {
-  if (!email.value) return 'Email requis'
-  if (!email.value.includes('@')) return 'Email invalide'
-  return undefined
-})
+  if (!email.value) return "Email requis";
+  if (!email.value.includes("@")) return "Email invalide";
+  return undefined;
+});
 </script>
 ```
+
 </details>
 
 ---
@@ -594,13 +595,13 @@ Complète ce formulaire de contact avec validation :
 
 ```vue
 <script setup lang="ts">
-import { reactive, computed } from 'vue'
+import { reactive, computed } from "vue";
 
 const form = reactive({
-  name: '',
-  email: '',
-  message: ''
-})
+  name: "",
+  email: "",
+  message: "",
+});
 
 // Crée un computed "errors" qui retourne un objet { name?, email?, message? }
 // - name: requis, min 2 caractères
@@ -608,12 +609,12 @@ const form = reactive({
 // - message: requis, min 10 caractères
 const errors = computed(() => {
   // ???
-})
+});
 
 // Le formulaire est valide si aucune erreur
 const isValid = computed(() => {
   // ???
-})
+});
 </script>
 ```
 
@@ -622,34 +623,35 @@ const isValid = computed(() => {
 
 ```vue
 <script setup lang="ts">
-import { reactive, computed } from 'vue'
+import { reactive, computed } from "vue";
 
 const form = reactive({
-  name: '',
-  email: '',
-  message: ''
-})
+  name: "",
+  email: "",
+  message: "",
+});
 
 const errors = computed(() => {
-  const errs: { name?: string; email?: string; message?: string } = {}
+  const errs: { name?: string; email?: string; message?: string } = {};
 
-  if (!form.name) errs.name = 'Nom requis'
-  else if (form.name.length < 2) errs.name = 'Minimum 2 caractères'
+  if (!form.name) errs.name = "Nom requis";
+  else if (form.name.length < 2) errs.name = "Minimum 2 caractères";
 
-  if (!form.email) errs.email = 'Email requis'
-  else if (!form.email.includes('@')) errs.email = 'Email invalide'
+  if (!form.email) errs.email = "Email requis";
+  else if (!form.email.includes("@")) errs.email = "Email invalide";
 
-  if (!form.message) errs.message = 'Message requis'
-  else if (form.message.length < 10) errs.message = 'Minimum 10 caractères'
+  if (!form.message) errs.message = "Message requis";
+  else if (form.message.length < 10) errs.message = "Minimum 10 caractères";
 
-  return errs
-})
+  return errs;
+});
 
 const isValid = computed(() => {
-  return Object.keys(errors.value).length === 0
-})
+  return Object.keys(errors.value).length === 0;
+});
 </script>
 ```
+
 </details>
 
 ---
@@ -660,10 +662,10 @@ Crée des fonctions de validation réutilisables :
 
 ```ts
 // Une règle retourne un message d'erreur ou undefined si valide
-type ValidationRule = (value: string) => string | undefined
+type ValidationRule = (value: string) => string | undefined;
 
 // Crée une règle "required" qui vérifie que le champ n'est pas vide
-export function required(message = 'Champ requis'): ValidationRule {
+export function required(message = "Champ requis"): ValidationRule {
   // ???
 }
 
@@ -682,25 +684,25 @@ export function email(): ValidationRule {
 <summary>Solution</summary>
 
 ```ts
-type ValidationRule = (value: string) => string | undefined
+type ValidationRule = (value: string) => string | undefined;
 
-export function required(message = 'Champ requis'): ValidationRule {
-  return (value) => value.trim() ? undefined : message
+export function required(message = "Champ requis"): ValidationRule {
+  return (value) => (value.trim() ? undefined : message);
 }
 
 export function minLength(min: number): ValidationRule {
-  return (value) => value.length >= min
-    ? undefined
-    : `Minimum ${min} caractères`
+  return (value) =>
+    value.length >= min ? undefined : `Minimum ${min} caractères`;
 }
 
 export function email(): ValidationRule {
   return (value) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return regex.test(value) ? undefined : 'Email invalide'
-  }
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(value) ? undefined : "Email invalide";
+  };
 }
 ```
+
 </details>
 
 ---
@@ -739,13 +741,14 @@ Complète le template pour afficher les erreurs sous chaque champ :
   </form>
 </template>
 ```
+
 </details>
 
 ---
 
 ## Exercice
 
-→ `exercices/08-formulaire-multi-etapes/ENONCE.md`
+→ `exercices/11-formulaire-multi-etapes/ENONCE.md`
 
 ## Suite
 

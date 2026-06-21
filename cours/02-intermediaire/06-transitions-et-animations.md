@@ -6,9 +6,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Quelle est la différence entre un slot par défaut et un slot nommé ?
 > 2. Comment accède-t-on aux données exposées par un scoped slot ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -25,14 +26,14 @@ Avant de commencer, rappelons quelques propriétés CSS importantes :
 ```css
 /* opacity : la transparence d'un élément */
 /* 0 = invisible, 0.5 = semi-transparent, 1 = totalement visible */
-opacity: 0;      /* L'élément est invisible */
-opacity: 1;      /* L'élément est visible */
+opacity: 0; /* L'élément est invisible */
+opacity: 1; /* L'élément est visible */
 
 /* transform : déplacer, tourner, agrandir un élément */
 /* SANS changer sa place dans le document (c'est performant !) */
-transform: translateX(20px);   /* Décale de 20px vers la droite */
-transform: translateY(-10px);  /* Décale de 10px vers le haut */
-transform: scale(1.2);         /* Agrandit de 20% */
+transform: translateX(20px); /* Décale de 20px vers la droite */
+transform: translateY(-10px); /* Décale de 10px vers le haut */
+transform: scale(1.2); /* Agrandit de 20% */
 
 /* transition : dit au navigateur "quand une propriété change, */
 /* fais-le progressivement au lieu d'un coup" */
@@ -59,10 +60,10 @@ Vue fournit un composant spécial appelé `<Transition>`. C'est un **emballage**
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // ref() crée une variable réactive (Vue surveille ses changements)
-const show = ref(true)   // true = le texte est visible au départ
+const show = ref(true); // true = le texte est visible au départ
 </script>
 
 <template>
@@ -98,6 +99,7 @@ const show = ref(true)   // true = le texte est visible au départ
 ```
 
 **Ce qui se passe :**
+
 1. Au départ, le `<p>` est visible
 2. On clique → `show` passe à `false`
 3. Vue ajoute les classes CSS d'animation de **sortie**
@@ -115,7 +117,7 @@ Quand tu donnes `name="fade"` à `<Transition>`, Vue ajoute automatiquement des 
 ```
                     ENTRÉE (apparition)
     ─────────────────────────────────────────────
-    
+
     Frame 0          Pendant              Terminé
     ┌─────────┐    ┌──────────────┐    ┌──────────┐
     │ .fade-   │    │ .fade-       │    │ .fade-   │
@@ -128,7 +130,7 @@ Quand tu donnes `name="fade"` à `<Transition>`, Vue ajoute automatiquement des 
 
                     SORTIE (disparition)
     ─────────────────────────────────────────────
-    
+
     Frame 0          Pendant              Terminé
     ┌─────────┐    ┌──────────────┐    ┌──────────┐
     │ .fade-   │    │ .fade-       │    │ .fade-   │
@@ -141,14 +143,14 @@ Quand tu donnes `name="fade"` à `<Transition>`, Vue ajoute automatiquement des 
 
 ### Tableau récapitulatif
 
-| Classe | Quand elle est appliquée | Rôle |
-|--------|--------------------------|------|
-| `.fade-enter-from` | 1 frame avant l'entrée | État de départ (ex: invisible) |
-| `.fade-enter-active` | Pendant toute l'entrée | Définit la transition CSS |
-| `.fade-enter-to` | À la fin de l'entrée | État d'arrivée (ex: visible) |
-| `.fade-leave-from` | Au début de la sortie | État de départ (ex: visible) |
-| `.fade-leave-active` | Pendant toute la sortie | Définit la transition CSS |
-| `.fade-leave-to` | À la fin de la sortie | État d'arrivée (ex: invisible) |
+| Classe               | Quand elle est appliquée | Rôle                           |
+| -------------------- | ------------------------ | ------------------------------ |
+| `.fade-enter-from`   | 1 frame avant l'entrée   | État de départ (ex: invisible) |
+| `.fade-enter-active` | Pendant toute l'entrée   | Définit la transition CSS      |
+| `.fade-enter-to`     | À la fin de l'entrée     | État d'arrivée (ex: visible)   |
+| `.fade-leave-from`   | Au début de la sortie    | État de départ (ex: visible)   |
+| `.fade-leave-active` | Pendant toute la sortie  | Définit la transition CSS      |
+| `.fade-leave-to`     | À la fin de la sortie    | État d'arrivée (ex: invisible) |
 
 > **Remplace "fade" par le `name` que tu as choisi.** Si `name="slide"`, les classes seront `.slide-enter-from`, `.slide-enter-active`, etc.
 
@@ -184,8 +186,8 @@ On combine un déplacement horizontal (`translateX`) avec un fondu (`opacity`) :
 /* décalé de 20px à droite + invisible */
 .slide-fade-enter-from,
 .slide-fade-leave-to {
-  transform: translateX(20px);  /* Décalé de 20px vers la droite */
-  opacity: 0;                   /* Invisible */
+  transform: translateX(20px); /* Décalé de 20px vers la droite */
+  opacity: 0; /* Invisible */
 }
 
 /* L'état "normal" (visible, non décalé) n'a pas besoin d'être défini */
@@ -223,31 +225,31 @@ La solution : `mode="out-in"` → l'ancien sort **d'abord**, puis le nouveau ent
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // On définit le type d'un élément de la liste
 interface Item {
-  id: number     // Identifiant unique (obligatoire pour :key)
-  text: string   // Le texte affiché
+  id: number; // Identifiant unique (obligatoire pour :key)
+  text: string; // Le texte affiché
 }
 
 // Notre liste réactive avec 2 éléments au départ
 const items = ref<Item[]>([
-  { id: 1, text: 'Premier' },
-  { id: 2, text: 'Deuxième' },
-])
+  { id: 1, text: "Premier" },
+  { id: 2, text: "Deuxième" },
+]);
 
-let nextId = 3   // Compteur pour générer des ids uniques
+let nextId = 3; // Compteur pour générer des ids uniques
 
 // Fonction pour ajouter un élément à la fin de la liste
 function addItem(): void {
-  items.value.push({ id: nextId++, text: `Item ${nextId}` })
+  items.value.push({ id: nextId++, text: `Item ${nextId}` });
 }
 
 // Fonction pour supprimer un élément par son id
 function removeItem(id: number): void {
   // filter() garde tous les éléments SAUF celui avec l'id donné
-  items.value = items.value.filter((item) => item.id !== id)
+  items.value = items.value.filter((item) => item.id !== id);
 }
 </script>
 
@@ -299,12 +301,12 @@ function removeItem(id: number): void {
 
 ### Différences entre `<Transition>` et `<TransitionGroup>`
 
-| | `<Transition>` | `<TransitionGroup>` |
-|---|---|---|
-| **Nombre d'éléments** | 1 seul | Plusieurs (liste) |
-| **Balise générée** | Aucune (invisible) | Oui, définie par `tag` |
-| **`:key` obligatoire** | Non | Oui, sur chaque enfant |
-| **Classe `.xxx-move`** | Non | Oui (animation de repositionnement) |
+|                        | `<Transition>`     | `<TransitionGroup>`                 |
+| ---------------------- | ------------------ | ----------------------------------- |
+| **Nombre d'éléments**  | 1 seul             | Plusieurs (liste)                   |
+| **Balise générée**     | Aucune (invisible) | Oui, définie par `tag`              |
+| **`:key` obligatoire** | Non                | Oui, sur chaque enfant              |
+| **Classe `.xxx-move`** | Non                | Oui (animation de repositionnement) |
 
 ---
 
@@ -331,23 +333,23 @@ Pour des animations plus complexes (avec des librairies comme GSAP), on peut uti
 <script setup lang="ts">
 // Avant l'entrée : on prépare l'élément (invisible)
 function onBeforeEnter(el: Element): void {
-  (el as HTMLElement).style.opacity = '0'
+  (el as HTMLElement).style.opacity = "0";
 }
 
 // Pendant l'entrée : on anime vers l'état visible
 function onEnter(el: Element, done: () => void): void {
-  const htmlEl = el as HTMLElement
-  htmlEl.style.transition = 'opacity 0.5s'  // Animation CSS de 0.5s
-  htmlEl.style.opacity = '1'                // Vers visible
-  setTimeout(done, 500)                     // On dit à Vue "c'est fini" après 0.5s
+  const htmlEl = el as HTMLElement;
+  htmlEl.style.transition = "opacity 0.5s"; // Animation CSS de 0.5s
+  htmlEl.style.opacity = "1"; // Vers visible
+  setTimeout(done, 500); // On dit à Vue "c'est fini" après 0.5s
 }
 
 // Pendant la sortie : on anime vers invisible
 function onLeave(el: Element, done: () => void): void {
-  const htmlEl = el as HTMLElement
-  htmlEl.style.transition = 'opacity 0.3s'  // Animation CSS de 0.3s
-  htmlEl.style.opacity = '0'                // Vers invisible
-  setTimeout(done, 300)                     // On dit à Vue "c'est fini" après 0.3s
+  const htmlEl = el as HTMLElement;
+  htmlEl.style.transition = "opacity 0.3s"; // Animation CSS de 0.3s
+  htmlEl.style.opacity = "0"; // Vers invisible
+  setTimeout(done, 300); // On dit à Vue "c'est fini" après 0.3s
 }
 </script>
 ```
@@ -368,15 +370,15 @@ function onLeave(el: Element, done: () => void): void {
 
 ## Résumé
 
-| Concept | Ce que ça fait |
-|---------|----------------|
-| `<Transition>` | Anime l'entrée/sortie d'**un seul** élément |
-| `<TransitionGroup>` | Anime l'entrée/sortie d'éléments dans une **liste** |
-| `name="xxx"` | Définit le préfixe des classes CSS (`.xxx-enter-from`, etc.) |
-| `mode="out-in"` | L'ancien élément sort avant que le nouveau entre |
-| Classes `-enter-*` | Contrôlent l'animation d'**apparition** |
-| Classes `-leave-*` | Contrôlent l'animation de **disparition** |
-| Classe `-move` | Contrôle l'animation de **repositionnement** (TransitionGroup) |
+| Concept             | Ce que ça fait                                                 |
+| ------------------- | -------------------------------------------------------------- |
+| `<Transition>`      | Anime l'entrée/sortie d'**un seul** élément                    |
+| `<TransitionGroup>` | Anime l'entrée/sortie d'éléments dans une **liste**            |
+| `name="xxx"`        | Définit le préfixe des classes CSS (`.xxx-enter-from`, etc.)   |
+| `mode="out-in"`     | L'ancien élément sort avant que le nouveau entre               |
+| Classes `-enter-*`  | Contrôlent l'animation d'**apparition**                        |
+| Classes `-leave-*`  | Contrôlent l'animation de **disparition**                      |
+| Classe `-move`      | Contrôle l'animation de **repositionnement** (TransitionGroup) |
 
 ---
 
@@ -424,6 +426,7 @@ Complète le CSS pour créer un effet de fondu :
 }
 </style>
 ```
+
 </details>
 
 ---
@@ -467,6 +470,7 @@ Crée une transition "slide" qui fait glisser l'élément depuis la droite :
 }
 </style>
 ```
+
 </details>
 
 ---
@@ -477,16 +481,16 @@ Complète ce code pour animer une liste d'éléments :
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const items = ref([1, 2, 3])
+const items = ref([1, 2, 3]);
 
 function addItem() {
-  items.value.push(items.value.length + 1)
+  items.value.push(items.value.length + 1);
 }
 
 function removeItem(index: number) {
-  items.value.splice(index, 1)
+  items.value.splice(index, 1);
 }
 </script>
 
@@ -495,9 +499,13 @@ function removeItem(index: number) {
 
   <!-- Utilise TransitionGroup avec le nom "list" -->
   <!-- ??? -->
-    <div v-for="item in items" :key="item" @click="removeItem(items.indexOf(item))">
-      Item {{ item }}
-    </div>
+  <div
+    v-for="item in items"
+    :key="item"
+    @click="removeItem(items.indexOf(item))"
+  >
+    Item {{ item }}
+  </div>
   <!-- ??? -->
 </template>
 ```
@@ -510,7 +518,11 @@ function removeItem(index: number) {
   <button @click="addItem">Ajouter</button>
 
   <TransitionGroup name="list" tag="div">
-    <div v-for="item in items" :key="item" @click="removeItem(items.indexOf(item))">
+    <div
+      v-for="item in items"
+      :key="item"
+      @click="removeItem(items.indexOf(item))"
+    >
       Item {{ item }}
     </div>
   </TransitionGroup>
@@ -533,6 +545,7 @@ function removeItem(index: number) {
 }
 </style>
 ```
+
 </details>
 
 ---
@@ -565,9 +578,14 @@ Corrige ce code pour que l'ancien élément disparaisse AVANT que le nouveau app
   </Transition>
 </template>
 ```
+
 </details>
 
 ---
+
+## Exercice
+
+→ `exercices/14-galerie-animee/ENONCE.md`
 
 ## Suite
 
@@ -578,6 +596,7 @@ Corrige ce code pour que l'ancien élément disparaisse AVANT que le nouveau app
 <!-- parcours-recommande -->
 
 ::: tip Parcours recommandé
+
 1. **Exercice** : [08-theme-injection](../../exercices/08-theme-injection/ENONCE)
 2. **Exercice** : [09-dashboard-composables](../../exercices/09-dashboard-composables/ENONCE)
 3. **Exercice** : [09-dashboard-filtres](../../exercices/09-dashboard-filtres/ENONCE)
@@ -587,4 +606,4 @@ Corrige ce code pour que l'ancien élément disparaisse AVANT que le nouveau app
 7. **Exercice** : [13-tableau-générique](../../exercices/13-tableau-generique/ENONCE)
 8. **Exercice** : [13-tableau-réutilisable](../../exercices/13-tableau-reutilisable/ENONCE)
 9. **Exercice** : [14-galerie-animee](../../exercices/14-galerie-animee/ENONCE)
-:::
+   :::

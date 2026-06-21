@@ -22,14 +22,14 @@
 
 ```typescript
 // vitest.config.ts
-import { defineConfig } from 'vitest/config';
-import vue from '@vitejs/plugin-vue';
+import { defineConfig } from "vitest/config";
+import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
   plugins: [vue()],
   test: {
     globals: true,
-    environment: 'jsdom',
+    environment: "jsdom",
   },
 });
 ```
@@ -42,15 +42,21 @@ export default defineConfig({
 
 ```typescript
 // composables/useCounter.ts
-import { ref, computed } from 'vue';
+import { ref, computed } from "vue";
 
 export function useCounter(initial = 0) {
   const count = ref(initial);
   const doubled = computed(() => count.value * 2);
 
-  function increment() { count.value++; }
-  function decrement() { count.value--; }
-  function reset() { count.value = initial; }
+  function increment() {
+    count.value++;
+  }
+  function decrement() {
+    count.value--;
+  }
+  function reset() {
+    count.value = initial;
+  }
 
   return { count, doubled, increment, decrement, reset };
 }
@@ -58,34 +64,34 @@ export function useCounter(initial = 0) {
 
 ```typescript
 // composables/useCounter.test.ts
-import { describe, it, expect } from 'vitest';
-import { useCounter } from './useCounter';
+import { describe, it, expect } from "vitest";
+import { useCounter } from "./useCounter";
 
-describe('useCounter', () => {
-  it('should start at 0 by default', () => {
+describe("useCounter", () => {
+  it("should start at 0 by default", () => {
     const { count } = useCounter();
     expect(count.value).toBe(0);
   });
 
-  it('should accept initial value', () => {
+  it("should accept initial value", () => {
     const { count } = useCounter(10);
     expect(count.value).toBe(10);
   });
 
-  it('should increment', () => {
+  it("should increment", () => {
     const { count, increment } = useCounter();
     increment();
     expect(count.value).toBe(1);
   });
 
-  it('should compute doubled', () => {
+  it("should compute doubled", () => {
     const { doubled, increment } = useCounter(5);
     expect(doubled.value).toBe(10);
     increment();
     expect(doubled.value).toBe(12);
   });
 
-  it('should reset to initial value', () => {
+  it("should reset to initial value", () => {
     const { count, increment, reset } = useCounter(5);
     increment();
     increment();
@@ -99,7 +105,7 @@ describe('useCounter', () => {
 
 ```typescript
 // composables/useWindowSize.ts
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from "vue";
 
 export function useWindowSize() {
   const width = ref(window.innerWidth);
@@ -110,8 +116,8 @@ export function useWindowSize() {
     height.value = window.innerHeight;
   }
 
-  onMounted(() => window.addEventListener('resize', update));
-  onUnmounted(() => window.removeEventListener('resize', update));
+  onMounted(() => window.addEventListener("resize", update));
+  onUnmounted(() => window.removeEventListener("resize", update));
 
   return { width, height };
 }
@@ -119,10 +125,10 @@ export function useWindowSize() {
 
 ```typescript
 // composables/useWindowSize.test.ts
-import { describe, it, expect } from 'vitest';
-import { mount } from '@vue/test-utils';
-import { defineComponent } from 'vue';
-import { useWindowSize } from './useWindowSize';
+import { describe, it, expect } from "vitest";
+import { mount } from "@vue/test-utils";
+import { defineComponent } from "vue";
+import { useWindowSize } from "./useWindowSize";
 
 // Wrapper component pour lifecycle hooks
 function withSetup<T>(composable: () => T) {
@@ -132,14 +138,16 @@ function withSetup<T>(composable: () => T) {
       result = composable();
       return {};
     },
-    render() { return null; },
+    render() {
+      return null;
+    },
   });
   const wrapper = mount(Comp);
   return { result: result!, wrapper };
 }
 
-describe('useWindowSize', () => {
-  it('should return current window dimensions', () => {
+describe("useWindowSize", () => {
+  it("should return current window dimensions", () => {
     const { result } = withSetup(() => useWindowSize());
     expect(result.width.value).toBe(window.innerWidth);
     expect(result.height.value).toBe(window.innerHeight);
@@ -151,7 +159,7 @@ describe('useWindowSize', () => {
 
 ```typescript
 // composables/useFetch.ts
-import { ref } from 'vue';
+import { ref } from "vue";
 
 export function useFetch<T>(url: string) {
   const data = ref<T | null>(null);
@@ -178,22 +186,22 @@ export function useFetch<T>(url: string) {
 
 ```typescript
 // composables/useFetch.test.ts
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useFetch } from './useFetch';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { useFetch } from "./useFetch";
 
-describe('useFetch', () => {
+describe("useFetch", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('should fetch data successfully', async () => {
-    const mockData = { id: 1, name: 'Alice' };
+  it("should fetch data successfully", async () => {
+    const mockData = { id: 1, name: "Alice" };
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(mockData),
     });
 
-    const { data, loading, error, execute } = useFetch('/api/users/1');
+    const { data, loading, error, execute } = useFetch("/api/users/1");
     expect(loading.value).toBe(false);
 
     await execute();
@@ -203,17 +211,17 @@ describe('useFetch', () => {
     expect(loading.value).toBe(false);
   });
 
-  it('should handle HTTP errors', async () => {
+  it("should handle HTTP errors", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 404,
     });
 
-    const { data, error, execute } = useFetch('/api/users/999');
+    const { data, error, execute } = useFetch("/api/users/999");
     await execute();
 
     expect(data.value).toBeNull();
-    expect(error.value?.message).toBe('HTTP 404');
+    expect(error.value?.message).toBe("HTTP 404");
   });
 });
 ```
@@ -224,7 +232,7 @@ describe('useFetch', () => {
 
 ```typescript
 // utils/reactive-utils.ts
-import { ref, watch } from 'vue';
+import { ref, watch } from "vue";
 
 export function useDebounce<T>(source: Ref<T>, delay: number) {
   const debounced = ref(source.value) as Ref<T>;
@@ -243,23 +251,23 @@ export function useDebounce<T>(source: Ref<T>, delay: number) {
 
 ```typescript
 // utils/reactive-utils.test.ts
-import { describe, it, expect, vi } from 'vitest';
-import { ref, nextTick } from 'vue';
-import { useDebounce } from './reactive-utils';
+import { describe, it, expect, vi } from "vitest";
+import { ref, nextTick } from "vue";
+import { useDebounce } from "./reactive-utils";
 
-describe('useDebounce', () => {
-  it('should debounce value changes', async () => {
+describe("useDebounce", () => {
+  it("should debounce value changes", async () => {
     vi.useFakeTimers();
-    const source = ref('hello');
+    const source = ref("hello");
     const debounced = useDebounce(source, 300);
 
-    source.value = 'world';
+    source.value = "world";
     await nextTick();
-    expect(debounced.value).toBe('hello'); // Pas encore change
+    expect(debounced.value).toBe("hello"); // Pas encore change
 
     vi.advanceTimersByTime(300);
     await nextTick();
-    expect(debounced.value).toBe('world'); // Maintenant oui
+    expect(debounced.value).toBe("world"); // Maintenant oui
 
     vi.useRealTimers();
   });
@@ -270,12 +278,12 @@ describe('useDebounce', () => {
 
 ## Exercice
 
-→ Voir l'exercice correspondant dans le cours (exercice 17).
+→ `exercices/17-tests-complets/ENONCE.md`
 
 ---
 
 ## Navigation
 
-| Précédent | Suivant |
-|-----------|---------|
+| Précédent                                           | Suivant                                              |
+| --------------------------------------------------- | ---------------------------------------------------- |
 | [02 — Pinia avance](./02-pinia-state-management.md) | [04 — Tests de composants](./04-tests-composants.md) |

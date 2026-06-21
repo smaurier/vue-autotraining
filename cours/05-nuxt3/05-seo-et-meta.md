@@ -4,9 +4,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Ou place-t-on les server routes dans un projet Nuxt 3 ?
 > 2. Quelle fonction utilise-t-on pour définir un handler d'API serveur ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -66,34 +67,34 @@ Le **titre** et la **description** que Google affiche viennent des **meta tags**
 // C'est comme remplir la fiche d'identité de votre page
 useHead({
   // Le titre de la page (affiché dans l'onglet du navigateur ET sur Google)
-  title: 'Mon Site - Accueil',
+  title: "Mon Site - Accueil",
 
   // "meta" = les balises méta (les infos cachées)
   meta: [
     // description = le résumé qui apparaît sur Google sous le titre
     {
-      name: 'description',                              // Le type de méta
-      content: 'Bienvenue sur mon site de recettes',     // Le contenu
+      name: "description", // Le type de méta
+      content: "Bienvenue sur mon site de recettes", // Le contenu
     },
 
     // og:title = le titre quand on partage le lien sur Facebook/LinkedIn
     // (on explique "og" plus bas, pas de panique !)
-    { property: 'og:title', content: 'Mon Site' },
+    { property: "og:title", content: "Mon Site" },
 
     // og:description = la description sur les réseaux sociaux
-    { property: 'og:description', content: 'Les meilleures recettes' },
+    { property: "og:description", content: "Les meilleures recettes" },
 
     // og:image = l'image de prévisualisation sur les réseaux sociaux
-    { property: 'og:image', content: '/og-image.jpg' },
+    { property: "og:image", content: "/og-image.jpg" },
   ],
 
   // "link" = liens vers d'autres ressources
   link: [
     // "canonical" dit à Google : "voici l'URL officielle de cette page"
     // (utile si la même page est accessible via plusieurs URLs)
-    { rel: 'canonical', href: 'https://monsite.com/' },
+    { rel: "canonical", href: "https://monsite.com/" },
   ],
-})
+});
 </script>
 ```
 
@@ -102,11 +103,11 @@ useHead({
 ```html
 <head>
   <title>Mon Site - Accueil</title>
-  <meta name="description" content="Bienvenue sur mon site de recettes">
-  <meta property="og:title" content="Mon Site">
-  <meta property="og:description" content="Les meilleures recettes">
-  <meta property="og:image" content="/og-image.jpg">
-  <link rel="canonical" href="https://monsite.com/">
+  <meta name="description" content="Bienvenue sur mon site de recettes" />
+  <meta property="og:title" content="Mon Site" />
+  <meta property="og:description" content="Les meilleures recettes" />
+  <meta property="og:image" content="/og-image.jpg" />
+  <link rel="canonical" href="https://monsite.com/" />
 </head>
 ```
 
@@ -122,19 +123,20 @@ useHead({
 // Chaque propriété a un nom clair et direct
 useSeoMeta({
   // === Pour Google ===
-  title: 'Recettes de crêpes',                          // Titre de la page
-  description: 'La meilleure recette de crêpes bretonnes, '
-             + 'facile et rapide à préparer',            // Description pour Google
+  title: "Recettes de crêpes", // Titre de la page
+  description:
+    "La meilleure recette de crêpes bretonnes, " +
+    "facile et rapide à préparer", // Description pour Google
 
   // === Pour les réseaux sociaux (Open Graph) ===
-  ogTitle: 'Recettes de crêpes',                         // Titre sur Facebook/LinkedIn
-  ogDescription: 'La meilleure recette de crêpes',       // Description sur les réseaux
-  ogImage: '/images/crepes.jpg',                          // Image de prévisualisation
+  ogTitle: "Recettes de crêpes", // Titre sur Facebook/LinkedIn
+  ogDescription: "La meilleure recette de crêpes", // Description sur les réseaux
+  ogImage: "/images/crepes.jpg", // Image de prévisualisation
 
   // === Spécifique à Twitter/X ===
-  twitterCard: 'summary_large_image',                     // Format de la carte Twitter
+  twitterCard: "summary_large_image", // Format de la carte Twitter
   // "summary_large_image" = une grande image de prévisualisation
-})
+});
 </script>
 ```
 
@@ -163,13 +165,13 @@ Cette carte est générée grâce aux balises **Open Graph** (`og:title`, `og:de
 
 Les propriétés **Open Graph** les plus importantes :
 
-| Propriété          | Rôle                                    | Exemple                      |
-|-------------------|-----------------------------------------|------------------------------|
-| `og:title`        | Titre affiché dans la carte             | "Recettes de crêpes"        |
-| `og:description`  | Description courte                      | "Facile et rapide"           |
-| `og:image`        | URL de l'image de prévisualisation      | "/images/crepes.jpg"         |
-| `og:url`          | L'URL canonique de la page              | "https://monsite.com/"       |
-| `og:type`         | Le type de contenu                      | "website" ou "article"       |
+| Propriété        | Rôle                               | Exemple                |
+| ---------------- | ---------------------------------- | ---------------------- |
+| `og:title`       | Titre affiché dans la carte        | "Recettes de crêpes"   |
+| `og:description` | Description courte                 | "Facile et rapide"     |
+| `og:image`       | URL de l'image de prévisualisation | "/images/crepes.jpg"   |
+| `og:url`         | L'URL canonique de la page         | "https://monsite.com/" |
+| `og:type`        | Le type de contenu                 | "website" ou "article" |
 
 ---
 
@@ -184,17 +186,17 @@ export default defineNuxtConfig({
     head: {
       // %s sera remplacé par le titre de chaque page
       // C'est comme un "trou à remplir"
-      titleTemplate: '%s | Mon Site',
+      titleTemplate: "%s | Mon Site",
     },
   },
-})
+});
 ```
 
 ```vue
 <!-- pages/about.vue -->
 <script setup lang="ts">
 // On ne met QUE le titre de la page, sans le nom du site
-useHead({ title: 'À propos' })
+useHead({ title: "À propos" });
 
 // Résultat dans l'onglet du navigateur : "À propos | Mon Site"
 // Le %s a été remplacé par "À propos" automatiquement !
@@ -216,18 +218,18 @@ Souvent, le titre et la description dépendent des **données de la page**. Par 
 ```vue
 <script setup lang="ts">
 // On récupère l'ID du produit depuis l'URL
-const route = useRoute()
+const route = useRoute();
 
 // On charge les données du produit depuis notre API
 // (useFetch fait une requête GET automatiquement)
-const { data: product } = await useFetch(`/api/products/${route.params.id}`)
+const { data: product } = await useFetch(`/api/products/${route.params.id}`);
 
 // Les meta sont "computed" (calculées) = elles se mettent à jour
 // automatiquement quand les données changent
 useHead({
   // computed() crée une valeur "réactive" qui se recalcule
   // quand product.value change
-  title: computed(() => product.value?.name ?? 'Chargement...'),
+  title: computed(() => product.value?.name ?? "Chargement..."),
   //                                   ↑↑
   //                     "?." = optional chaining
   //                     Si product.value est null, ça ne plante pas
@@ -237,11 +239,11 @@ useHead({
 
   meta: [
     {
-      name: 'description',
-      content: computed(() => product.value?.description ?? ''),
+      name: "description",
+      content: computed(() => product.value?.description ?? ""),
     },
   ],
-})
+});
 </script>
 
 <template>
@@ -256,6 +258,7 @@ useHead({
 ```
 
 > **`?.`** et **`??`** sont des opérateurs JavaScript modernes :
+>
 > - `product.value?.name` → "si product.value existe, donne-moi .name, sinon donne undefined"
 > - `undefined ?? 'Chargement...'` → "si c'est undefined, utilise 'Chargement...' à la place"
 
@@ -274,13 +277,13 @@ pnpm add @nuxtjs/sitemap
 // nuxt.config.ts
 export default defineNuxtConfig({
   // On ajoute le module à la liste des modules Nuxt
-  modules: ['@nuxtjs/sitemap'],
+  modules: ["@nuxtjs/sitemap"],
 
   // On indique l'URL de notre site (obligatoire pour le sitemap)
   site: {
-    url: 'https://monsite.com',
+    url: "https://monsite.com",
   },
-})
+});
 // → Le sitemap sera accessible sur https://monsite.com/sitemap.xml
 // → Google le lira pour trouver toutes vos pages
 ```
@@ -292,6 +295,7 @@ export default defineNuxtConfig({
 Par défaut, Nuxt génère les pages **à chaque visite** (le serveur travaille à chaque requête). Avec le **SSG**, on peut **pré-générer toutes les pages** une seule fois sous forme de fichiers HTML.
 
 C'est comme la différence entre :
+
 - **Un restaurant** (SSR) : le plat est cuisiné à chaque commande
 - **Un traiteur** (SSG) : tous les plats sont préparés à l'avance, il suffit de les servir
 
@@ -300,15 +304,15 @@ Avantage du SSG : **ultra rapide** (pas besoin de serveur), parfait pour les blo
 ```ts
 // nuxt.config.ts
 export default defineNuxtConfig({
-  ssr: true,    // Active le rendu côté serveur
+  ssr: true, // Active le rendu côté serveur
   nitro: {
     prerender: {
-      routes: ['/'],          // Pré-rend au minimum la page d'accueil
-      crawlLinks: true,       // Découvre et pré-rend automatiquement
-                               // toutes les pages liées
+      routes: ["/"], // Pré-rend au minimum la page d'accueil
+      crawlLinks: true, // Découvre et pré-rend automatiquement
+      // toutes les pages liées
     },
   },
-})
+});
 ```
 
 ```bash
@@ -342,8 +346,8 @@ Configure les meta d'une page produit :
 ```vue
 <!-- pages/products/[id].vue -->
 <script setup lang="ts">
-const route = useRoute()
-const { data: product } = await useFetch(`/api/products/${route.params.id}`)
+const route = useRoute();
+const { data: product } = await useFetch(`/api/products/${route.params.id}`);
 
 // Configure le titre et la description dynamiquement
 // ???
@@ -355,17 +359,18 @@ const { data: product } = await useFetch(`/api/products/${route.params.id}`)
 
 ```vue
 <script setup lang="ts">
-const route = useRoute()
-const { data: product } = await useFetch(`/api/products/${route.params.id}`)
+const route = useRoute();
+const { data: product } = await useFetch(`/api/products/${route.params.id}`);
 
 useHead({
-  title: () => product.value?.name || 'Produit',
+  title: () => product.value?.name || "Produit",
   meta: [
-    { name: 'description', content: () => product.value?.description || '' }
-  ]
-})
+    { name: "description", content: () => product.value?.description || "" },
+  ],
+});
 </script>
 ```
+
 </details>
 
 ---
@@ -378,7 +383,7 @@ Ajoute les balises Open Graph pour le partage social :
 // Configure og:title, og:description et og:image
 useSeoMeta({
   // ???
-})
+});
 ```
 
 <details>
@@ -391,9 +396,10 @@ useSeoMeta({
   description: product.value?.description,
   ogDescription: product.value?.description,
   ogImage: product.value?.image,
-  twitterCard: 'summary_large_image'
-})
+  twitterCard: "summary_large_image",
+});
 ```
+
 </details>
 
 ---
@@ -404,8 +410,8 @@ Définis l'URL canonique d'une page :
 
 ```vue
 <script setup lang="ts">
-const config = useRuntimeConfig()
-const route = useRoute()
+const config = useRuntimeConfig();
+const route = useRoute();
 
 // Définis l'URL canonique
 // ???
@@ -417,26 +423,27 @@ const route = useRoute()
 
 ```vue
 <script setup lang="ts">
-const config = useRuntimeConfig()
-const route = useRoute()
+const config = useRuntimeConfig();
+const route = useRoute();
 
 useHead({
   link: [
     {
-      rel: 'canonical',
-      href: `${config.public.siteUrl}${route.path}`
-    }
-  ]
-})
+      rel: "canonical",
+      href: `${config.public.siteUrl}${route.path}`,
+    },
+  ],
+});
 </script>
 ```
+
 </details>
 
 ---
 
 ## Exercice
 
-→ `exercices/14-nuxt-blog/ENONCE.md`
+→ `exercices/20-blog-nuxt-simule/ENONCE.md`
 
 ## Suite
 
@@ -447,6 +454,7 @@ useHead({
 <!-- parcours-recommande -->
 
 ::: tip Parcours recommandé
+
 1. **Exercice** : [20-nuxt-patterns](../../exercices/20-nuxt-patterns/ENONCE)
 2. **Exercice** : [20-blog-nuxt-simule](../../exercices/20-blog-nuxt-simule/ENONCE)
-:::
+   :::

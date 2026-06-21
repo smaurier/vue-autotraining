@@ -4,9 +4,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Quelle est la différence entre `ref()` et `reactive()` ?
 > 2. À quoi sert `computed()` et quand l'utiliser ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -21,6 +22,7 @@
 Un **événement**, c'est **quelque chose qui se passe** sur ta page web.
 
 Exemples d'événements du quotidien :
+
 - Tu **cliques** sur un bouton → c'est un événement `click`
 - Tu **tapes** sur le clavier → c'est un événement `keyup` ou `keydown`
 - Tu **soumets** un formulaire → c'est un événement `submit`
@@ -30,15 +32,15 @@ En JavaScript pur (sans Vue), tu écoutes les événements comme ça :
 
 ```ts
 // 1. On récupère le bouton dans le HTML
-const bouton: HTMLElement | null = document.querySelector('#monBouton')
+const bouton: HTMLElement | null = document.querySelector("#monBouton");
 
 // 2. On lui dit : "quand quelqu'un clique sur toi, exécute cette fonction"
-bouton?.addEventListener('click', function(event: MouseEvent) {
+bouton?.addEventListener("click", function (event: MouseEvent) {
   // 'event' est un objet qui contient les détails de ce qui s'est passé
   // Par exemple : ou était la souris au moment du clic
-  console.log('Le bouton a été cliqué !')
-  console.log('Position de la souris :', event.clientX, event.clientY)
-})
+  console.log("Le bouton a été cliqué !");
+  console.log("Position de la souris :", event.clientX, event.clientY);
+});
 ```
 
 C'est fonctionnel, mais c'est **verbeux**. Vue simplifie tout ça avec `@` !
@@ -59,7 +61,7 @@ En Vue, au lieu d'écrire `addEventListener`, on utilise `@` directement dans le
 function handleClick(event: MouseEvent): void {
   // event.clientX = position horizontale de la souris (en pixels)
   // event.clientY = position verticale de la souris (en pixels)
-  console.log('Clic à', event.clientX, event.clientY)
+  console.log("Clic à", event.clientX, event.clientY);
 }
 </script>
 
@@ -74,13 +76,13 @@ function handleClick(event: MouseEvent): void {
 
 Quand un événement se produit, le navigateur crée un **objet événement** qui contient des informations :
 
-| Propriété              | Ce qu'elle contient                        |
-| ---------------------- | ------------------------------------------ |
-| `event.clientX`        | Position X de la souris                    |
-| `event.clientY`        | Position Y de la souris                    |
-| `event.target`         | L'élément HTML sur lequel on a cliqué      |
-| `event.key`            | La touche du clavier pressée (pour keyup)  |
-| `event.preventDefault()` | Empêche le comportement par défaut       |
+| Propriété                | Ce qu'elle contient                       |
+| ------------------------ | ----------------------------------------- |
+| `event.clientX`          | Position X de la souris                   |
+| `event.clientY`          | Position Y de la souris                   |
+| `event.target`           | L'élément HTML sur lequel on a cliqué     |
+| `event.key`              | La touche du clavier pressée (pour keyup) |
+| `event.preventDefault()` | Empêche le comportement par défaut        |
 
 Dans le template, cet objet s'appelle **`$event`** :
 
@@ -101,12 +103,12 @@ Parfois, tu veux envoyer tes propres données à la fonction (pas juste l'évén
 <script setup lang="ts">
 // Cette fonction attend un 'id' de type number
 function deleteItem(id: number): void {
-  console.log('Suppression de l\'élément numéro', id)
+  console.log("Suppression de l'élément numéro", id);
 }
 
 // Cette fonction attend un 'id' ET l'événement souris
 function handleAction(id: number, event: MouseEvent): void {
-  console.log('Action sur', id, 'à la position', event.clientX)
+  console.log("Action sur", id, "à la position", event.clientX);
 }
 </script>
 
@@ -123,6 +125,7 @@ function handleAction(id: number, event: MouseEvent): void {
 ```
 
 > 💡 **Rappel arrow function** : `(e) => handleAction(item.id, e)` est une façon courte d'écrire :
+>
 > ```ts
 > function(e: Event) { handleAction(item.id, e) }
 > ```
@@ -223,16 +226,16 @@ Avant de voir `v-model`, rappelons comment les formulaires fonctionnent en HTML 
 
 ```ts
 // En TypeScript pur, pour afficher ce que l'utilisateur tape :
-const champ: HTMLInputElement | null = document.querySelector('#champNom')     // 1. Récupérer l'input
-const affichage: HTMLElement | null = document.querySelector('#affichage') // 2. Récupérer le <p>
+const champ: HTMLInputElement | null = document.querySelector("#champNom"); // 1. Récupérer l'input
+const affichage: HTMLElement | null = document.querySelector("#affichage"); // 2. Récupérer le <p>
 
 // 3. Écouter chaque frappe au clavier dans le champ
-champ?.addEventListener('input', function(event: Event) {
+champ?.addEventListener("input", function (event: Event) {
   // 4. Récupérer la valeur actuelle du champ
-  const valeur: string = (event.target as HTMLInputElement).value
+  const valeur: string = (event.target as HTMLInputElement).value;
   // 5. L'afficher dans le <p>
-  if (affichage) affichage.textContent = 'Tu as tapé : ' + valeur
-})
+  if (affichage) affichage.textContent = "Tu as tapé : " + valeur;
+});
 ```
 
 C'est beaucoup de code pour juste **synchroniser un champ avec un affichage**. Vue réduit tout ça à une seule ligne grâce à `v-model`.
@@ -266,10 +269,10 @@ C'est ça la **liaison bidirectionnelle** (two-way binding) : les deux côtés d
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // On crée une variable réactive de type string, initialisée à ""
-const name = ref<string>('')
+const name = ref<string>("");
 </script>
 
 <template>
@@ -312,10 +315,10 @@ const name = ref<string>('')
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // Variable pour stocker le texte de la description
-const description = ref<string>('')
+const description = ref<string>("");
 </script>
 
 <template>
@@ -335,10 +338,10 @@ Il y a **deux cas** pour les checkboxes :
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // Une seule checkbox = un booléen (cochée = true, décochée = false)
-const isAccepted = ref<boolean>(false)
+const isAccepted = ref<boolean>(false);
 </script>
 
 <template>
@@ -358,10 +361,10 @@ const isAccepted = ref<boolean>(false)
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // Plusieurs checkboxes = un tableau (array) qui stocke les valeurs cochées
-const selectedFruits = ref<string[]>([])
+const selectedFruits = ref<string[]>([]);
 // string[] → un tableau de chaînes de caractères
 // [] → initialement vide (rien n'est coché)
 </script>
@@ -394,10 +397,10 @@ const selectedFruits = ref<string[]>([])
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // Un seul choix possible → une seule variable string
-const picked = ref<string>('')
+const picked = ref<string>("");
 </script>
 
 <template>
@@ -424,14 +427,14 @@ const picked = ref<string>('')
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // On crée un type personnalisé pour les valeurs autorisées
 // Seules les valeurs "low", "medium" ou "high" sont acceptées
-type Priority = 'low' | 'medium' | 'high'
+type Priority = "low" | "medium" | "high";
 
 // La variable commence à "medium"
-const priority = ref<Priority>('medium')
+const priority = ref<Priority>("medium");
 </script>
 
 <template>
@@ -456,11 +459,11 @@ Les modificateurs de `v-model` transforment automatiquement la valeur. On les aj
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // Sans .number, la valeur serait une string "25" (texte)
 // Avec .number, elle est automatiquement convertie en number 25 (nombre)
-const age = ref<number>(0)
+const age = ref<number>(0);
 </script>
 
 <template>
@@ -502,10 +505,7 @@ const age = ref<number>(0)
 <MyInput v-model="name" />
 
 <!-- C'est un raccourci pour : -->
-<MyInput
-  :modelValue="name"
-  @update:modelValue="name = $event"
-/>
+<MyInput :modelValue="name" @update:modelValue="name = $event" />
 <!--
   :modelValue="name"                    → on envoie la valeur au composant (prop)
   @update:modelValue="name = $event"   → quand le composant envoie une mise à jour,
@@ -518,22 +518,22 @@ const age = ref<number>(0)
 
 ## Résumé
 
-| Concept               | Syntaxe                    | Explication                                  |
-| --------------------- | -------------------------- | -------------------------------------------- |
-| Événement click       | `@click="handler"`         | Appelle `handler` quand on clique            |
-| Avec argument         | `@click="handler(arg)"`    | Passe un argument à la fonction              |
-| Prevent default       | `@submit.prevent`          | Empêche le comportement par défaut           |
-| Stop propagation      | `@click.stop`              | Empêche l'événement de remonter              |
-| Une seule fois        | `@click.once`              | N'écoute que le premier événement            |
-| Touche clavier        | `@keyup.enter`             | Réagit à la touche Entrée                    |
-| Input texte           | `v-model="variable"`       | Lie un champ à une variable (miroir) 🪞      |
-| Checkbox boolean      | `v-model="boolRef"`        | `true` si cochée, `false` sinon              |
-| Checkbox multiples    | `v-model="arrayRef"`       | Tableau des valeurs cochées                  |
-| Radio                 | `v-model="stringRef"`      | La `value` du radio sélectionné              |
-| Select                | `v-model="selected"`       | La `value` de l'option choisie               |
-| Convertir en nombre   | `v-model.number`           | La saisie est convertie en `number`          |
-| Supprimer les espaces | `v-model.trim`             | Enlève les espaces au début et à la fin      |
-| Mise à jour paresseuse| `v-model.lazy`             | Met à jour quand on quitte le champ          |
+| Concept                | Syntaxe                 | Explication                             |
+| ---------------------- | ----------------------- | --------------------------------------- |
+| Événement click        | `@click="handler"`      | Appelle `handler` quand on clique       |
+| Avec argument          | `@click="handler(arg)"` | Passe un argument à la fonction         |
+| Prevent default        | `@submit.prevent`       | Empêche le comportement par défaut      |
+| Stop propagation       | `@click.stop`           | Empêche l'événement de remonter         |
+| Une seule fois         | `@click.once`           | N'écoute que le premier événement       |
+| Touche clavier         | `@keyup.enter`          | Réagit à la touche Entrée               |
+| Input texte            | `v-model="variable"`    | Lie un champ à une variable (miroir) 🪞 |
+| Checkbox boolean       | `v-model="boolRef"`     | `true` si cochée, `false` sinon         |
+| Checkbox multiples     | `v-model="arrayRef"`    | Tableau des valeurs cochées             |
+| Radio                  | `v-model="stringRef"`   | La `value` du radio sélectionné         |
+| Select                 | `v-model="selected"`    | La `value` de l'option choisie          |
+| Convertir en nombre    | `v-model.number`        | La saisie est convertie en `number`     |
+| Supprimer les espaces  | `v-model.trim`          | Enlève les espaces au début et à la fin |
+| Mise à jour paresseuse | `v-model.lazy`          | Met à jour quand on quitte le champ     |
 
 ---
 
@@ -543,12 +543,12 @@ const age = ref<number>(0)
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const nom = ref('')
-const email = ref('')
-const message = ref('')
-const newsletter = ref(false)
+const nom = ref("");
+const email = ref("");
+const message = ref("");
+const newsletter = ref(false);
 
 function envoyerFormulaire(): void {
   // Affiche les données dans la console
@@ -574,9 +574,9 @@ function envoyerFormulaire(): void {
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const quantite = ref(1)
+const quantite = ref(1);
 
 function incrementer(): void {
   // Max 10
@@ -600,22 +600,22 @@ function decrementer(): void {
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const recherche = ref('')
-const resultats = ref<string[]>([])
+const recherche = ref("");
+const resultats = ref<string[]>([]);
 
 function lancerRecherche(): void {
-  console.log('Recherche:', recherche.value)
+  console.log("Recherche:", recherche.value);
   // Simuler des résultats
-  resultats.value = ['Résultat 1', 'Résultat 2']
+  resultats.value = ["Résultat 1", "Résultat 2"];
 }
 </script>
 
 <template>
   <!-- Active la recherche avec Entrée ET avec le bouton -->
-  <input 
-    v-model="recherche" 
+  <input
+    v-model="recherche"
     @keyup.???="lancerRecherche"
     placeholder="Rechercher..."
   />
@@ -636,8 +636,8 @@ function lancerRecherche(): void {
 </form>
 
 <!-- E.2 -->
-function incrementer() { if (quantite.value < 10) quantite.value++ }
-function decrementer() { if (quantite.value > 1) quantite.value-- }
+function incrementer() { if (quantite.value < 10) quantite.value++ } function
+decrementer() { if (quantite.value > 1) quantite.value-- }
 <button @click="decrementer" :disabled="quantite <= 1">-</button>
 <button @click="incrementer" :disabled="quantite >= 10">+</button>
 
@@ -648,6 +648,10 @@ function decrementer() { if (quantite.value > 1) quantite.value-- }
 </details>
 
 ---
+
+## Exercice
+
+→ `exercices/04-formulaire-contact/ENONCE.md`
 
 ## Suite
 

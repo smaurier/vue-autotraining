@@ -749,6 +749,10 @@ age.value = 31; // ← modifie aussi state.age !
 
 ---
 
+## Exercice
+
+→ `exercices/02-compteur-reactif/ENONCE.md`
+
 ## Suite
 
 → `cours/01-debutant/04-evenements-et-v-model.md`
