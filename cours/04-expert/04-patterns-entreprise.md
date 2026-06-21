@@ -11,9 +11,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Qu'est-ce qu'une structure "feature-based" (par fonctionnalité) ?
 > 2. À quoi sert un fichier `index.ts` (barrel export) dans un dossier ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -44,11 +45,11 @@ d'organiser le code** qui fonctionnent dans les gros projets. Ce sont des
 
 ### Quand en a-t-on besoin ?
 
-| Taille du projet       | Patterns nécessaires ?                      |
-| ---------------------- | ------------------------------------------- |
-| Projet perso / petit   | ❌ Non, c'est de la sur-ingénierie          |
-| Projet moyen (5-10 pages) | ⚠️ Quelques-uns (services, types)        |
-| Gros projet en équipe  | ✅ Oui, pour que tout le monde s'y retrouve |
+| Taille du projet          | Patterns nécessaires ?                      |
+| ------------------------- | ------------------------------------------- |
+| Projet perso / petit      | ❌ Non, c'est de la sur-ingénierie          |
+| Projet moyen (5-10 pages) | ⚠️ Quelques-uns (services, types)           |
+| Gros projet en équipe     | ✅ Oui, pour que tout le monde s'y retrouve |
 
 ---
 
@@ -69,55 +70,55 @@ directement les appels au serveur. On crée un **service** qui s'en occupe.
 // Ce fichier s'occupe UNIQUEMENT de communiquer avec le serveur
 
 // On définit l'adresse de base de notre API
-const BASE_URL = '/api/products'
+const BASE_URL = "/api/products";
 
 export const productService = {
   // Récupérer tous les produits
   async getAll(): Promise<Product[]> {
-    const response = await fetch(BASE_URL)
+    const response = await fetch(BASE_URL);
     // fetch() envoie une requête HTTP au serveur
     // await = on attend la réponse
 
     if (!response.ok) {
-      throw new Error(`Le serveur a répondu avec l'erreur ${response.status}`)
+      throw new Error(`Le serveur a répondu avec l'erreur ${response.status}`);
     }
 
-    return response.json()
+    return response.json();
     // On convertit la réponse JSON en objet JavaScript
   },
 
   // Créer un nouveau produit
   async create(newProduct: CreateProductDto): Promise<Product> {
     const response = await fetch(BASE_URL, {
-      method: 'POST',                                  // POST = envoyer des données
-      headers: { 'Content-Type': 'application/json' }, // Format des données
-      body: JSON.stringify(newProduct),                 // Les données du produit
-    })
+      method: "POST", // POST = envoyer des données
+      headers: { "Content-Type": "application/json" }, // Format des données
+      body: JSON.stringify(newProduct), // Les données du produit
+    });
 
     if (!response.ok) {
-      throw new Error(`Erreur lors de la création: ${response.status}`)
+      throw new Error(`Erreur lors de la création: ${response.status}`);
     }
 
-    return response.json()
+    return response.json();
   },
-}
+};
 ```
 
 ### Pourquoi c'est utile ?
 
 ```ts
 // ❌ SANS service : le composant fait tout (affichage + appel API)
-const products = ref<Product[]>([])
+const products = ref<Product[]>([]);
 onMounted(async () => {
-  const res = await fetch('/api/products')   // Appel API dans le composant 😬
-  products.value = await res.json()
-})
+  const res = await fetch("/api/products"); // Appel API dans le composant 😬
+  products.value = await res.json();
+});
 
 // ✅ AVEC service : le composant reste simple
-const products = ref<Product[]>([])
+const products = ref<Product[]>([]);
 onMounted(async () => {
-  products.value = await productService.getAll()  // Une seule ligne, bien lisible
-})
+  products.value = await productService.getAll(); // Une seule ligne, bien lisible
+});
 ```
 
 > **Avantage** : si l'URL de l'API change, tu modifies UN seul fichier (le service),
@@ -150,19 +151,19 @@ export interface ProductRepository {
   // interface = un contrat, une "liste de promesses"
   // "Celui qui implémente cette interface devra fournir ces méthodes"
 
-  getAll(): Promise<Product[]>
+  getAll(): Promise<Product[]>;
   // Retourner tous les produits
 
-  getById(id: number): Promise<Product>
+  getById(id: number): Promise<Product>;
   // Retourner un produit par son identifiant
 
-  create(data: CreateProductDto): Promise<Product>
+  create(data: CreateProductDto): Promise<Product>;
   // Créer un produit et le retourner
 
-  update(id: number, data: UpdateProductDto): Promise<Product>
+  update(id: number, data: UpdateProductDto): Promise<Product>;
   // Modifier un produit existant
 
-  delete(id: number): Promise<void>
+  delete(id: number): Promise<void>;
   // Supprimer un produit (void = ne retourne rien)
 }
 ```
@@ -181,38 +182,38 @@ export class HttpProductRepository implements ProductRepository {
   // "private readonly" = on garde cette valeur, et elle ne changera pas
 
   async getAll(): Promise<Product[]> {
-    const res = await fetch(this.baseUrl)
+    const res = await fetch(this.baseUrl);
     // On appelle le serveur avec l'URL de base
-    return res.json()
+    return res.json();
   }
 
   async getById(id: number): Promise<Product> {
-    const res = await fetch(`${this.baseUrl}/${id}`)
-    return res.json()
+    const res = await fetch(`${this.baseUrl}/${id}`);
+    return res.json();
   }
 
   async create(data: CreateProductDto): Promise<Product> {
     const res = await fetch(this.baseUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
-    })
-    return res.json()
+    });
+    return res.json();
   }
 
   async update(id: number, data: UpdateProductDto): Promise<Product> {
     const res = await fetch(`${this.baseUrl}/${id}`, {
-      method: 'PUT',      // PUT = remplacer/modifier une ressource
-      headers: { 'Content-Type': 'application/json' },
+      method: "PUT", // PUT = remplacer/modifier une ressource
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
-    })
-    return res.json()
+    });
+    return res.json();
   }
 
   async delete(id: number): Promise<void> {
     await fetch(`${this.baseUrl}/${id}`, {
-      method: 'DELETE',    // DELETE = supprimer une ressource
-    })
+      method: "DELETE", // DELETE = supprimer une ressource
+    });
   }
 }
 ```
@@ -227,39 +228,39 @@ export class HttpProductRepository implements ProductRepository {
 export class InMemoryProductRepository implements ProductRepository {
   // "implements ProductRepository" = même contrat, mais implémentation différente
 
-  private items: Product[] = []
+  private items: Product[] = [];
   // Un simple tableau JavaScript fait office de base de données
 
   async getAll(): Promise<Product[]> {
-    return [...this.items]
+    return [...this.items];
     // On retourne une copie du tableau (spread operator ...)
   }
 
   async getById(id: number): Promise<Product> {
-    const found = this.items.find(item => item.id === id)
+    const found = this.items.find((item) => item.id === id);
     // .find() cherche dans le tableau l'élément qui correspond
-    if (!found) throw new Error(`Produit ${id} non trouvé`)
-    return found
+    if (!found) throw new Error(`Produit ${id} non trouvé`);
+    return found;
   }
 
   async create(data: CreateProductDto): Promise<Product> {
-    const newProduct = { id: Date.now(), ...data }
+    const newProduct = { id: Date.now(), ...data };
     // On crée un produit avec un id unique (le timestamp actuel)
-    this.items.push(newProduct)
+    this.items.push(newProduct);
     // On l'ajoute au tableau
-    return newProduct
+    return newProduct;
   }
 
   async update(id: number, data: UpdateProductDto): Promise<Product> {
-    const index = this.items.findIndex(item => item.id === id)
+    const index = this.items.findIndex((item) => item.id === id);
     // findIndex retourne la POSITION de l'élément (ou -1 si pas trouvé)
-    if (index === -1) throw new Error(`Produit ${id} non trouvé`)
-    this.items[index] = { ...this.items[index], ...data }
-    return this.items[index]
+    if (index === -1) throw new Error(`Produit ${id} non trouvé`);
+    this.items[index] = { ...this.items[index], ...data };
+    return this.items[index];
   }
 
   async delete(id: number): Promise<void> {
-    this.items = this.items.filter(item => item.id !== id)
+    this.items = this.items.filter((item) => item.id !== id);
     // filter() garde uniquement les éléments qui NE correspondent PAS à l'id
   }
 }
@@ -299,28 +300,28 @@ export class Email {
 
   // La seule façon de créer un Email, c'est avec cette méthode
   static create(raw: string): Email {
-    const trimmed = raw.trim().toLowerCase()
+    const trimmed = raw.trim().toLowerCase();
     // trim() = enlève les espaces avant/après
     // toLowerCase() = convertit en minuscules
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
       // Cette regex vérifie que le texte ressemble à "quelquechose@domaine.ext"
-      throw new Error(`Email invalide : ${raw}`)
+      throw new Error(`Email invalide : ${raw}`);
       // Si ce n'est pas un email valide, on lance une erreur
     }
 
-    return new Email(trimmed)
+    return new Email(trimmed);
     // Si tout est OK, on crée l'objet Email
   }
 
   // Convertir en texte
   toString(): string {
-    return this.value
+    return this.value;
   }
 
   // Comparer deux emails
   equals(other: Email): boolean {
-    return this.value === other.value
+    return this.value === other.value;
     // Deux emails sont égaux si leur texte est identique
   }
 }
@@ -328,13 +329,13 @@ export class Email {
 
 ```ts
 // Utilisation :
-const email1 = Email.create('  Alice@Gmail.COM  ')
+const email1 = Email.create("  Alice@Gmail.COM  ");
 // → Crée un Email avec la valeur "alice@gmail.com" (nettoyé + minuscules)
 
-const email2 = Email.create('pas-un-email')
+const email2 = Email.create("pas-un-email");
 // → ❌ Erreur ! "Email invalide : pas-un-email"
 
-console.log(email1.toString())  // "alice@gmail.com"
+console.log(email1.toString()); // "alice@gmail.com"
 ```
 
 > **Avantage** : la validation est faite UNE seule fois, à la création.
@@ -421,6 +422,7 @@ src/
 ### 📦 L'analogie de l'entrepôt
 
 Imagine que tu gères 3 boutiques en ligne. Elles ont toutes besoin de :
+
 - Les mêmes boutons, les mêmes formulaires (le design system)
 - Les mêmes fonctions utilitaires (validation, formatage)
 
@@ -458,8 +460,8 @@ pnpm-workspace.yaml    ← La config qui relie tout ça
 # pnpm-workspace.yaml
 # Ce fichier dit à pnpm : "voici les dossiers qui font partie du projet"
 packages:
-  - "packages/*"    # Tout ce qui est dans packages/
-  - "apps/*"        # Tout ce qui est dans apps/
+  - "packages/*" # Tout ce qui est dans packages/
+  - "apps/*" # Tout ce qui est dans apps/
 ```
 
 ### Les avantages
@@ -529,14 +531,14 @@ d'une technologie à une autre (Vue 2 → Vue 3, Angular → Vue, etc.)
 
 ## 📝 Résumé
 
-| Pattern             | Analogie                     | Quand l'utiliser ?              |
-| ------------------- | ---------------------------- | ------------------------------- |
-| Service Layer       | Le serveur du restaurant     | Dès que tu appelles une API     |
-| Repository          | Le bibliothécaire            | Projets moyens à gros           |
-| Value Object        | Un email "garanti valide"    | Quand tu as des règles métier   |
-| Clean Architecture  | Les anneaux d'un oignon      | Très gros projets               |
-| Monorepo            | Un entrepôt pour 3 boutiques | Plusieurs apps qui partagent du code |
-| Micro-frontends     | Des stands indépendants dans un food court | 3+ équipes, déploiement séparé |
+| Pattern            | Analogie                                   | Quand l'utiliser ?                   |
+| ------------------ | ------------------------------------------ | ------------------------------------ |
+| Service Layer      | Le serveur du restaurant                   | Dès que tu appelles une API          |
+| Repository         | Le bibliothécaire                          | Projets moyens à gros                |
+| Value Object       | Un email "garanti valide"                  | Quand tu as des règles métier        |
+| Clean Architecture | Les anneaux d'un oignon                    | Très gros projets                    |
+| Monorepo           | Un entrepôt pour 3 boutiques               | Plusieurs apps qui partagent du code |
+| Micro-frontends    | Des stands indépendants dans un food court | 3+ équipes, déploiement séparé       |
 
 > **Rappel** : tu n'as PAS besoin de tout ça pour démarrer.
 > Commence simple, et ajoute des patterns quand le besoin se fait sentir.
@@ -553,12 +555,12 @@ Transforme ce code en utilisant un service :
 ```vue
 <script setup lang="ts">
 async function createUser(data: UserData) {
-  const res = await fetch('/api/users', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  })
-  return res.json()
+  const res = await fetch("/api/users", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return res.json();
 }
 </script>
 ```
@@ -570,26 +572,27 @@ async function createUser(data: UserData) {
 // services/userService.ts
 export const userService = {
   async create(data: UserData): Promise<User> {
-    const res = await fetch('/api/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    })
-    if (!res.ok) throw new Error('Erreur création utilisateur')
-    return res.json()
-  }
-}
+    const res = await fetch("/api/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error("Erreur création utilisateur");
+    return res.json();
+  },
+};
 ```
 
 ```vue
 <script setup lang="ts">
-import { userService } from '@/services/userService'
+import { userService } from "@/services/userService";
 
 async function handleSubmit(data: UserData) {
-  const user = await userService.create(data)
+  const user = await userService.create(data);
 }
 </script>
 ```
+
 </details>
 
 ---
@@ -604,49 +607,50 @@ Crée un repository pour les produits :
 
 export const productRepository = {
   // ???
-}
+};
 ```
 
 <details>
 <summary>Solution</summary>
 
 ```ts
-const API_URL = '/api/products'
+const API_URL = "/api/products";
 
 export const productRepository = {
   async getAll(): Promise<Product[]> {
-    const res = await fetch(API_URL)
-    return res.json()
+    const res = await fetch(API_URL);
+    return res.json();
   },
 
   async getById(id: number): Promise<Product> {
-    const res = await fetch(`${API_URL}/${id}`)
-    return res.json()
+    const res = await fetch(`${API_URL}/${id}`);
+    return res.json();
   },
 
-  async create(data: Omit<Product, 'id'>): Promise<Product> {
+  async create(data: Omit<Product, "id">): Promise<Product> {
     const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    })
-    return res.json()
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return res.json();
   },
 
   async update(id: number, data: Partial<Product>): Promise<Product> {
     const res = await fetch(`${API_URL}/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    })
-    return res.json()
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return res.json();
   },
 
   async delete(id: number): Promise<void> {
-    await fetch(`${API_URL}/${id}`, { method: 'DELETE' })
-  }
-}
+    await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+  },
+};
 ```
+
 </details>
 
 ---
@@ -664,8 +668,8 @@ export class Email {
 }
 
 // Utilisation attendue :
-const email = new Email('test@example.com')  // OK
-const bad = new Email('invalid')             // Erreur !
+const email = new Email("test@example.com"); // OK
+const bad = new Email("invalid"); // Erreur !
 ```
 
 <details>
@@ -673,31 +677,36 @@ const bad = new Email('invalid')             // Erreur !
 
 ```ts
 export class Email {
-  private readonly value: string
+  private readonly value: string;
 
   constructor(email: string) {
     if (!this.isValid(email)) {
-      throw new Error(`Email invalide : ${email}`)
+      throw new Error(`Email invalide : ${email}`);
     }
-    this.value = email.toLowerCase()
+    this.value = email.toLowerCase();
   }
 
   private isValid(email: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
   toString(): string {
-    return this.value
+    return this.value;
   }
 
   equals(other: Email): boolean {
-    return this.value === other.value
+    return this.value === other.value;
   }
 }
 ```
+
 </details>
 
 ---
+
+## Exercice
+
+→ `exercices/19-architecture-patterns/ENONCE.md`
 
 ## Suite
 
@@ -708,6 +717,7 @@ export class Email {
 <!-- parcours-recommande -->
 
 ::: tip Parcours recommandé
+
 1. **Exercice** : [18-performance-audit](../../exercices/18-performance-audit/ENONCE)
 2. **Exercice** : [19-architecture-patterns](../../exercices/19-architecture-patterns/ENONCE)
-:::
+   :::

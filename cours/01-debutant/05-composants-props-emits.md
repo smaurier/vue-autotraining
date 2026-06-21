@@ -4,9 +4,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Quelle syntaxe utilise-t-on pour écouter un événement clic dans le template ?
 > 2. Que fait `v-model` sur un `<input>` ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -31,12 +32,12 @@ En Vue, les **composants** sont tes briques LEGO. Chaque composant est un fichie
 
 ## Pourquoi découper en composants ?
 
-| Avantage          | Explication                                                        |
-| ----------------- | ------------------------------------------------------------------ |
-| **Réutilisation** | Un composant `UserCard` peut être utilisé 50 fois dans ton app     |
-| **Lisibilité**    | Chaque fichier à un seul rôle → plus facile à lire                 |
-| **Testabilité**   | On peut tester chaque composant séparément                         |
-| **Maintenabilité**| Modifier un composant ne casse pas le reste de l'application       |
+| Avantage           | Explication                                                    |
+| ------------------ | -------------------------------------------------------------- |
+| **Réutilisation**  | Un composant `UserCard` peut être utilisé 50 fois dans ton app |
+| **Lisibilité**     | Chaque fichier à un seul rôle → plus facile à lire             |
+| **Testabilité**    | On peut tester chaque composant séparément                     |
+| **Maintenabilité** | Modifier un composant ne casse pas le reste de l'application   |
 
 ---
 
@@ -51,13 +52,13 @@ Avant de créer des composants, il faut comprendre comment JavaScript partage du
 
 // 'export' = "je rends cette fonction disponible pour les autres fichiers"
 export function addition(a: number, b: number): number {
-  return a + b
+  return a + b;
 }
 
 // 'export default' = "c'est l'export principal de ce fichier"
 // Un fichier ne peut avoir qu'UN SEUL export default
 export default function multiplication(a: number, b: number): number {
-  return a * b
+  return a * b;
 }
 ```
 
@@ -67,18 +68,19 @@ export default function multiplication(a: number, b: number): number {
 // fichier : app.ts
 
 // Import d'un export nommé → on met des accolades { }
-import { addition } from './mathUtils'
+import { addition } from "./mathUtils";
 
 // Import d'un export default → pas d'accolades, on choisit le nom qu'on veut
-import multiplication from './mathUtils'
+import multiplication from "./mathUtils";
 
-console.log(addition(2, 3))       // 5
-console.log(multiplication(2, 3)) // 6
+console.log(addition(2, 3)); // 5
+console.log(multiplication(2, 3)); // 6
 ```
 
 > 💡 En Vue, chaque fichier `.vue` est un **export default** (le composant entier). C'est pour ça qu'on l'importe sans accolades :
+>
 > ```ts
-> import UserCard from './components/UserCard.vue'  // pas de { }
+> import UserCard from "./components/UserCard.vue"; // pas de { }
 > ```
 
 ---
@@ -95,12 +97,12 @@ console.log(multiplication(2, 3)) // 6
 // On définit les "paramètres" du composant (les props)
 // C'est comme les paramètres d'une fonction
 interface Props {
-  name: string   // Le nom de l'utilisateur (texte obligatoire)
-  email: string  // L'email de l'utilisateur (texte obligatoire)
+  name: string; // Le nom de l'utilisateur (texte obligatoire)
+  email: string; // L'email de l'utilisateur (texte obligatoire)
 }
 
 // defineProps() dit à Vue : "ce composant attend ces données de son parent"
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 </script>
 
 <template>
@@ -121,7 +123,7 @@ const props = defineProps<Props>()
 <script setup lang="ts">
 // On importe le composant (comme on importe une fonction)
 // Pas de { } car c'est un export default
-import UserCard from './components/UserCard.vue'
+import UserCard from "./components/UserCard.vue";
 </script>
 
 <template>
@@ -153,15 +155,15 @@ Composant Vue :           <UserCard name="Alice" /> → "Alice" est la prop
 <script setup lang="ts">
 // On déclare une interface qui liste TOUTES les props acceptées
 interface Props {
-  title: string              // Obligatoire : un texte
-  count: number              // Obligatoire : un nombre
-  items: string[]            // Obligatoire : un tableau de textes
-  variant?: 'primary' | 'secondary'  // Optionnelle (le ? = pas obligatoire)
-                             // Ne peut valoir que "primary" ou "secondary"
+  title: string; // Obligatoire : un texte
+  count: number; // Obligatoire : un nombre
+  items: string[]; // Obligatoire : un tableau de textes
+  variant?: "primary" | "secondary"; // Optionnelle (le ? = pas obligatoire)
+  // Ne peut valoir que "primary" ou "secondary"
 }
 
 // defineProps<Props>() → dit à Vue "voici les données que j'attends"
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
 // On peut maintenant utiliser props.title, props.count, etc.
 </script>
@@ -174,16 +176,16 @@ Quand une prop est **optionnelle** (`?`), on peut lui donner une **valeur par d�
 ```vue
 <script setup lang="ts">
 interface Props {
-  title: string       // Obligatoire (pas de ?)
-  count?: number      // Optionnelle → valeur par défaut ci-dessous
-  showIcon?: boolean  // Optionnelle → valeur par défaut ci-dessous
+  title: string; // Obligatoire (pas de ?)
+  count?: number; // Optionnelle → valeur par défaut ci-dessous
+  showIcon?: boolean; // Optionnelle → valeur par défaut ci-dessous
 }
 
 // withDefaults() enveloppe defineProps() pour ajouter des valeurs par défaut
 const props = withDefaults(defineProps<Props>(), {
-  count: 0,        // Si le parent ne passe pas 'count', ce sera 0
-  showIcon: true,  // Si le parent ne passe pas 'showIcon', ce sera true
-})
+  count: 0, // Si le parent ne passe pas 'count', ce sera 0
+  showIcon: true, // Si le parent ne passe pas 'showIcon', ce sera true
+});
 </script>
 ```
 
@@ -193,20 +195,20 @@ Avant Vue 3.5, destructurer les props cassait la réactivité. Il fallait toujou
 
 ```vue
 <script setup lang="ts">
-import { watchEffect } from 'vue'
+import { watchEffect } from "vue";
 
 // ❌ Avant (Vue 3.4 et avant) : la destructuration casse la réactivité
 // const { count } = defineProps<{ count: number }>()
 // count ne serait plus réactif → watchEffect ne se redéclencherait pas
 
 // ✅ Après (Vue 3.5+) : la destructuration est reactive !
-const { count, msg = 'hello' } = defineProps<{
-  count: number
-  msg?: string
-}>()
+const { count, msg = "hello" } = defineProps<{
+  count: number;
+  msg?: string;
+}>();
 
 // count et msg restent réactifs
-watchEffect(() => console.log(count)) // se redéclenche quand count change
+watchEffect(() => console.log(count)); // se redéclenche quand count change
 
 // Les valeurs par défaut se mettent directement dans la destructuration
 // Plus besoin de withDefaults() pour les cas simples !
@@ -226,11 +228,11 @@ watchEffect(() => console.log(count)) // se redéclenche quand count change
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import UserCard from './components/UserCard.vue'
+import { ref } from "vue";
+import UserCard from "./components/UserCard.vue";
 
-const userName = ref<string>('Alice')
-const items = ref<string[]>(['pomme', 'banane'])
+const userName = ref<string>("Alice");
+const items = ref<string[]>(["pomme", "banane"]);
 </script>
 
 <template>
@@ -263,13 +265,13 @@ Une prop est une **donnée qui appartient au parent**. L'enfant peut la **lire**
 
 ```ts
 // ❌ INTERDIT — ne modifie jamais une prop directement
-props.count = 5
+props.count = 5;
 // Vue affichera une erreur dans la console !
 
 // ✅ Si tu as besoin de modifier la valeur, crée une COPIE locale
-const localCount = ref(props.count)
+const localCount = ref(props.count);
 // Maintenant tu peux modifier localCount sans toucher à la prop
-localCount.value = 5
+localCount.value = 5;
 ```
 
 > **Pourquoi ?** Parce que les données descendent du parent vers l'enfant. Si l'enfant modifie les props, le parent ne sait plus ce qui se passe → c'est le chaos !
@@ -322,26 +324,26 @@ Imagine le parent et l'enfant reliés par un **talkie-walkie** :
 const emit = defineEmits<{
   // (event: 'update', value: string): void
   //    → je peux envoyer un événement 'update' avec une valeur texte
-  (event: 'update', value: string): void
+  (event: "update", value: string): void;
 
   // → je peux envoyer un événement 'delete' avec un numéro (l'id)
-  (event: 'delete', id: number): void
+  (event: "delete", id: number): void;
 
   // → je peux envoyer un événement 'close' sans données
-  (event: 'close'): void
-}>()
+  (event: "close"): void;
+}>();
 
 // Fonction appelée quand l'utilisateur clique sur "Sauver"
 function handleSave(): void {
   // emit('update', 'nouvelle valeur')
   //   → envoie le message "update" au parent, avec la donnée "nouvelle valeur"
-  emit('update', 'nouvelle valeur')
+  emit("update", "nouvelle valeur");
 }
 
 // Fonction appelée quand l'utilisateur clique sur "Supprimer"
 function handleDelete(): void {
   // emit('delete', 42) → envoie le message "delete" avec l'id 42
-  emit('delete', 42)
+  emit("delete", 42);
 }
 </script>
 
@@ -366,18 +368,18 @@ function handleDelete(): void {
 
 <script setup lang="ts">
 // On importe le composant enfant
-import ChildComponent from './ChildComponent.vue'
+import ChildComponent from "./ChildComponent.vue";
 
 // Cette fonction sera appelée quand l'enfant émet 'update'
 // 'value' = la donnée envoyée par l'enfant
 function onUpdate(value: string): void {
-  console.log('Mis à jour :', value)
+  console.log("Mis à jour :", value);
 }
 
 // Cette fonction sera appelée quand l'enfant émet 'delete'
 // 'id' = le numéro envoyé par l'enfant
 function onDelete(id: number): void {
-  console.log('Supprimé :', id)
+  console.log("Supprimé :", id);
 }
 </script>
 
@@ -439,10 +441,10 @@ On a vu `v-model` sur les `<input>` HTML dans le cours précédent. Il fonctionn
 ```vue
 <!-- Parent -->
 <script setup lang="ts">
-import { ref } from 'vue'
-import CustomInput from './CustomInput.vue'
+import { ref } from "vue";
+import CustomInput from "./CustomInput.vue";
 
-const username = ref<string>('')
+const username = ref<string>("");
 </script>
 
 <template>
@@ -450,10 +452,7 @@ const username = ref<string>('')
   <CustomInput v-model="username" />
 
   <!-- C'est exactement la même chose que : -->
-  <CustomInput
-    :modelValue="username"
-    @update:modelValue="username = $event"
-  />
+  <CustomInput :modelValue="username" @update:modelValue="username = $event" />
   <!--
     :modelValue="username" → on envoie la valeur en prop
     @update:modelValue     → on écoute quand l'enfant met à jour
@@ -470,21 +469,21 @@ const username = ref<string>('')
 <script setup lang="ts">
 // On reçoit 'modelValue' en prop (c'est le nom spécial attendu par v-model)
 const props = defineProps<{
-  modelValue: string
-}>()
+  modelValue: string;
+}>();
 
 // On déclare qu'on peut émettre 'update:modelValue'
 // (c'est le nom spécial attendu par v-model)
 const emit = defineEmits<{
-  (event: 'update:modelValue', value: string): void
-}>()
+  (event: "update:modelValue", value: string): void;
+}>();
 
 // Quand l'utilisateur tape dans l'input
 function onInput(event: Event): void {
   // On récupère l'élément HTML
-  const target = event.target as HTMLInputElement
+  const target = event.target as HTMLInputElement;
   // On envoie la nouvelle valeur au parent via emit
-  emit('update:modelValue', target.value)
+  emit("update:modelValue", target.value);
 }
 </script>
 
@@ -504,11 +503,11 @@ Depuis Vue 3.4, `defineModel` remplace le combo prop + emit en **une seule ligne
 ```vue
 <!-- Parent -->
 <script setup lang="ts">
-import { ref } from 'vue'
-import UserForm from './UserForm.vue'
+import { ref } from "vue";
+import UserForm from "./UserForm.vue";
 
-const first = ref<string>('')
-const last = ref<string>('')
+const first = ref<string>("");
+const last = ref<string>("");
 </script>
 
 <template>
@@ -524,10 +523,10 @@ const last = ref<string>('')
 <script setup lang="ts">
 // defineModel() crée automatiquement la prop ET l'emit !
 // Plus besoin de defineProps + defineEmits séparément
-const firstName = defineModel<string>('firstName')
+const firstName = defineModel<string>("firstName");
 // → crée la prop 'firstName' + l'emit 'update:firstName'
 
-const lastName = defineModel<string>('lastName')
+const lastName = defineModel<string>("lastName");
 // → crée la prop 'lastName' + l'emit 'update:lastName'
 </script>
 
@@ -578,7 +577,7 @@ Un **slot** est un **espace réservé** dans un composant que le parent peut rem
 ```vue
 <!-- Parent — on remplit le slot -->
 <script setup lang="ts">
-import Card from './Card.vue'
+import Card from "./Card.vue";
 </script>
 
 <template>
@@ -592,6 +591,7 @@ import Card from './Card.vue'
 ```
 
 **Résultat HTML** :
+
 ```html
 <div class="card">
   <h2>Mon titre</h2>
@@ -643,7 +643,7 @@ Parfois, tu veux **plusieurs emplacements** dans ton composant. C'est comme un m
 ```vue
 <!-- Parent — on remplit chaque slot par son nom -->
 <script setup lang="ts">
-import Layout from './Layout.vue'
+import Layout from "./Layout.vue";
 </script>
 
 <template>
@@ -666,6 +666,7 @@ import Layout from './Layout.vue'
 ```
 
 **Résultat HTML** :
+
 ```html
 <header>
   <h1>Bienvenue sur mon site</h1>
@@ -701,20 +702,20 @@ import Layout from './Layout.vue'
 └───────────────────────────────────────────────────────────────┘
 ```
 
-| Concept           | Direction       | Syntaxe                                | Analogie                  |
-| ----------------- | --------------- | -------------------------------------- | ------------------------- |
-| **Props**         | Parent → Enfant | `:name="value"`                        | Paramètres de fonction    |
-| **Emits**         | Enfant → Parent | `emit('event', data)`                  | Talkie-walkie 📻          |
-| **v-model**       | ↕ Bidirectionnel| `v-model="data"`                       | Miroir magique 🪞         |
-| **Slots**         | Parent → Enfant | `<slot>` + contenu entre balises       | Trou dans le mur 🕳️      |
-| **defineModel**   | ↕ Simplifié     | `const x = defineModel('name')`        | v-model en une ligne      |
-| **withDefaults**  | Props par défaut| `withDefaults(defineProps(), {...})`    | Valeurs de secours        |
+| Concept          | Direction        | Syntaxe                              | Analogie               |
+| ---------------- | ---------------- | ------------------------------------ | ---------------------- |
+| **Props**        | Parent → Enfant  | `:name="value"`                      | Paramètres de fonction |
+| **Emits**        | Enfant → Parent  | `emit('event', data)`                | Talkie-walkie 📻       |
+| **v-model**      | ↕ Bidirectionnel | `v-model="data"`                     | Miroir magique 🪞      |
+| **Slots**        | Parent → Enfant  | `<slot>` + contenu entre balises     | Trou dans le mur 🕳️    |
+| **defineModel**  | ↕ Simplifié      | `const x = defineModel('name')`      | v-model en une ligne   |
+| **withDefaults** | Props par défaut | `withDefaults(defineProps(), {...})` | Valeurs de secours     |
 
 ---
 
 ## Exercice
 
-→ `exercices/04-catalogue-produits/ENONCE.md`
+→ `exercices/05-catalogue-produits/ENONCE.md`
 
 ## Suite
 

@@ -4,9 +4,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Quelle est la différence entre `watch` et `watchEffect` ?
 > 2. À quoi sert `toRefs()` quand on déstructure un objet réactif ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -41,14 +42,16 @@ interface Counter {
 }
 
 function createCounter(): Counter {
-  let count: number = 0;                       // Une variable interne
+  let count: number = 0; // Une variable interne
 
-  function increment(): void {               // Une fonction interne
+  function increment(): void {
+    // Une fonction interne
     count++;
     console.log("count =", count);
   }
 
-  function reset(): void {                   // Une autre fonction interne
+  function reset(): void {
+    // Une autre fonction interne
     count = 0;
     console.log("count remis à 0");
   }
@@ -58,10 +61,10 @@ function createCounter(): Counter {
 }
 
 // Utilisation :
-const counter: Counter = createCounter();       // On appelle la fonction
-counter.increment();                   // count = 1
-counter.increment();                   // count = 2
-counter.reset();                       // count remis à 0
+const counter: Counter = createCounter(); // On appelle la fonction
+counter.increment(); // count = 1
+counter.increment(); // count = 2
+counter.reset(); // count remis à 0
 ```
 
 ### 📌 Rappel JavaScript : la déstructuration d'objet
@@ -93,6 +96,7 @@ Tous les composables commencent par **`use`** suivi du nom en camelCase :
 **Pourquoi `use` ?** C'est une convention popularisée par React Hooks et adoptée par Vue. Quand tu vois `use...`, tu sais immédiatement que c'est un composable qui contient de la logique réactive.
 
 Les fichiers se placent dans un dossier `composables/` :
+
 ```
 src/
   composables/
@@ -109,18 +113,20 @@ Commençons par un composable minimaliste pour comprendre la structure :
 
 ```ts
 // composables/useCounter.ts
-import { ref } from "vue";                  // On importe ref depuis Vue
+import { ref } from "vue"; // On importe ref depuis Vue
 
 // Le composable est une simple fonction exportée
 // Elle commence par "use" : c'est la convention
 export function useCounter() {
-  const count = ref<number>(0);              // On crée une donnée réactive (un compteur)
+  const count = ref<number>(0); // On crée une donnée réactive (un compteur)
 
-  function increment(): void {               // Fonction pour augmenter de 1
-    count.value++;                           // On modifie la valeur de la ref
+  function increment(): void {
+    // Fonction pour augmenter de 1
+    count.value++; // On modifie la valeur de la ref
   }
 
-  function decrement(): void {               // Fonction pour diminuer de 1
+  function decrement(): void {
+    // Fonction pour diminuer de 1
     count.value--;
   }
 
@@ -166,7 +172,7 @@ import { ref, computed } from "vue";
 // min : valeur minimum (par défaut : 0)
 // max : valeur maximum (par défaut : Infinity = infini)
 export function useCounter(initial = 0, min = 0, max = Infinity) {
-  const count = ref<number>(initial);        // Le compteur commence à "initial"
+  const count = ref<number>(initial); // Le compteur commence à "initial"
 
   // computed = valeur calculée automatiquement
   // canDecrement sera true si count > min (on peut encore diminuer)
@@ -175,15 +181,15 @@ export function useCounter(initial = 0, min = 0, max = Infinity) {
   const canIncrement = computed(() => count.value < max);
 
   function increment(): void {
-    if (canIncrement.value) count.value++;    // Augmente seulement si on n'est pas au max
+    if (canIncrement.value) count.value++; // Augmente seulement si on n'est pas au max
   }
 
   function decrement(): void {
-    if (canDecrement.value) count.value--;    // Diminue seulement si on n'est pas au min
+    if (canDecrement.value) count.value--; // Diminue seulement si on n'est pas au min
   }
 
   function reset(): void {
-    count.value = initial;                    // Remet le compteur à sa valeur initiale
+    count.value = initial; // Remet le compteur à sa valeur initiale
   }
 
   // On retourne tout ce qui peut être utile à l'extérieur
@@ -196,7 +202,8 @@ export function useCounter(initial = 0, min = 0, max = Infinity) {
 import { useCounter } from "@/composables/useCounter";
 
 // On crée un compteur qui va de 0 à 10
-const { count, increment, decrement, reset, canIncrement, canDecrement } = useCounter(0, 0, 10);
+const { count, increment, decrement, reset, canIncrement, canDecrement } =
+  useCounter(0, 0, 10);
 // count commence à 0, ne peut pas descendre en dessous de 0 ni dépasser 10
 </script>
 
@@ -249,13 +256,13 @@ import { ref, onMounted, onUnmounted } from "vue";
 
 // Interface = la forme de l'objet qu'on va retourner
 interface WindowSize {
-  width: number;   // Largeur de la fenêtre en pixels
-  height: number;  // Hauteur de la fenêtre en pixels
+  width: number; // Largeur de la fenêtre en pixels
+  height: number; // Hauteur de la fenêtre en pixels
 }
 
 export function useWindowSize(): WindowSize {
   // On crée deux refs avec la taille actuelle de la fenêtre
-  const width = ref<number>(window.innerWidth);   // Largeur actuelle
+  const width = ref<number>(window.innerWidth); // Largeur actuelle
   const height = ref<number>(window.innerHeight); // Hauteur actuelle
 
   // Cette fonction met à jour nos refs quand la fenêtre est redimensionnée
@@ -303,7 +310,10 @@ setTimeout(() => {
 }, 500);
 
 // clearTimeout ANNULE un setTimeout avant qu'il s'exécute
-const timer: ReturnType<typeof setTimeout> = setTimeout(() => console.log("..."), 500);
+const timer: ReturnType<typeof setTimeout> = setTimeout(
+  () => console.log("..."),
+  500,
+);
 clearTimeout(timer); // Annulé ! Le console.log ne s'exécutera jamais.
 
 // Le "debounce" c'est : "attend que l'utilisateur ait FINI de taper
@@ -330,9 +340,10 @@ export function useDebounce<T>(source: Ref<T>, delay = 300): Ref<T> {
 
   // On surveille la source : à chaque changement...
   watch(source, (val) => {
-    clearTimeout(timeout);           // ...on annule le timer précédent
-    timeout = setTimeout(() => {     // ...on lance un nouveau timer
-      debounced.value = val;         // ...qui met à jour la valeur après le délai
+    clearTimeout(timeout); // ...on annule le timer précédent
+    timeout = setTimeout(() => {
+      // ...on lance un nouveau timer
+      debounced.value = val; // ...qui met à jour la valeur après le délai
     }, delay);
   });
 
@@ -345,8 +356,8 @@ export function useDebounce<T>(source: Ref<T>, delay = 300): Ref<T> {
 import { ref } from "vue";
 import { useDebounce } from "@/composables/useDebounce";
 
-const search = ref<string>("");                      // Ce que l'utilisateur tape
-const debouncedSearch = useDebounce(search, 500);    // Version "retardée" (500ms)
+const search = ref<string>(""); // Ce que l'utilisateur tape
+const debouncedSearch = useDebounce(search, 500); // Version "retardée" (500ms)
 
 // Quand l'utilisateur tape "bonjour" caractère par caractère :
 // search change à chaque lettre : "b", "bo", "bon", "bonj", "bonjo", "bonjou", "bonjour"
@@ -374,11 +385,11 @@ async function chargerDonnees(): Promise<void> {
   try {
     // try = "essaie d'exécuter ce code"
     const response: Response = await fetch("/api/users"); // Envoie une requête HTTP
-    const data: unknown = await response.json();          // Convertit la réponse en objet
-    console.log(data);                                    // Affiche les données
+    const data: unknown = await response.json(); // Convertit la réponse en objet
+    console.log(data); // Affiche les données
   } catch (err: unknown) {
     // catch = "si ça échoue, exécute ce code"
-    console.error("Erreur :", err);             // Affiche l'erreur
+    console.error("Erreur :", err); // Affiche l'erreur
   }
 }
 ```
@@ -392,17 +403,18 @@ Ce composable est un **outil générique** pour charger des données depuis une 
 import { ref, type Ref } from "vue";
 
 // Les 4 états possibles d'un chargement
-type AsyncStatus = "idle"      // Pas encore lancé
-                 | "loading"   // En cours de chargement
-                 | "error"     // Échec
-                 | "success";  // Succès
+type AsyncStatus =
+  | "idle" // Pas encore lancé
+  | "loading" // En cours de chargement
+  | "error" // Échec
+  | "success"; // Succès
 
 // L'interface décrit ce que le composable va retourner
 interface UseAsyncDataReturn<T> {
-  data: Ref<T | null>;           // Les données (null si pas encore chargées)
-  error: Ref<string | null>;     // Le message d'erreur (null si tout va bien)
-  status: Ref<AsyncStatus>;      // L'état actuel
-  execute: () => Promise<void>;  // La fonction pour lancer le chargement
+  data: Ref<T | null>; // Les données (null si pas encore chargées)
+  error: Ref<string | null>; // Le message d'erreur (null si tout va bien)
+  status: Ref<AsyncStatus>; // L'état actuel
+  execute: () => Promise<void>; // La fonction pour lancer le chargement
 }
 
 // fetcher = une fonction qui retourne une Promise (= une promesse de données)
@@ -410,22 +422,22 @@ interface UseAsyncDataReturn<T> {
 export function useAsyncData<T>(
   fetcher: () => Promise<T>,
 ): UseAsyncDataReturn<T> {
-  const data = ref<T | null>(null) as Ref<T | null>;  // Les données (vide au départ)
-  const error = ref<string | null>(null);              // L'erreur (aucune au départ)
-  const status = ref<AsyncStatus>("idle");             // L'état (pas encore lancé)
+  const data = ref<T | null>(null) as Ref<T | null>; // Les données (vide au départ)
+  const error = ref<string | null>(null); // L'erreur (aucune au départ)
+  const status = ref<AsyncStatus>("idle"); // L'état (pas encore lancé)
 
   // La fonction qui lance le chargement
   async function execute(): Promise<void> {
-    status.value = "loading";    // On passe en mode "chargement"
-    error.value = null;          // On efface l'erreur précédente
+    status.value = "loading"; // On passe en mode "chargement"
+    error.value = null; // On efface l'erreur précédente
 
     try {
-      data.value = await fetcher();  // On attend les données
-      status.value = "success";       // Tout s'est bien passé !
+      data.value = await fetcher(); // On attend les données
+      status.value = "success"; // Tout s'est bien passé !
     } catch (err) {
       // Si ça échoue, on récupère le message d'erreur
       error.value = err instanceof Error ? err.message : "Erreur inconnue";
-      status.value = "error";         // On passe en mode "erreur"
+      status.value = "error"; // On passe en mode "erreur"
     }
   }
 
@@ -442,19 +454,19 @@ import { useAsyncData } from "@/composables/useAsyncData";
 
 // On définit la forme d'un utilisateur
 interface User {
-  id: number;     // Identifiant
-  name: string;   // Nom
+  id: number; // Identifiant
+  name: string; // Nom
 }
 
 // On utilise le composable pour charger une liste d'utilisateurs
 const {
-  data: users,     // On renomme "data" en "users" pour plus de clarté
-  status,          // L'état (idle, loading, error, success)
-  error,           // Le message d'erreur éventuel
-  execute,         // La fonction de chargement
+  data: users, // On renomme "data" en "users" pour plus de clarté
+  status, // L'état (idle, loading, error, success)
+  error, // Le message d'erreur éventuel
+  execute, // La fonction de chargement
 } = useAsyncData<User[]>(
   // Le fetcher : une fonction qui va chercher les données
-  () => fetch("/api/users").then((r) => r.json())
+  () => fetch("/api/users").then((r) => r.json()),
 );
 
 // onMounted = "quand le composant apparaît, lance le chargement"
@@ -480,7 +492,7 @@ Parfois, un composable a besoin de récupérer quelque chose fourni par un paren
 ```ts
 // composables/useApi.ts
 import { inject } from "vue";
-import { ApiClientKey } from "@/types";  // La clé d'injection (voir provide/inject)
+import { ApiClientKey } from "@/types"; // La clé d'injection (voir provide/inject)
 
 export function useApi() {
   // inject() récupère ce qu'un composant parent a fourni avec provide()
@@ -503,8 +515,8 @@ Un composable peut **utiliser d'autres composables** ! C'est comme empiler des b
 ```ts
 // composables/useSearchUsers.ts
 import { ref, watch } from "vue";
-import { useDebounce } from "./useDebounce";       // Composable de debounce
-import { useAsyncData } from "./useAsyncData";     // Composable de chargement
+import { useDebounce } from "./useDebounce"; // Composable de debounce
+import { useAsyncData } from "./useAsyncData"; // Composable de chargement
 
 interface User {
   id: number;
@@ -512,7 +524,7 @@ interface User {
 }
 
 export function useSearchUsers() {
-  const search = ref<string>("");                   // Ce que l'utilisateur tape
+  const search = ref<string>(""); // Ce que l'utilisateur tape
   const debouncedSearch = useDebounce(search, 300); // Version retardée (300ms)
 
   // On configure le chargement des utilisateurs
@@ -560,13 +572,13 @@ En Vue 2, pour partager de la logique entre composants, on utilisait les **mixin
 
 ### Comparaison : mixins vs composables
 
-| Problème                        | Mixins ❌                                       | Composables ✅                                    |
-| ------------------------------- | ----------------------------------------------- | ------------------------------------------------ |
-| **D'où vient cette variable ?** | Impossible à savoir (fusionnée magiquement)     | Clair : `const { count } = useCounter()`         |
-| **Conflits de noms**            | Si 2 mixins ont un `data.count`, ça casse       | Chaque composable a son propre scope             |
-| **TypeScript**                  | Très mauvais support                            | Support parfait (tout est typé)                  |
-| **Testabilité**                 | Difficile (dépend du composant)                 | Facile (fonction pure, testable seule)           |
-| **Composition**                 | Les mixins ne se composent pas bien entre eux   | Les composables s'empilent comme des LEGO        |
+| Problème                        | Mixins ❌                                     | Composables ✅                            |
+| ------------------------------- | --------------------------------------------- | ----------------------------------------- |
+| **D'où vient cette variable ?** | Impossible à savoir (fusionnée magiquement)   | Clair : `const { count } = useCounter()`  |
+| **Conflits de noms**            | Si 2 mixins ont un `data.count`, ça casse     | Chaque composable a son propre scope      |
+| **TypeScript**                  | Très mauvais support                          | Support parfait (tout est typé)           |
+| **Testabilité**                 | Difficile (dépend du composant)               | Facile (fonction pure, testable seule)    |
+| **Composition**                 | Les mixins ne se composent pas bien entre eux | Les composables s'empilent comme des LEGO |
 
 **En résumé :** les composables sont plus clairs, plus sûrs, plus testables et plus flexibles. Il n'y a aucune raison d'utiliser des mixins en Vue 3.
 
@@ -574,15 +586,15 @@ En Vue 2, pour partager de la logique entre composants, on utilisait les **mixin
 
 ## Récapitulatif
 
-| Concept                  | Explication                                                                 |
-| ------------------------ | --------------------------------------------------------------------------- |
-| Composable               | Fonction `use...()` qui contient de la logique réactive réutilisable        |
-| Convention de nommage    | `use` + nom en camelCase → `useCounter`, `useAuth`, `useFetch`              |
-| Retour                   | Un objet avec des refs, computed, fonctions                                 |
-| Paramètres               | Peuvent être des valeurs simples ou des refs (paramètres réactifs)          |
-| Side effects             | Toujours nettoyer dans `onUnmounted` (removeEventListener, clearTimeout...) |
-| Composition              | Un composable peut utiliser d'autres composables                            |
-| Avantage vs mixins       | Clarté, typage, pas de conflits de noms, testable                           |
+| Concept               | Explication                                                                 |
+| --------------------- | --------------------------------------------------------------------------- |
+| Composable            | Fonction `use...()` qui contient de la logique réactive réutilisable        |
+| Convention de nommage | `use` + nom en camelCase → `useCounter`, `useAuth`, `useFetch`              |
+| Retour                | Un objet avec des refs, computed, fonctions                                 |
+| Paramètres            | Peuvent être des valeurs simples ou des refs (paramètres réactifs)          |
+| Side effects          | Toujours nettoyer dans `onUnmounted` (removeEventListener, clearTimeout...) |
+| Composition           | Un composable peut utiliser d'autres composables                            |
+| Avantage vs mixins    | Clarté, typage, pas de conflits de noms, testable                           |
 
 ---
 
@@ -617,26 +629,27 @@ export function useToggle(initial = false) {
 <summary>Solution</summary>
 
 ```ts
-import { ref } from 'vue'
+import { ref } from "vue";
 
 export function useToggle(initial = false) {
-  const isActive = ref(initial)
+  const isActive = ref(initial);
 
   function toggle() {
-    isActive.value = !isActive.value
+    isActive.value = !isActive.value;
   }
 
   function setTrue() {
-    isActive.value = true
+    isActive.value = true;
   }
 
   function setFalse() {
-    isActive.value = false
+    isActive.value = false;
   }
 
-  return { isActive, toggle, setTrue, setFalse }
+  return { isActive, toggle, setTrue, setFalse };
 }
 ```
+
 </details>
 
 ---
@@ -664,20 +677,21 @@ export function useFullName(firstName: Ref<string>, lastName: Ref<string>) {
 <summary>Solution</summary>
 
 ```ts
-import { computed, type Ref } from 'vue'
+import { computed, type Ref } from "vue";
 
 export function useFullName(firstName: Ref<string>, lastName: Ref<string>) {
-  const fullName = computed(() => `${firstName.value} ${lastName.value}`)
+  const fullName = computed(() => `${firstName.value} ${lastName.value}`);
 
   const initials = computed(() => {
-    const f = firstName.value.charAt(0).toUpperCase()
-    const l = lastName.value.charAt(0).toUpperCase()
-    return `${f}.${l}.`
-  })
+    const f = firstName.value.charAt(0).toUpperCase();
+    const l = lastName.value.charAt(0).toUpperCase();
+    return `${f}.${l}.`;
+  });
 
-  return { fullName, initials }
+  return { fullName, initials };
 }
 ```
+
 </details>
 
 ---
@@ -688,12 +702,11 @@ Complète ce composable `useInterval` qui exécute une fonction régulièrement 
 
 ```ts
 // composables/useInterval.ts
-import { onUnmounted } from 'vue'
+import { onUnmounted } from "vue";
 
 export function useInterval(callback: () => void, delay: number) {
   // Lance l'intervalle
   // ???
-
   // Arrête l'intervalle quand le composant est détruit
   // ???
 }
@@ -703,16 +716,17 @@ export function useInterval(callback: () => void, delay: number) {
 <summary>Solution</summary>
 
 ```ts
-import { onUnmounted } from 'vue'
+import { onUnmounted } from "vue";
 
 export function useInterval(callback: () => void, delay: number) {
-  const intervalId = setInterval(callback, delay)
+  const intervalId = setInterval(callback, delay);
 
   onUnmounted(() => {
-    clearInterval(intervalId)
-  })
+    clearInterval(intervalId);
+  });
 }
 ```
+
 </details>
 
 ---
@@ -743,21 +757,26 @@ export function useLocalStorage<T>(key: string, defaultValue: T): Ref<T> {
 <summary>Solution</summary>
 
 ```ts
-import { ref, watch, type Ref } from 'vue'
+import { ref, watch, type Ref } from "vue";
 
 export function useLocalStorage<T>(key: string, defaultValue: T): Ref<T> {
-  const stored = localStorage.getItem(key)
-  const initial = stored ? JSON.parse(stored) : defaultValue
+  const stored = localStorage.getItem(key);
+  const initial = stored ? JSON.parse(stored) : defaultValue;
 
-  const data = ref<T>(initial) as Ref<T>
+  const data = ref<T>(initial) as Ref<T>;
 
-  watch(data, (newVal) => {
-    localStorage.setItem(key, JSON.stringify(newVal))
-  }, { deep: true })
+  watch(
+    data,
+    (newVal) => {
+      localStorage.setItem(key, JSON.stringify(newVal));
+    },
+    { deep: true },
+  );
 
-  return data
+  return data;
 }
 ```
+
 </details>
 
 ---
@@ -783,14 +802,14 @@ npm install @vueuse/core
 #### `useLocalStorage` — Persistance réactive
 
 ```ts
-import { useLocalStorage } from '@vueuse/core'
+import { useLocalStorage } from "@vueuse/core";
 
 // Crée une ref synchronisée avec localStorage
 // Si la clé existe déjà, la valeur est restaurée automatiquement
-const theme = useLocalStorage('theme', 'light')
+const theme = useLocalStorage("theme", "light");
 // theme est une Ref<string>
 
-theme.value = 'dark'
+theme.value = "dark";
 // → localStorage.setItem('theme', '"dark"') est appelé automatiquement
 // → Au prochain chargement, theme.value sera 'dark'
 ```
@@ -800,10 +819,10 @@ C'est comme ton exercice CP.4, mais en **mieux** : VueUse gère la sérialisatio
 #### `useDark` — Mode sombre en une ligne
 
 ```ts
-import { useDark, useToggle } from '@vueuse/core'
+import { useDark, useToggle } from "@vueuse/core";
 
-const isDark = useDark()          // Détecte automatiquement la préférence système
-const toggleDark = useToggle(isDark) // Fonction pour basculer
+const isDark = useDark(); // Détecte automatiquement la préférence système
+const toggleDark = useToggle(isDark); // Fonction pour basculer
 
 // isDark est une Ref<boolean> réactive
 // Elle ajoute/retire la classe 'dark' sur <html> automatiquement
@@ -813,16 +832,16 @@ const toggleDark = useToggle(isDark) // Fonction pour basculer
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useIntersectionObserver } from '@vueuse/core'
+import { ref } from "vue";
+import { useIntersectionObserver } from "@vueuse/core";
 
-const target = ref<HTMLElement | null>(null) // Référence vers l'élément HTML
-const isVisible = ref(false)
+const target = ref<HTMLElement | null>(null); // Référence vers l'élément HTML
+const isVisible = ref(false);
 
 // Quand l'élément entre/sort du viewport, isVisible est mis à jour
 useIntersectionObserver(target, ([entry]) => {
-  isVisible.value = entry.isIntersecting
-})
+  isVisible.value = entry.isIntersecting;
+});
 </script>
 
 <template>
@@ -838,12 +857,10 @@ Cas d'usage typique : lazy loading d'images, animations au scroll, infinite scro
 #### `useFetch` — Requêtes HTTP réactives
 
 ```ts
-import { useFetch } from '@vueuse/core'
+import { useFetch } from "@vueuse/core";
 
 // Lance la requête immédiatement et retourne des refs réactives
-const { data, error, isFetching } = useFetch<User[]>('/api/users')
-  .get()
-  .json()
+const { data, error, isFetching } = useFetch<User[]>("/api/users").get().json();
 
 // data : Ref<User[] | null>
 // error : Ref<any>
@@ -856,37 +873,37 @@ La vraie puissance apparaît quand tu **combines** VueUse avec ta logique métie
 
 ```ts
 // composables/useUserPreferences.ts
-import { useLocalStorage, useDark } from '@vueuse/core'
-import { computed } from 'vue'
+import { useLocalStorage, useDark } from "@vueuse/core";
+import { computed } from "vue";
 
 interface UserPreferences {
-  fontSize: number
-  language: string
-  notifications: boolean
+  fontSize: number;
+  language: string;
+  notifications: boolean;
 }
 
 export function useUserPreferences() {
   // VueUse gère la persistance
-  const preferences = useLocalStorage<UserPreferences>('user-prefs', {
+  const preferences = useLocalStorage<UserPreferences>("user-prefs", {
     fontSize: 16,
-    language: 'fr',
+    language: "fr",
     notifications: true,
-  })
+  });
 
   // VueUse gère le mode sombre
-  const isDark = useDark()
+  const isDark = useDark();
 
   // Ta logique métier par-dessus
   const cssVariables = computed(() => ({
-    '--font-size': `${preferences.value.fontSize}px`,
-    '--theme': isDark.value ? 'dark' : 'light',
-  }))
+    "--font-size": `${preferences.value.fontSize}px`,
+    "--theme": isDark.value ? "dark" : "light",
+  }));
 
   function resetToDefaults(): void {
-    preferences.value = { fontSize: 16, language: 'fr', notifications: true }
+    preferences.value = { fontSize: 16, language: "fr", notifications: true };
   }
 
-  return { preferences, isDark, cssVariables, resetToDefaults }
+  return { preferences, isDark, cssVariables, resetToDefaults };
 }
 ```
 
@@ -894,13 +911,13 @@ export function useUserPreferences() {
 
 VueUse est excellent, mais il ne faut pas en abuser :
 
-| Situation | Utiliser VueUse ? | Pourquoi |
-|-----------|-------------------|----------|
-| Logique standard (localStorage, dark mode, fetch) | Oui | Déjà testé, documenté, edge cases gérés |
-| Logique métier spécifique | Non | Écris ton propre composable |
-| Composable de 5 lignes | Non | L'import VueUse est plus lourd que le code |
-| Apprentissage | Non d'abord | Comprends le mécanisme avant d'utiliser la lib |
-| Un seul composable VueUse | Peut-être | Ça vaut le coup d'ajouter une dépendance ? |
+| Situation                                         | Utiliser VueUse ? | Pourquoi                                       |
+| ------------------------------------------------- | ----------------- | ---------------------------------------------- |
+| Logique standard (localStorage, dark mode, fetch) | Oui               | Déjà testé, documenté, edge cases gérés        |
+| Logique métier spécifique                         | Non               | Écris ton propre composable                    |
+| Composable de 5 lignes                            | Non               | L'import VueUse est plus lourd que le code     |
+| Apprentissage                                     | Non d'abord       | Comprends le mécanisme avant d'utiliser la lib |
+| Un seul composable VueUse                         | Peut-être         | Ça vaut le coup d'ajouter une dépendance ?     |
 
 > **Principe de simplicité** : n'ajoute pas une dépendance pour remplacer 10 lignes de code. Utilise VueUse quand tu as besoin de **plusieurs** de ses composables, ou quand le composable VueUse gère des edge cases complexes (SSR, synchronisation onglets, nettoyage...) que tu ne veux pas gérer toi-même.
 
@@ -920,7 +937,7 @@ VueUse est excellent, mais il ne faut pas en abuser :
 
 ## Exercice
 
-→ `exercices/06-dashboard-filtres/ENONCE.md`
+→ `exercices/09-dashboard-composables/ENONCE.md`
 
 ## Suite
 

@@ -4,9 +4,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Quelle est la convention de nommage pour un composable ?
 > 2. Que doit retourner un composable pour être utilisé dans un composant ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -42,6 +43,7 @@ const maPromesse: Promise<Response> = fetch("https://api.exemple.com/donnees");
 ```
 
 Une Promise peut avoir 3 états :
+
 - **pending** (en attente) — la cuisine prépare encore
 - **fulfilled** (résolue) — le plat est arrivé ! 🎉
 - **rejected** (rejetée) — il y a eu un problème (plus de stock, four en panne...) ❌
@@ -103,6 +105,7 @@ try {
 C'est comme un **menu de restaurant** : le serveur (l'API) te propose une liste de plats (de données) que tu peux commander (demander).
 
 Exemple concret :
+
 - Tu appelles `https://api.monsite.com/produits` → tu reçois la **liste des produits**
 - Tu appelles `https://api.monsite.com/produits/42` → tu reçois le **produit n°42**
 
@@ -115,9 +118,9 @@ L'outil pour faire ces appels en JavaScript, c'est la fonction `fetch()`.
 const reponse: Response = await fetch("https://api.monsite.com/produits");
 
 // L'objet Response contient :
-reponse.ok;       // true si tout va bien (code 200-299), false sinon
-reponse.status;   // Le code HTTP (200 = OK, 404 = pas trouvé, 500 = erreur serveur)
-reponse.json();   // Une méthode pour transformer la réponse en objet typé
+reponse.ok; // true si tout va bien (code 200-299), false sinon
+reponse.status; // Le code HTTP (200 = OK, 404 = pas trouvé, 500 = erreur serveur)
+reponse.json(); // Une méthode pour transformer la réponse en objet typé
 ```
 
 ---
@@ -126,12 +129,12 @@ reponse.json();   // Une méthode pour transformer la réponse en objet typé
 
 Tout appel réseau peut se trouver dans **4 états** différents :
 
-| État | Signification | Analogie restaurant |
-|------|--------------|---------------------|
-| `idle` | Rien ne s'est passé encore | Tu n'as pas encore commandé |
-| `loading` | En cours de chargement | La cuisine prépare ton plat |
-| `error` | Ça a échoué | Le plat est en rupture de stock |
-| `success` | Les données sont arrivées | Ton plat est sur la table ! |
+| État      | Signification              | Analogie restaurant             |
+| --------- | -------------------------- | ------------------------------- |
+| `idle`    | Rien ne s'est passé encore | Tu n'as pas encore commandé     |
+| `loading` | En cours de chargement     | La cuisine prépare ton plat     |
+| `error`   | Ça a échoué                | Le plat est en rupture de stock |
+| `success` | Les données sont arrivées  | Ton plat est sur la table !     |
 
 Il faut **toujours** gérer ces 4 cas dans ton interface, sinon l'utilisateur ne sait pas ce qui se passe.
 
@@ -141,10 +144,10 @@ Il faut **toujours** gérer ces 4 cas dans ton interface, sinon l'utilisateur ne
 // On crée un type qui ne peut être QUE dans l'un de ces 4 états
 // Le <T> veut dire "le type des données peut varier" (on verra les generics plus tard)
 type AsyncState<T> =
-  | { status: "idle" }                           // Pas encore commencé
-  | { status: "loading" }                        // En cours de chargement
-  | { status: "error"; error: string }           // Erreur avec un message
-  | { status: "success"; data: T };              // Succès avec les données
+  | { status: "idle" } // Pas encore commencé
+  | { status: "loading" } // En cours de chargement
+  | { status: "error"; error: string } // Erreur avec un message
+  | { status: "success"; data: T }; // Succès avec les données
 ```
 
 ---
@@ -160,9 +163,9 @@ import { ref, onMounted } from "vue";
 
 // On définit la forme d'un produit (typage TypeScript)
 interface Product {
-  id: number;       // Identifiant unique
-  name: string;     // Nom du produit
-  price: number;    // Prix en euros
+  id: number; // Identifiant unique
+  name: string; // Nom du produit
+  price: number; // Prix en euros
 }
 
 // --- Les 3 variables réactives pour gérer nos états ---
@@ -178,8 +181,8 @@ const isLoading = ref<boolean>(false);
 
 // --- La fonction qui va chercher les produits ---
 async function fetchProducts(): Promise<void> {
-  isLoading.value = true;    // On passe en mode "chargement"
-  error.value = null;         // On réinitialise l'erreur
+  isLoading.value = true; // On passe en mode "chargement"
+  error.value = null; // On réinitialise l'erreur
 
   try {
     // On demande les produits au serveur
@@ -193,12 +196,10 @@ async function fetchProducts(): Promise<void> {
 
     // On transforme la réponse en tableau de produits
     products.value = await response.json();
-
   } catch (err) {
     // Si quelque chose a échoué (réseau, serveur...), on stocke le message d'erreur
     // On vérifie que err est bien un objet Error pour accéder à .message
     error.value = err instanceof Error ? err.message : "Erreur inconnue";
-
   } finally {
     // Dans TOUS les cas (succès ou erreur), on arrête le chargement
     isLoading.value = false;
@@ -219,9 +220,7 @@ onMounted(fetchProducts);
   <!-- État "success" : on affiche la liste des produits -->
   <ul v-else>
     <!-- v-for parcourt chaque produit, :key identifie chaque élément de façon unique -->
-    <li v-for="p in products" :key="p.id">
-      {{ p.name }} - {{ p.price }}€
-    </li>
+    <li v-for="p in products" :key="p.id">{{ p.name }} - {{ p.price }}€</li>
   </ul>
 </template>
 ```
@@ -260,7 +259,6 @@ async function search(query: string): Promise<void> {
     });
     // Si on arrive ici, la requête a réussi
     results.value = await res.json();
-
   } catch (err) {
     // Si la requête a été ANNULÉE (par nous), on ignore l'erreur
     if (err instanceof DOMException && err.name === "AbortError") {
@@ -301,11 +299,10 @@ async function toggleFavorite(productId: number): Promise<void> {
   try {
     // ÉTAPE 3 : On envoie le changement au serveur
     await fetch(`/api/products/${productId}/favorite`, {
-      method: "PATCH",   // PATCH = modifier partiellement une ressource
+      method: "PATCH", // PATCH = modifier partiellement une ressource
       body: JSON.stringify({ favorite: product.favorite }), // On envoie le nouvel état
     });
     // Si on arrive ici, le serveur a confirmé, tout va bien !
-
   } catch {
     // ÉTAPE 4 (si échec) : On ANNULE le changement (rollback)
     product.favorite = wasFavorite;
@@ -324,11 +321,10 @@ Parfois, un appel réseau échoue juste parce que le réseau a eu un hoquet. On 
 // Cette fonction réessaie un appel jusqu'à "maxRetries" fois
 // Si ça échoue à chaque fois, elle renvoie l'erreur
 async function fetchWithRetry<T>(
-  fetcher: () => Promise<T>,   // La fonction à réessayer
-  maxRetries = 3,              // Nombre max de tentatives (3 par défaut)
-  delay = 1000,                // Délai entre les tentatives en millisecondes (1s par défaut)
+  fetcher: () => Promise<T>, // La fonction à réessayer
+  maxRetries = 3, // Nombre max de tentatives (3 par défaut)
+  delay = 1000, // Délai entre les tentatives en millisecondes (1s par défaut)
 ): Promise<T> {
-
   // On boucle sur le nombre de tentatives
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
@@ -340,7 +336,9 @@ async function fetchWithRetry<T>(
 
       // Sinon, on attend un peu avant de réessayer
       // Le délai augmente à chaque tentative (1s, 2s, 3s...)
-      await new Promise((resolve) => setTimeout(resolve, delay * (attempt + 1)));
+      await new Promise((resolve) =>
+        setTimeout(resolve, delay * (attempt + 1)),
+      );
     }
   }
   throw new Error("Unreachable"); // On n'arrive jamais ici, mais TypeScript a besoin de ça
@@ -351,7 +349,9 @@ async function fetchWithRetry<T>(
 
 ```ts
 // On réessaie de charger les produits jusqu'à 3 fois
-const produits = await fetchWithRetry(() => fetch("/api/products").then(r => r.json()));
+const produits = await fetchWithRetry(() =>
+  fetch("/api/products").then((r) => r.json()),
+);
 ```
 
 ---
@@ -372,33 +372,32 @@ import { ref, watchEffect, type Ref } from "vue";
 
 // On décrit ce que notre composable va retourner
 interface UseFetchReturn<T> {
-  data: Ref<T | null>;          // Les données (null si pas encore chargées)
-  error: Ref<string | null>;    // Le message d'erreur (null si pas d'erreur)
-  isLoading: Ref<boolean>;      // Est-ce qu'on charge en ce moment ?
+  data: Ref<T | null>; // Les données (null si pas encore chargées)
+  error: Ref<string | null>; // Le message d'erreur (null si pas d'erreur)
+  isLoading: Ref<boolean>; // Est-ce qu'on charge en ce moment ?
   refetch: () => Promise<void>; // Une fonction pour re-charger les données
 }
 
 // Le composable lui-même
 // "url" peut être un string fixe OU un Ref<string> (qui peut changer)
 export function useFetch<T>(url: Ref<string> | string): UseFetchReturn<T> {
-
   // On crée nos 3 variables réactives
-  const data = ref<T | null>(null) as Ref<T | null>;  // Les données
-  const error = ref<string | null>(null);               // L'erreur éventuelle
-  const isLoading = ref(false);                          // L'état de chargement
+  const data = ref<T | null>(null) as Ref<T | null>; // Les données
+  const error = ref<string | null>(null); // L'erreur éventuelle
+  const isLoading = ref(false); // L'état de chargement
 
   // La fonction qui effectue vraiment le fetch
   async function doFetch(): Promise<void> {
     // Si url est un Ref, on prend sa .value, sinon on prend le string directement
     const urlValue = typeof url === "string" ? url : url.value;
 
-    isLoading.value = true;  // On commence à charger
-    error.value = null;       // On efface les anciennes erreurs
+    isLoading.value = true; // On commence à charger
+    error.value = null; // On efface les anciennes erreurs
 
     try {
-      const res = await fetch(urlValue);                    // On appelle l'API
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);   // On vérifie la réponse
-      data.value = await res.json();                         // On stocke les données
+      const res = await fetch(urlValue); // On appelle l'API
+      if (!res.ok) throw new Error(`HTTP ${res.status}`); // On vérifie la réponse
+      data.value = await res.json(); // On stocke les données
     } catch (err) {
       // En cas d'erreur, on stocke le message
       error.value = err instanceof Error ? err.message : "Erreur";
@@ -437,7 +436,12 @@ interface Product {
 
 // Une seule ligne pour tout gérer ! 🎉
 // On récupère data, error, isLoading et une fonction pour recharger
-const { data: products, error, isLoading, refetch } = useFetch<Product[]>("/api/products");
+const {
+  data: products,
+  error,
+  isLoading,
+  refetch,
+} = useFetch<Product[]>("/api/products");
 </script>
 
 <template>
@@ -456,16 +460,16 @@ const { data: products, error, isLoading, refetch } = useFetch<Product[]>("/api/
 
 ## Récapitulatif
 
-| Concept | À quoi ça sert |
-|---------|----------------|
-| `async/await` | Attendre qu'une opération asynchrone se termine |
-| `try/catch/finally` | Gérer les erreurs proprement |
-| `fetch()` | Faire un appel réseau (API) |
-| `loading/error/data` | Les 3 états à toujours gérer dans l'interface |
-| `AbortController` | Annuler une requête en cours |
-| Optimistic Update | Mettre à jour l'interface avant la confirmation serveur |
-| Retry | Réessayer automatiquement en cas d'échec |
-| Composable `useFetch` | Réutiliser la logique fetch dans tous les composants |
+| Concept               | À quoi ça sert                                          |
+| --------------------- | ------------------------------------------------------- |
+| `async/await`         | Attendre qu'une opération asynchrone se termine         |
+| `try/catch/finally`   | Gérer les erreurs proprement                            |
+| `fetch()`             | Faire un appel réseau (API)                             |
+| `loading/error/data`  | Les 3 états à toujours gérer dans l'interface           |
+| `AbortController`     | Annuler une requête en cours                            |
+| Optimistic Update     | Mettre à jour l'interface avant la confirmation serveur |
+| Retry                 | Réessayer automatiquement en cas d'échec                |
+| Composable `useFetch` | Réutiliser la logique fetch dans tous les composants    |
 
 ---
 
@@ -477,16 +481,16 @@ Complète ce composant pour charger et afficher une liste d'utilisateurs :
 
 ```vue
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted } from "vue";
 
 interface User {
-  id: number
-  name: string
+  id: number;
+  name: string;
 }
 
-const users = ref<User[]>([])
-const isLoading = ref(false)
-const error = ref<string | null>(null)
+const users = ref<User[]>([]);
+const isLoading = ref(false);
+const error = ref<string | null>(null);
 
 // Charge les utilisateurs depuis /api/users
 async function fetchUsers() {
@@ -494,8 +498,8 @@ async function fetchUsers() {
 }
 
 onMounted(() => {
-  fetchUsers()
-})
+  fetchUsers();
+});
 </script>
 ```
 
@@ -504,37 +508,38 @@ onMounted(() => {
 
 ```vue
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted } from "vue";
 
 interface User {
-  id: number
-  name: string
+  id: number;
+  name: string;
 }
 
-const users = ref<User[]>([])
-const isLoading = ref(false)
-const error = ref<string | null>(null)
+const users = ref<User[]>([]);
+const isLoading = ref(false);
+const error = ref<string | null>(null);
 
 async function fetchUsers() {
-  isLoading.value = true
-  error.value = null
+  isLoading.value = true;
+  error.value = null;
 
   try {
-    const response = await fetch('/api/users')
-    if (!response.ok) throw new Error(`HTTP ${response.status}`)
-    users.value = await response.json()
+    const response = await fetch("/api/users");
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    users.value = await response.json();
   } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Erreur'
+    error.value = err instanceof Error ? err.message : "Erreur";
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 onMounted(() => {
-  fetchUsers()
-})
+  fetchUsers();
+});
 </script>
 ```
+
 </details>
 
 ---
@@ -570,6 +575,7 @@ Complète le template pour afficher les 3 états possibles :
   </ul>
 </template>
 ```
+
 </details>
 
 ---
@@ -579,10 +585,10 @@ Complète le template pour afficher les 3 états possibles :
 Complète ce code pour annuler les requêtes précédentes quand `search` change :
 
 ```ts
-import { ref, watchEffect } from 'vue'
+import { ref, watchEffect } from "vue";
 
-const search = ref('')
-const results = ref<string[]>([])
+const search = ref("");
+const results = ref<string[]>([]);
 
 watchEffect((onCleanup) => {
   // Crée un AbortController
@@ -591,40 +597,46 @@ watchEffect((onCleanup) => {
   // Lance la requête avec le signal
   fetch(`/api/search?q=${search.value}`, {
     // ???
-  }).then(r => r.json()).then(data => {
-    results.value = data
   })
+    .then((r) => r.json())
+    .then((data) => {
+      results.value = data;
+    });
 
   // Annule la requête si search change avant qu'elle finisse
   // ???
-})
+});
 ```
 
 <details>
 <summary>Solution</summary>
 
 ```ts
-import { ref, watchEffect } from 'vue'
+import { ref, watchEffect } from "vue";
 
-const search = ref('')
-const results = ref<string[]>([])
+const search = ref("");
+const results = ref<string[]>([]);
 
 watchEffect((onCleanup) => {
-  const controller = new AbortController()
+  const controller = new AbortController();
 
   fetch(`/api/search?q=${search.value}`, {
-    signal: controller.signal
-  }).then(r => r.json()).then(data => {
-    results.value = data
-  }).catch(() => {
-    // Ignorer l'erreur d'abort
+    signal: controller.signal,
   })
+    .then((r) => r.json())
+    .then((data) => {
+      results.value = data;
+    })
+    .catch(() => {
+      // Ignorer l'erreur d'abort
+    });
 
   onCleanup(() => {
-    controller.abort()
-  })
-})
+    controller.abort();
+  });
+});
 ```
+
 </details>
 
 ---
@@ -643,18 +655,19 @@ type AsyncState<T> = ???
 
 ```ts
 type AsyncState<T> =
-  | { status: 'idle' }
-  | { status: 'loading' }
-  | { status: 'error'; error: string }
-  | { status: 'success'; data: T }
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "error"; error: string }
+  | { status: "success"; data: T };
 ```
+
 </details>
 
 ---
 
 ## Exercice
 
-→ `exercices/07-crud-api/ENONCE.md`
+→ `exercices/10-crud-api/ENONCE.md`
 
 ## Suite
 

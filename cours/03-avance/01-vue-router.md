@@ -81,42 +81,42 @@ un **chemin URL** à un **composant Vue**.
 
 // On importe les outils nécessaires depuis vue-router
 import {
-  createRouter,        // Fonction pour créer le routeur
-  createWebHistory,    // Mode "history" : des URLs propres (sans #)
+  createRouter, // Fonction pour créer le routeur
+  createWebHistory, // Mode "history" : des URLs propres (sans #)
   type RouteRecordRaw, // Le type TypeScript pour décrire une route
-} from 'vue-router'
+} from "vue-router";
 
 // On définit la liste des routes : chaque objet = une "page"
 const routes: RouteRecordRaw[] = [
   {
-    path: '/',              // L'URL "/" = la page d'accueil
-    name: 'home',           // Un petit nom pour cette route (pratique pour les liens)
+    path: "/", // L'URL "/" = la page d'accueil
+    name: "home", // Un petit nom pour cette route (pratique pour les liens)
     // Le composant à afficher. () => import(...) = "charge-le seulement quand on en a besoin"
     // C'est le "lazy loading" : ça évite de charger TOUTES les pages d'un coup
-    component: () => import('@/views/HomeView.vue'),
+    component: () => import("@/views/HomeView.vue"),
   },
   {
-    path: '/about',         // L'URL "/about" = la page À propos
-    name: 'about',
-    component: () => import('@/views/AboutView.vue'),
+    path: "/about", // L'URL "/about" = la page À propos
+    name: "about",
+    component: () => import("@/views/AboutView.vue"),
   },
   {
     // Route "attrape-tout" : si aucune route ne correspond, on affiche une page 404
     // Le :pathMatch(.*) veut dire "n'importe quel chemin"
-    path: '/:pathMatch(.*)*',
-    name: 'not-found',
-    component: () => import('@/views/NotFoundView.vue'),
+    path: "/:pathMatch(.*)*",
+    name: "not-found",
+    component: () => import("@/views/NotFoundView.vue"),
   },
-]
+];
 
 // On crée le routeur avec la configuration
 const router = createRouter({
   history: createWebHistory(), // Utilise le mode "history" du navigateur
-  routes,                      // On passe la liste des routes
-})
+  routes, // On passe la liste des routes
+});
 
 // On exporte le routeur pour l'utiliser dans main.ts
-export default router
+export default router;
 ```
 
 ## Étape 2 — Brancher le routeur à l'application
@@ -124,14 +124,14 @@ export default router
 ```ts
 // main.ts — Le point d'entrée de l'application
 
-import { createApp } from 'vue'   // Fonction pour créer l'appli Vue
-import App from './App.vue'        // Le composant racine
-import router from './router'      // Notre routeur qu'on vient de créer
+import { createApp } from "vue"; // Fonction pour créer l'appli Vue
+import App from "./App.vue"; // Le composant racine
+import router from "./router"; // Notre routeur qu'on vient de créer
 
 // On crée l'appli, on branche le routeur avec .use(), puis on monte le tout
 createApp(App)
-  .use(router)    // "Hé l'appli, utilise ce routeur pour gérer la navigation !"
-  .mount('#app')  // On affiche l'appli dans la div #app du HTML
+  .use(router) // "Hé l'appli, utilise ce routeur pour gérer la navigation !"
+  .mount("#app"); // On affiche l'appli dans la div #app du HTML
 ```
 
 ---
@@ -218,18 +218,18 @@ Il faut une route **dynamique** qui accepte N'IMPORTE QUEL id.
 ```vue
 <!-- UserView.vue — La page de profil d'un utilisateur -->
 <script setup lang="ts">
-import { computed } from 'vue'     // Pour créer une valeur calculée
-import { useRoute } from 'vue-router'  // Pour accéder à la route actuelle
+import { computed } from "vue"; // Pour créer une valeur calculée
+import { useRoute } from "vue-router"; // Pour accéder à la route actuelle
 
 // useRoute() donne accès aux informations de la route actuelle
 // (le path, les paramètres, la query, etc.)
-const route = useRoute()
+const route = useRoute();
 
 // On récupère le paramètre "id" de l'URL
 // route.params.id est toujours une STRING (texte)
 // Number(...) le convertit en nombre (42 au lieu de "42")
 // computed() le rend réactif : si l'URL change, userId se met à jour automatiquement
-const userId = computed(() => Number(route.params.id))
+const userId = computed(() => Number(route.params.id));
 </script>
 
 <template>
@@ -305,28 +305,29 @@ Parfois, on veut naviguer après une action (formulaire soumis, bouton cliqué, 
 et pas juste avec un lien dans le template. On utilise alors `useRouter()`.
 
 > **Attention à ne pas confondre :**
+>
 > - `useRoute()` (sans "r" à la fin) = donne les **infos** de la route actuelle (params, query...)
 > - `useRouter()` (avec "r") = donne le **routeur** pour **naviguer** vers d'autres pages
 
 ```ts
-import { useRouter } from 'vue-router'
+import { useRouter } from "vue-router";
 
-const router = useRouter()  // On récupère le routeur
+const router = useRouter(); // On récupère le routeur
 
 // === NAVIGUER vers une page ===
 // Méthode 1 : par nom de route + paramètres (recommandé)
-router.push({ name: 'user', params: { id: 42 } })
+router.push({ name: "user", params: { id: 42 } });
 
 // Méthode 2 : par chemin (plus simple mais moins flexible)
-router.push('/about')
+router.push("/about");
 
 // === REMPLACER la page actuelle (pas de retour en arrière possible) ===
 // L'historique ne gardera pas la page d'avant
-router.replace({ name: 'home' })
+router.replace({ name: "home" });
 
 // === NAVIGUER dans l'historique ===
-router.back()    // Retour en arrière (comme le bouton ← du navigateur)
-router.go(-2)    // Reculer de 2 pages dans l'historique
+router.back(); // Retour en arrière (comme le bouton ← du navigateur)
+router.go(-2); // Reculer de 2 pages dans l'historique
 ```
 
 ---
@@ -354,20 +355,21 @@ router.beforeEach((to, from) => {
   // On vérifie si l'utilisateur est connecté
   // localStorage est un petit espace de stockage dans le navigateur
   // !! transforme une valeur en true/false (rappel JS ci-dessous)
-  const isAuthenticated = !!localStorage.getItem('token')
+  const isAuthenticated = !!localStorage.getItem("token");
 
   // Si la route exige une authentification ET que l'utilisateur n'est pas connecté...
   if (to.meta.requiresAuth && !isAuthenticated) {
     // ...on le redirige vers la page de connexion au lieu de le laisser passer
-    return { name: 'login' }
+    return { name: "login" };
   }
   // Si on ne retourne rien, la navigation se fait normalement
-})
+});
 ```
 
 > **📝 Rappel JavaScript — L'opérateur `!!`**
 >
 > `!!` transforme n'importe quelle valeur en `true` ou `false` :
+>
 > - `!!"hello"` → `true` (une chaîne non vide est "truthy")
 > - `!!""` → `false` (une chaîne vide est "falsy")
 > - `!!null` → `false` (null est "falsy")
@@ -407,11 +409,11 @@ Par défaut, `to.meta` peut contenir n'importe quoi. Avec TypeScript, on peut
 // router/types.ts — On enrichit le type RouteMeta de Vue Router
 
 // "declare module" permet d'ajouter des types à un module existant
-declare module 'vue-router' {
+declare module "vue-router" {
   interface RouteMeta {
-    requiresAuth?: boolean                     // La page nécessite-t-elle une connexion ?
-    role?: 'admin' | 'user' | 'manager'        // Quel rôle est requis ?
-    title?: string                              // Titre de la page (pour l'onglet du navigateur)
+    requiresAuth?: boolean; // La page nécessite-t-elle une connexion ?
+    role?: "admin" | "user" | "manager"; // Quel rôle est requis ?
+    title?: string; // Titre de la page (pour l'onglet du navigateur)
   }
 }
 ```
@@ -428,23 +430,23 @@ On peut regrouper des routes par **feature** (fonctionnalité) :
 ```ts
 const routes: RouteRecordRaw[] = [
   {
-    path: '/admin',
+    path: "/admin",
     // Le layout de toute la section admin
-    component: () => import('@/features/admin/AdminLayout.vue'),
+    component: () => import("@/features/admin/AdminLayout.vue"),
     children: [
       {
-        path: 'users',
+        path: "users",
         // Ces pages "admin" seront regroupées dans un même fichier JavaScript
         // Le navigateur les téléchargera ensemble quand on accède à /admin
-        component: () => import('@/features/admin/views/UsersView.vue'),
+        component: () => import("@/features/admin/views/UsersView.vue"),
       },
       {
-        path: 'settings',
-        component: () => import('@/features/admin/views/SettingsView.vue'),
+        path: "settings",
+        component: () => import("@/features/admin/views/SettingsView.vue"),
       },
     ],
   },
-]
+];
 ```
 
 ---
@@ -456,14 +458,14 @@ Un petit utilitaire pratique pour lire et modifier les paramètres de recherche 
 
 ```ts
 // composables/useRouteQuery.ts
-import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 // Ce composable synchronise un paramètre de l'URL avec une variable réactive
 // Exemple : si l'URL est /search?q=vue, useRouteQuery('q') retourne "vue"
-export function useRouteQuery(key: string, defaultValue = '') {
-  const route = useRoute()     // Pour LIRE les paramètres actuels
-  const router = useRouter()   // Pour MODIFIER l'URL
+export function useRouteQuery(key: string, defaultValue = "") {
+  const route = useRoute(); // Pour LIRE les paramètres actuels
+  const router = useRouter(); // Pour MODIFIER l'URL
 
   return computed({
     // Quand on LIT la valeur : on prend le paramètre de l'URL (ou la valeur par défaut)
@@ -472,20 +474,20 @@ export function useRouteQuery(key: string, defaultValue = '') {
     set: (value: string) => {
       router.replace({
         query: { ...route.query, [key]: value || undefined },
-      })
+      });
     },
-  })
+  });
 }
 ```
 
 ```vue
 <!-- Exemple d'utilisation -->
 <script setup lang="ts">
-import { useRouteQuery } from '@/composables/useRouteQuery'
+import { useRouteQuery } from "@/composables/useRouteQuery";
 
 // searchQuery est synchronisé avec ?q= dans l'URL
 // Si l'URL est /search?q=hello → searchQuery.value vaut "hello"
-const searchQuery = useRouteQuery('q')
+const searchQuery = useRouteQuery("q");
 </script>
 
 <template>
@@ -527,24 +529,22 @@ Complète la configuration du routeur :
 
 ```ts
 // router/index.ts
-import { createRouter, createWebHistory } from 'vue-router'
-import Home from '@/views/Home.vue'
-import About from '@/views/About.vue'
-import Contact from '@/views/Contact.vue'
+import { createRouter, createWebHistory } from "vue-router";
+import Home from "@/views/Home.vue";
+import About from "@/views/About.vue";
+import Contact from "@/views/Contact.vue";
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     // Route "/" → Home
     // ???
-    
     // Route "/about" → About
     // ???
-    
     // Route "/contact" → Contact
     // ???
-  ]
-})
+  ],
+});
 ```
 
 <details>
@@ -554,12 +554,13 @@ const router = createRouter({
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/', component: Home },
-    { path: '/about', component: About },
-    { path: '/contact', component: Contact }
-  ]
-})
+    { path: "/", component: Home },
+    { path: "/about", component: About },
+    { path: "/contact", component: Contact },
+  ],
+});
 ```
+
 </details>
 
 ---
@@ -598,16 +599,17 @@ const productId = ???
 ```vue
 <!-- ProductDetail.vue -->
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
+import { useRoute } from "vue-router";
 
-const route = useRoute()
-const productId = route.params.id
+const route = useRoute();
+const productId = route.params.id;
 </script>
 
 <template>
   <h1>Produit n°{{ productId }}</h1>
 </template>
 ```
+
 </details>
 
 ---
@@ -638,12 +640,12 @@ function goToProduct(id: number) {
 
 ```vue
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useRouter } from "vue-router";
 
-const router = useRouter()
+const router = useRouter();
 
 function goToProduct(id: number) {
-  router.push(`/products/${id}`)
+  router.push(`/products/${id}`);
 }
 </script>
 
@@ -651,6 +653,7 @@ function goToProduct(id: number) {
   <button @click="goToProduct(42)">Voir le produit 42</button>
 </template>
 ```
+
 </details>
 
 ---
@@ -662,13 +665,13 @@ Crée un guard qui empêche l'accès à `/admin` si l'utilisateur n'est pas conn
 ```ts
 // Suppose que isLoggedIn() retourne true/false
 function isLoggedIn(): boolean {
-  return localStorage.getItem('token') !== null
+  return localStorage.getItem("token") !== null;
 }
 
 router.beforeEach((to, from) => {
   // Si on va vers /admin et qu'on n'est pas connecté → redirige vers /login
   // ???
-})
+});
 ```
 
 <details>
@@ -676,18 +679,19 @@ router.beforeEach((to, from) => {
 
 ```ts
 router.beforeEach((to, from) => {
-  if (to.path === '/admin' && !isLoggedIn()) {
-    return '/login'
+  if (to.path === "/admin" && !isLoggedIn()) {
+    return "/login";
   }
-})
+});
 ```
+
 </details>
 
 ---
 
 ## Exercice
 
-→ `exercices/10-app-multi-pages/ENONCE.md`
+→ `exercices/15-app-multi-pages/ENONCE.md`
 
 ## Suite
 

@@ -4,9 +4,10 @@
 
 > **🔄 Rappel du cours précédent**
 > Avant de continuer, vérifie que tu peux répondre à ces questions :
+>
 > 1. Quels sont les deux hébergeurs gratuits les plus simples pour déployer une app Vue ?
 > 2. Comment configure-t-on les variables d'environnement en production ?
-> 
+>
 > <details>
 > <summary>Vérifier mes réponses</summary>
 >
@@ -43,11 +44,11 @@ ne s'en plaignent.
 
 ### Les 3 piliers du monitoring
 
-| Pilier | Ce que c'est | Analogie |
-|--------|-------------|----------|
-| **Error tracking** | Attraper les erreurs en production | 🚨 L'alarme incendie |
-| **Performance** | Mesurer la vitesse de l'app | ⏱️ Le chronomètre |
-| **Analytics** | Comprendre comment les utilisateurs utilisent l'app | 📊 Le compteur de visiteurs |
+| Pilier             | Ce que c'est                                        | Analogie                    |
+| ------------------ | --------------------------------------------------- | --------------------------- |
+| **Error tracking** | Attraper les erreurs en production                  | 🚨 L'alarme incendie        |
+| **Performance**    | Mesurer la vitesse de l'app                         | ⏱️ Le chronomètre           |
+| **Analytics**      | Comprendre comment les utilisateurs utilisent l'app | 📊 Le compteur de visiteurs |
 
 ---
 
@@ -195,13 +196,13 @@ pour évaluer l'expérience utilisateur sur un site web.
 
 ### Les métriques principales
 
-| Métrique | Nom complet | Ce que ça mesure | Seuil acceptable |
-|----------|------------|------------------|-----------------|
-| **LCP** | Largest Contentful Paint | Temps avant que le contenu principal soit visible | < 2.5 secondes |
-| **FID** | First Input Delay | Temps avant que l'app réagisse au premier clic | < 100 millisecondes |
-| **CLS** | Cumulative Layout Shift | Est-ce que les éléments bougent/sautent pendant le chargement ? | < 0.1 |
-| **FCP** | First Contentful Paint | Temps avant que quelque chose s'affiche | < 1.8 secondes |
-| **TTFB** | Time To First Byte | Temps avant que le serveur réponde | < 800 millisecondes |
+| Métrique | Nom complet              | Ce que ça mesure                                                | Seuil acceptable    |
+| -------- | ------------------------ | --------------------------------------------------------------- | ------------------- |
+| **LCP**  | Largest Contentful Paint | Temps avant que le contenu principal soit visible               | < 2.5 secondes      |
+| **FID**  | First Input Delay        | Temps avant que l'app réagisse au premier clic                  | < 100 millisecondes |
+| **CLS**  | Cumulative Layout Shift  | Est-ce que les éléments bougent/sautent pendant le chargement ? | < 0.1               |
+| **FCP**  | First Contentful Paint   | Temps avant que quelque chose s'affiche                         | < 1.8 secondes      |
+| **TTFB** | Time To First Byte       | Temps avant que le serveur réponde                              | < 800 millisecondes |
 
 ### Mesurer les Web Vitals dans ton app
 
@@ -220,19 +221,19 @@ function sendMetric(metric: Metric): void {
   // sendBeacon = envoie des données au serveur sans bloquer la page
   // (même si l'utilisateur ferme l'onglet, les données sont envoyées)
   navigator.sendBeacon(
-    "/api/metrics",              // L'URL de notre API qui reçoit les métriques
-    JSON.stringify(metric),      // On convertit l'objet en texte JSON
+    "/api/metrics", // L'URL de notre API qui reçoit les métriques
+    JSON.stringify(metric), // On convertit l'objet en texte JSON
   );
 }
 
 // Fonction à appeler au démarrage de l'app
 export function initWebVitals(): void {
   // Chaque fonction mesure une métrique et appelle sendMetric automatiquement
-  onCLS(sendMetric);   // Mesure la stabilité visuelle
-  onFID(sendMetric);   // Mesure la réactivité au premier clic
-  onLCP(sendMetric);   // Mesure le temps de chargement du contenu principal
-  onFCP(sendMetric);   // Mesure le temps avant le premier affichage
-  onTTFB(sendMetric);  // Mesure le temps de réponse du serveur
+  onCLS(sendMetric); // Mesure la stabilité visuelle
+  onFID(sendMetric); // Mesure la réactivité au premier clic
+  onLCP(sendMetric); // Mesure le temps de chargement du contenu principal
+  onFCP(sendMetric); // Mesure le temps avant le premier affichage
+  onTTFB(sendMetric); // Mesure le temps de réponse du serveur
 }
 ```
 
@@ -252,6 +253,7 @@ Le **logging**, c'est **écrire un journal** de ce qui se passe dans ton app.
 ### Rappel : `console.log` vs un vrai système de logs
 
 En développement, tu utilises `console.log()` pour débugger. Mais en production :
+
 - Les `console.log` **ne sont pas enregistrés** — ils disparaissent quand l'utilisateur ferme l'onglet
 - Tu ne peux **pas les consulter** depuis ton ordinateur
 - Il n'y a **pas de niveau d'importance** (info, warning, erreur)
@@ -272,10 +274,10 @@ type LogLevel = "info" | "warn" | "error";
 
 // La structure d'une entrée de log
 interface LogEntry {
-  level: LogLevel;                      // Le niveau (info, warn, error)
-  message: string;                      // Le message humain
-  context?: Record<string, unknown>;    // Des infos supplémentaires (optionnel)
-  timestamp: string;                    // La date et l'heure exactes
+  level: LogLevel; // Le niveau (info, warn, error)
+  message: string; // Le message humain
+  context?: Record<string, unknown>; // Des infos supplémentaires (optionnel)
+  timestamp: string; // La date et l'heure exactes
 }
 
 // Fonction interne qui crée et envoie un log
@@ -289,7 +291,7 @@ function log(
     level,
     message,
     context,
-    timestamp: new Date().toISOString(),  // Ex: "2026-02-26T14:30:00.000Z"
+    timestamp: new Date().toISOString(), // Ex: "2026-02-26T14:30:00.000Z"
   };
 
   // En développement → on affiche dans la console du navigateur
@@ -320,7 +322,10 @@ export const logger = {
 import { logger } from "@/utils/logger";
 
 // Quand l'utilisateur se connecte
-logger.info("Utilisateur connecté", { userId: 42, email: "sophie@example.com" });
+logger.info("Utilisateur connecté", {
+  userId: 42,
+  email: "sophie@example.com",
+});
 
 // Quand quelque chose est lent
 logger.warn("Appel API lent", { url: "/api/products", duration: 3200 });
@@ -335,13 +340,13 @@ logger.error("Erreur de chargement", { page: "/dashboard", status: 500 });
 
 En production, voici les **métriques clés** à surveiller :
 
-| Métrique | Ce que ça veut dire | Seuil acceptable | Si c'est au-dessus... |
-|----------|--------------------|-----------------|-----------------------|
-| **Error rate** | % de requêtes qui échouent | < 0.1% | Ton app a des bugs en production |
-| **LCP** | Temps de chargement du contenu | < 2.5s | L'app est trop lente |
-| **FID** | Temps de réaction au premier clic | < 100ms | L'app semble "gelée" |
-| **CLS** | Éléments qui bougent pendant le chargement | < 0.1 | L'interface "saute" — mauvaise UX |
-| **API response time (p95)** | Temps de réponse du serveur (pour 95% des requêtes) | < 500ms | Le backend est trop lent |
+| Métrique                    | Ce que ça veut dire                                 | Seuil acceptable | Si c'est au-dessus...             |
+| --------------------------- | --------------------------------------------------- | ---------------- | --------------------------------- |
+| **Error rate**              | % de requêtes qui échouent                          | < 0.1%           | Ton app a des bugs en production  |
+| **LCP**                     | Temps de chargement du contenu                      | < 2.5s           | L'app est trop lente              |
+| **FID**                     | Temps de réaction au premier clic                   | < 100ms          | L'app semble "gelée"              |
+| **CLS**                     | Éléments qui bougent pendant le chargement          | < 0.1            | L'interface "saute" — mauvaise UX |
+| **API response time (p95)** | Temps de réponse du serveur (pour 95% des requêtes) | < 500ms          | Le backend est trop lent          |
 
 > **p95** signifie "95e percentile" — 95% des requêtes sont plus rapides que cette valeur.
 > On utilise p95 plutôt que la moyenne car **une moyenne peut cacher des cas extrêmes**.
@@ -363,14 +368,14 @@ Si tu débutes, voici l'ordre recommandé :
 
 ## 📝 Résumé
 
-| Concept | Explication simple |
-|---------|-------------------|
-| **Monitoring** | Surveiller ton app en production (comme des caméras de sécurité) |
-| **Sentry** | Service qui attrape les erreurs automatiquement et te prévient |
+| Concept            | Explication simple                                                  |
+| ------------------ | ------------------------------------------------------------------- |
+| **Monitoring**     | Surveiller ton app en production (comme des caméras de sécurité)    |
+| **Sentry**         | Service qui attrape les erreurs automatiquement et te prévient      |
 | **Error Boundary** | Composant Vue qui empêche une erreur d'enfant de casser toute l'app |
-| **Web Vitals** | Mesures de performance (vitesse de chargement, réactivité) |
-| **Logging** | Journal de bord de ton app (qui, quand, quoi, erreur ou pas) |
-| **p95** | 95% des requêtes sont plus rapides que cette valeur |
+| **Web Vitals**     | Mesures de performance (vitesse de chargement, réactivité)          |
+| **Logging**        | Journal de bord de ton app (qui, quand, quoi, erreur ou pas)        |
+| **p95**            | 95% des requêtes sont plus rapides que cette valeur                 |
 
 ---
 
@@ -382,19 +387,19 @@ Complète l'intégration de Sentry dans une app Vue :
 
 ```ts
 // main.ts
-import * as Sentry from '@sentry/vue'
+import * as Sentry from "@sentry/vue";
 
-const app = createApp(App)
+const app = createApp(App);
 
 // Initialise Sentry
 Sentry.init({
   app,
   // DSN : l'adresse ou envoyer les erreurs
   // ???
-  
+
   // environnement : production, staging...
   // ???
-})
+});
 ```
 
 <details>
@@ -405,12 +410,11 @@ Sentry.init({
   app,
   dsn: import.meta.env.VITE_SENTRY_DSN,
   environment: import.meta.env.MODE,
-  integrations: [
-    Sentry.browserTracingIntegration(),
-  ],
-  tracesSampleRate: 0.1  // 10% des requêtes tracées
-})
+  integrations: [Sentry.browserTracingIntegration()],
+  tracesSampleRate: 0.1, // 10% des requêtes tracées
+});
 ```
+
 </details>
 
 ---
@@ -422,10 +426,10 @@ Crée un composant ErrorBoundary qui capture les erreurs de ses enfants :
 ```vue
 <!-- ErrorBoundary.vue -->
 <script setup lang="ts">
-import { ref, onErrorCaptured } from 'vue'
+import { ref, onErrorCaptured } from "vue";
 
-const hasError = ref(false)
-const errorMessage = ref('')
+const hasError = ref(false);
+const errorMessage = ref("");
 
 // Capture les erreurs des composants enfants
 // ???
@@ -445,18 +449,19 @@ const errorMessage = ref('')
 
 ```vue
 <script setup lang="ts">
-import { ref, onErrorCaptured } from 'vue'
+import { ref, onErrorCaptured } from "vue";
 
-const hasError = ref(false)
-const errorMessage = ref('')
+const hasError = ref(false);
+const errorMessage = ref("");
 
 onErrorCaptured((error) => {
-  hasError.value = true
-  errorMessage.value = error.message
-  return false  // empêche la propagation
-})
+  hasError.value = true;
+  errorMessage.value = error.message;
+  return false; // empêche la propagation
+});
 </script>
 ```
+
 </details>
 
 ---
@@ -466,7 +471,7 @@ onErrorCaptured((error) => {
 Intègre la mesure des Web Vitals :
 
 ```ts
-import { onLCP, onFID, onCLS } from 'web-vitals'
+import { onLCP, onFID, onCLS } from "web-vitals";
 
 // Envoie les métriques à ton service d'analytics
 function sendToAnalytics(metric: { name: string; value: number }) {
@@ -481,20 +486,25 @@ function sendToAnalytics(metric: { name: string; value: number }) {
 <summary>Solution</summary>
 
 ```ts
-import { onLCP, onFID, onCLS } from 'web-vitals'
+import { onLCP, onFID, onCLS } from "web-vitals";
 
 function sendToAnalytics(metric: { name: string; value: number }) {
-  console.log(`[Web Vitals] ${metric.name}: ${metric.value}`)
+  console.log(`[Web Vitals] ${metric.name}: ${metric.value}`);
   // En production : envoyer à Google Analytics, Sentry, etc.
 }
 
-onLCP(sendToAnalytics)
-onFID(sendToAnalytics)
-onCLS(sendToAnalytics)
+onLCP(sendToAnalytics);
+onFID(sendToAnalytics);
+onCLS(sendToAnalytics);
 ```
+
 </details>
 
 ---
+
+## Exercice
+
+→ `exercices/22-pipeline-ci-visuel/ENONCE.md`
 
 ## Suite
 
@@ -505,6 +515,7 @@ onCLS(sendToAnalytics)
 <!-- parcours-recommande -->
 
 ::: tip Parcours recommandé
+
 1. **Exercice** : [22-pipeline-ci](../../exercices/22-pipeline-ci/ENONCE)
 2. **Exercice** : [22-pipeline-ci-visuel](../../exercices/22-pipeline-ci-visuel/ENONCE)
-:::
+   :::
