@@ -8,7 +8,7 @@ outcomes:
   - sait migrer un composant simple d'Options API vers Composition API
   - sait choisir le style adapté à un contexte d'équipe / de projet
 prerequis: [06-lifecycle-hooks]
-next: 01-composition-api-avancee
+next: 08-composition-api-avancee
 libs: [{ name: vue, version: "3.5" }]
 tribuzen: front-office TribuZen — migrer un composant legacy Options API (hérité d'un CMS) vers Composition API script setup, comme sur une vraie migration d'app
 last-reviewed: 2026-07
