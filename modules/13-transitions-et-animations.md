@@ -8,7 +8,7 @@ outcomes:
   - sait respecter prefers-reduced-motion (obligation d'accessibilité)
   - sait choisir des propriétés animées performantes (transform, opacity)
 prerequis: [12-slots-avances]
-next: 01-vue-router
+next: 14-vue-router
 libs: [{ name: vue, version: "3.5" }]
 tribuzen: front-office TribuZen — transitions du feed famille (apparition des posts, réordonnancement de la liste), respect strict de prefers-reduced-motion (RGAA)
 last-reviewed: 2026-07
