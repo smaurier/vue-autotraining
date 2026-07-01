@@ -1,103 +1,87 @@
-# Lab 03 — Réactivité (Composition API)
+# Lab 03 — Réactivité
 
-> **Outcome :** à la fin, tu sais assembler les primitives de réactivité (`ref`/`reactive`/`computed`/`watch`), diagnostiquer une **perte de réactivité** et la corriger avec `toRefs`, le tout branché dans un SFC `<script setup>` et couvert par des tests Vitest.
-> **Vrai outil :** Vue 3.5 + Vite + Vitest (tests unitaires de logique réactive).
-> **Feedback :** le coach valide les tests en session (`vitest run` = vert).
-
-> **Périmètre :** ce lab reste sur les **primitives de réactivité**. La communication parent-enfant (`defineProps`/`defineEmits`) est vue au module 05 ; le pattern **composable** complet (paramètres `Ref`, lifecycle, nettoyage) au module intermédiaire 02-composables. Ici, on extrait la logique dans une fonction uniquement pour la **tester en isolation** — c'est l'embryon d'un composable, sans en faire l'objet du lab.
+> **Outcome :** à la fin, tu sais assembler `ref`, `computed` et `watch` dans un SFC Vue 3, diagnostiquer une perte de réactivité par destructuring et la corriger avec `toRefs`.
+> **Vrai outil :** Vue 3.5 + Vite dev server (HMR visible en direct dans le navigateur).
+> **Feedback :** le coach valide visuellement en session — pas de test-runner auto-correcteur.
 
 ---
 
 ## Énoncé
 
-Tu construis l'état réactif de `FamilyMemberList` (catalogue de membres TribuZen) et tu apprends à repérer/corriger une perte de réactivité.
+Tu pars du composant `FamilyMemberList.vue` **cassé** (extrait du module 03, section 1) et tu le répares entièrement. Voici le cahier des charges **exact** :
 
-### Partie A — état réactif testable
+1. La liste des membres est un `ref<Member[]>` — toute mutation déclenche le rendu.
+2. Un champ de recherche (câblé avec `v-model`) filtre les membres en temps réel via un `computed`.
+3. Un compteur **en ligne** dérive du même `ref` via un second `computed` — affiché dans le titre.
+4. Une recherche non vide loggue dans la console après **300 ms** de silence (debounce via `watch` + `onCleanup`). Si l'utilisateur tape puis efface immédiatement, aucun log ne sort.
+5. Un bouton **Ajouter Charlie** ajoute un membre et la liste se met à jour instantanément.
+6. Un empty state s'affiche si aucun membre ne correspond au filtre actif.
 
-Écris une fonction `useMembers(initial?)` qui retourne l'état réactif de la liste. Elle doit :
-1. Tenir une liste réactive de membres (`ref<Member[]>`)
-2. Exposer un filtre par nom (`query: ref<string>`) + la liste filtrée (`filtered: computed`)
-3. Exposer `onlineCount: computed<number>` (membres avec `online: true`)
-4. Permettre `addMember(name, role)` et `removeMember(id)`
-5. Logger dans la console les recherches non vides après 300 ms (debounce via `watch` + `onCleanup`)
+**Composant cassé à corriger (starter) :**
 
-**Contrainte** : la fonction retourne des `ref`/`computed`, elle est destructurée directement — aucune perte de réactivité autorisée.
+```vue
+<!-- FamilyMemberList.vue — starter cassé -->
+<script setup>
+// ❌ Bug 1 : tableau JS ordinaire — Vue ne le surveille pas
+let members = [
+  { id: '1', name: 'Alice', role: 'parent', online: true  },
+  { id: '2', name: 'Bob',   role: 'enfant', online: false },
+  { id: '3', name: 'Cara',  role: 'parent', online: true  },
+]
 
-### Partie B — perte de réactivité et fix `toRefs`
+// ❌ Bug 2 : variable primitive — Vue n'y réagit pas
+let search = ''
 
-Reproduis puis corrige le piège n°1 : partir d'un `reactive`, le destructurer (réactivité cassée), puis rétablir avec `toRefs`. Prouve les deux comportements par des tests.
+// ❌ Bug 3 : valeur plain calculée UNE SEULE FOIS au montage
+const filteredMembers = members.filter(m =>
+  m.name.toLowerCase().includes(search.toLowerCase())
+)
 
-Structure à créer dans le repo 02-vue (les dossiers existent déjà via Vite) :
+function addMember(name) {
+  members.push({ id: Date.now(), name, role: 'enfant', online: false })
+  // le template ne se met PAS à jour
+}
+</script>
 
+<template>
+  <input @input="e => search = e.target.value" placeholder="Filtrer..." />
+  <ul>
+    <li v-for="m in filteredMembers" :key="m.id">{{ m.name }}</li>
+  </ul>
+  <button @click="addMember('Charlie')">Ajouter Charlie</button>
+</template>
 ```
-02-vue/
-  src/
-    composables/
-      useMembers.ts              ← Partie A
-      useMembers.test.ts         ← tests Vitest (A + B)
-      reactivityPitfall.ts       ← Partie B (démo destructuring / toRefs)
-    components/
-      FamilyMemberList.vue       ← intégration SFC
-```
+
+**Pas de gap-fill** — tu écris le composant complet depuis ce starter.
 
 ---
 
 ## Étapes (en friction)
 
-**Étape 1 — Modélise le type `Member` et l'état initial**
+1. **Corrige Bug 1** — déclare l'interface `Member` (`id`, `name`, `role`, `online`) et enveloppe `members` dans un `ref<Member[]>`. Dans `addMember`, remplace `push` par un remplacement entier : `members.value = [...members.value, newMember]`. Pourquoi ce remplacement est-il préférable à `push` pour la prévisibilité ?
 
-Sans regarder la correction : écris l'interface `Member` (id, name, role, online) et initialise la liste avec `ref<Member[]>([])`. Pense au typage générique.
+2. **Corrige Bug 2** — remplace `let search = ''` par `const query = ref('')`. Câble `v-model="query"` sur l'input (supprime le `@input` manuel et `e.target.value`).
 
-- Pourquoi `ref` et pas `reactive` pour un tableau ici ?
-- Que se passe-t-il si tu fais `members.value.push(...)` directement au lieu de `members.value = [...members.value, newMember]` ? (Les deux fonctionnent avec `ref` sur tableau — mais lequel est plus prévisible / immuable ?)
+3. **Corrige Bug 3** — remplace `filteredMembers` par un `computed<Member[]>`. Guard clause : si `query.value.trim()` est vide, retourner toute la liste ; sinon filtrer sur `m.name.toLowerCase()`. Pourquoi un `computed` et pas une méthode `getFiltered()` appelée dans le template ?
 
-**Étape 2 — Implémente `filtered` avec `computed`**
+4. **Ajoute `onlineCount`** — un second `computed<number>` qui compte les membres avec `online: true`. Affiche `onlineCount` membres en ligne dans un `<h2>`. (Rappel : auto-unwrap dans le template — pas de `.value`.)
 
-Écris le `computed` qui filtre par `query.value`. Cas à gérer : query vide → retourner tous les membres.
+5. **Ajoute le debounce** — un `watch(query, (newQ, _oldQ, onCleanup) => { ... })`. À l'intérieur : crée un `setTimeout` de 300 ms qui loggue `newQ` si non vide. Passe `onCleanup(() => clearTimeout(timer))` pour annuler le timer précédent avant chaque nouvelle frappe. Pourquoi `watch` et pas `watchEffect` ici ?
 
-- Pourquoi ne pas utiliser une méthode `getFiltered()` à la place ?
-- Le `computed` sera-t-il recalculé si un membre change son `online` status mais que `query` reste vide ? (Réfléchis aux dépendances trackées.)
+6. **Écris le template complet** — `v-model="query"` sur l'input, `v-for="member in filtered"` avec `:key="member.id"`, un span `v-if="member.online"` pour le point vert, `:class="{ 'member--offline': !member.online }"` sur chaque `<li>`. Empty state via `v-if="filtered.length === 0"` + `v-else` sur la liste.
 
-**Étape 3 — Implémente le debounce avec `watch` + `onCleanup`**
-
-Utilise `watch(query, (newQ, _, onCleanup) => { ... })` avec `setTimeout` / `clearTimeout`. Le cleanup doit annuler le timer précédent avant chaque nouvel appel.
-
-- Pourquoi `watch` et pas `watchEffect` ici ?
-- Si l'utilisateur tape "Ali" puis efface immédiatement, combien de logs console doivent apparaître ?
-
-**Étape 4 — Retourne les valeurs**
-
-La fonction retourne `{ members, query, filtered, onlineCount, addMember, removeMember }`. Toutes les valeurs doivent rester réactives après destructuration.
-
-- Quel **type TypeScript** obtiens-tu si tu fais `const { filtered } = useMembers()` ? Une `Ref` ou une `ComputedRef` ?
-- Faut-il appliquer `toRefs` ici ? Pourquoi ou pourquoi pas ? (Indice : on retourne déjà des refs.)
-
-**Étape 5 — Partie B : casse puis répare la réactivité**
-
-Dans `reactivityPitfall.ts`, crée un `reactive({ count: 0 })`, destructure-le, mute la copie, observe que rien ne bouge. Puis refais avec `toRefs`.
-
-- Pourquoi le destructuring d'un `reactive` produit-il une valeur figée ?
-- `toRef(state, 'count')` vs `toRefs(state)` : quand préférer l'un ?
-
-**Étape 6 — Écris les tests Vitest**
-
-Couvre l'état réactif (Partie A) ET la démo `toRefs` (Partie B). Les `ref`/`computed` sont synchrones : pas besoin de `nextTick` pour lire une valeur dérivée.
-
-**Étape 7 — Crée `FamilyMemberList.vue`**
-
-Crée le SFC avec `<script setup lang="ts">`, importe `useMembers`, utilise `v-model` sur `query`, `v-for` sur `filtered`. Ajoute un bouton "Ajouter un membre test". (Pas de `defineProps`/`defineEmits` ici — c'est le module 05.)
+7. **Vérifie les cas limites** — saisir "ali" → seule Alice reste ; taper "bo" puis effacer en moins de 300 ms → aucun log console ; cliquer le bouton → Charlie apparaît sans rechargement. Ajouter tous les membres offline → empty state si tu filtres sur un nom inexistant.
 
 ---
 
 ## Corrigé complet commenté
 
-### `src/composables/useMembers.ts`
-
-```ts
-// useMembers.ts
+```vue
+<!-- FamilyMemberList.vue — corrigé -->
+<script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 
-// Typage du domaine — chaque membre de famille TribuZen
+// Interface du domaine TribuZen — define ici, migrera vers src/types plus tard
 interface Member {
   id: string
   name: string
@@ -105,301 +89,203 @@ interface Member {
   online: boolean
 }
 
-export function useMembers(initialMembers: Member[] = []) {
-  // ref<Member[]> : on remplace le tableau entier à chaque mutation
-  // → Vue détecte le changement d'identité, rendu déclenché.
-  // Alternative : reactive([]) marche aussi, mais ref reste destructurable
-  // sans toRefs quand on retourne l'état → choix plus sûr.
-  const members = ref<Member[]>(initialMembers)
+// Fix Bug 1 : ref<Member[]> — Vue installe un Proxy profond sur le tableau.
+// On remplace le tableau entier à chaque mutation (spread + nouvel objet).
+// push() déclencherait aussi le rendu avec ref, mais le remplacement
+// est plus prévisible, immuable, et facilement testable en isolation.
+const members = ref<Member[]>([
+  { id: '1', name: 'Alice', role: 'parent', online: true  },
+  { id: '2', name: 'Bob',   role: 'enfant', online: false },
+  { id: '3', name: 'Cara',  role: 'parent', online: true  },
+])
 
-  // Chaîne de recherche — ref<string> car c'est une primitive
-  const query = ref('')
+// Fix Bug 2 : ref<string> pour une primitive — reactive() ne peut pas
+// envelopper un string directement (interdit par TypeScript + Vue).
+// v-model dans le template lit et écrit query.value automatiquement.
+const query = ref('')
 
-  // computed = valeur dérivée, mise en cache.
-  // Recalcule UNIQUEMENT si members.value ou query.value change.
-  // Accéder à m.name dans le filter crée la dépendance sur le contenu.
-  const filtered = computed<Member[]>(() => {
-    const q = query.value.toLowerCase().trim()
-    if (q === '') return members.value
-    return members.value.filter(m => m.name.toLowerCase().includes(q))
-  })
-
-  // Compteur membres en ligne — dépend de members.value.
-  // Note : ref sur tableau utilise un Proxy profond en interne, donc
-  // muter members.value[0].online = true déclenche aussi le recalcul.
-  const onlineCount = computed<number>(() =>
-    members.value.filter(m => m.online).length
-  )
-
-  // watch explicite sur query (pas watchEffect) car :
-  // 1. on veut logguer seulement quand query CHANGE (pas au montage) ;
-  // 2. onCleanup annule le timer précédent → debounce correct.
-  watch(query, (newQ, _oldQ, onCleanup) => {
-    const timer = setTimeout(() => {
-      if (newQ.trim()) {
-        // En production : remplacer par un vrai appel analytics
-        console.log('[TribuZen analytics] member search:', newQ)
-      }
-    }, 300)
-    // onCleanup est appelé juste AVANT la prochaine exécution du callback
-    // → si l'utilisateur tape vite, seul le dernier setTimeout survit.
-    onCleanup(() => clearTimeout(timer))
-  })
-
-  // Mutation : on remplace le tableau entier (immutabilité) plutôt que push()
-  function addMember(name: string, role: Member['role'] = 'enfant'): void {
-    members.value = [
-      ...members.value,
-      { id: crypto.randomUUID(), name: name.trim(), role, online: false },
-    ]
-  }
-
-  function removeMember(id: string): void {
-    members.value = members.value.filter(m => m.id !== id)
-  }
-
-  // On retourne des refs/computed directement : pas de toRefs nécessaire,
-  // car ce ne sont pas les propriétés d'un reactive mais des refs autonomes.
-  return {
-    members,       // Ref<Member[]>
-    query,         // Ref<string>
-    filtered,      // ComputedRef<Member[]>
-    onlineCount,   // ComputedRef<number>
-    addMember,
-    removeMember,
-  }
-}
-```
-
-### `src/composables/reactivityPitfall.ts` (Partie B)
-
-```ts
-// reactivityPitfall.ts — démonstration perte de réactivité + fix toRefs
-import { reactive, toRefs, watchEffect } from 'vue'
-
-// CAS CASSÉ : destructurer un reactive extrait une valeur primitive figée
-export function brokenDestructuring() {
-  const state = reactive({ count: 0 })
-  const { count } = state // ❌ count = 0, un number ordinaire, plus lié au Proxy
-
-  // Muter la copie n'affecte pas le Proxy source
-  let local = count
-  local++ // state.count reste 0
-  return { stateCount: () => state.count, localCount: local }
-}
-
-// CAS CORRIGÉ : toRefs transforme chaque prop en Ref synchronisée
-export function fixedWithToRefs() {
-  const state = reactive({ count: 0, name: 'Alice' })
-  const { count, name } = toRefs(state) // ✅ Ref<number>, Ref<string>
-
-  count.value++         // state.count devient 1 (bidirectionnel)
-  name.value = 'Bob'    // state.name devient 'Bob'
-
-  // Preuve d'observabilité : watchEffect (flush sync = re-run immédiat)
-  // ré-exécute sur mutation via la ref.
-  const log: number[] = []
-  watchEffect(() => log.push(count.value), { flush: 'sync' })
-  count.value++ // déclenche le watchEffect → log = [1, 2]
-
-  return { state, count, name, log }
-}
-```
-
-### `src/composables/useMembers.test.ts`
-
-```ts
-import { describe, it, expect, vi } from 'vitest'
-import { useMembers } from './useMembers'
-import { brokenDestructuring, fixedWithToRefs } from './reactivityPitfall'
-
-// Les Ref et computed sont synchrones — pas besoin de nextTick pour les lire.
-describe('useMembers — état réactif (Partie A)', () => {
-  it('initialise avec les membres fournis', () => {
-    const initial = [{ id: '1', name: 'Alice', role: 'parent' as const, online: true }]
-    const { members } = useMembers(initial)
-    expect(members.value).toHaveLength(1)
-    expect(members.value[0].name).toBe('Alice')
-  })
-
-  it('addMember ajoute un membre avec un id UUID', () => {
-    const { members, addMember } = useMembers()
-    addMember('Bob', 'enfant')
-    expect(members.value).toHaveLength(1)
-    expect(members.value[0].name).toBe('Bob')
-    expect(members.value[0].online).toBe(false)
-    expect(members.value[0].id).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-    )
-  })
-
-  it('removeMember supprime par id sans altérer les autres', () => {
-    const { members, addMember, removeMember } = useMembers()
-    addMember('Alice')
-    addMember('Bob')
-    removeMember(members.value[0].id)
-    expect(members.value).toHaveLength(1)
-    expect(members.value[0].name).toBe('Bob')
-  })
-
-  it('filtered réagit à query.value de façon synchrone', () => {
-    const { filtered, query, addMember } = useMembers()
-    addMember('Alice')
-    addMember('Albert')
-    addMember('Bob')
-
-    expect(filtered.value).toHaveLength(3) // query vide → tous
-
-    query.value = 'al'
-    expect(filtered.value.map(m => m.name)).toEqual(['Alice', 'Albert'])
-
-    query.value = 'bob'
-    expect(filtered.value).toHaveLength(1)
-  })
-
-  it('onlineCount compte uniquement les membres online', () => {
-    const initial = [
-      { id: '1', name: 'Alice', role: 'parent' as const, online: true },
-      { id: '2', name: 'Bob',   role: 'enfant' as const, online: false },
-    ]
-    const { onlineCount } = useMembers(initial)
-    expect(onlineCount.value).toBe(1)
-  })
-
-  it('le watch debounce loggue après 300 ms', async () => {
-    vi.useFakeTimers()
-    const spy = vi.spyOn(console, 'log').mockImplementation(() => {})
-    const { query } = useMembers()
-
-    query.value = 'Ali'
-    vi.advanceTimersByTime(200)
-    expect(spy).not.toHaveBeenCalled() // avant 300 ms : rien
-
-    await vi.runAllTimersAsync()
-    expect(spy).toHaveBeenCalledWith('[TribuZen analytics] member search:', 'Ali')
-
-    spy.mockRestore()
-    vi.useRealTimers()
-  })
+// Fix Bug 3 : computed met le résultat en cache.
+// Ne recalcule QUE si members.value OU query.value change.
+// Une méthode getFiltered() recalculerait à CHAQUE render, même sans changement.
+const filtered = computed<Member[]>(() => {
+  const q = query.value.toLowerCase().trim()
+  // Guard clause : query vide → toute la liste, sans parcourir chaque membre
+  if (q === '') return members.value
+  return members.value.filter(m => m.name.toLowerCase().includes(q))
 })
 
-describe('perte de réactivité et fix toRefs (Partie B)', () => {
-  it('destructurer un reactive fige la valeur (cassé)', () => {
-    const { stateCount, localCount } = brokenDestructuring()
-    expect(stateCount()).toBe(0)  // le Proxy source n'a pas bougé
-    expect(localCount).toBe(1)    // la copie locale, elle, a bougé — désynchro
-  })
+// Compteur indépendant — dépend uniquement de members.value.
+// Les deux computed sont mis en cache séparément : modifier query.value
+// recalcule filtered mais PAS onlineCount (ses dépendances n'ont pas changé).
+const onlineCount = computed<number>(() =>
+  members.value.filter(m => m.online).length
+)
 
-  it('toRefs rétablit la liaison bidirectionnelle', () => {
-    const { state, count, name, log } = fixedWithToRefs()
-    expect(state.count).toBe(2)     // count.value++ x2 propagé au reactive
-    expect(state.name).toBe('Bob')  // name.value = 'Bob' propagé
-    expect(log).toEqual([1, 2])     // l'effect a bien re-tracké la ref
-  })
+// watch vs watchEffect :
+// — watch = source EXPLICITE (query) → déclenché seulement sur changement
+// — watch est LAZY : pas de log au montage, uniquement sur mutation
+// — watchEffect aurait logué immédiatement au montage avec query vide
+// onCleanup est appelé AVANT la prochaine exécution du callback :
+// si l'utilisateur tape vite, clearTimeout annule le setTimeout précédent
+// → seul le dernier appel après 300 ms de silence produit un log.
+watch(query, (newQ, _oldQ, onCleanup) => {
+  const timer = setTimeout(() => {
+    if (newQ.trim()) {
+      console.log('[TribuZen analytics] member search:', newQ)
+    }
+  }, 300)
+  onCleanup(() => clearTimeout(timer))
 })
-```
 
-### `src/components/FamilyMemberList.vue`
-
-```vue
-<script setup lang="ts">
-import { useMembers } from '@/composables/useMembers'
-
-// Pas de defineProps/defineEmits ici : props/emits = module 05.
-// Destructuration directe : query/filtered/onlineCount sont des Ref/ComputedRef
-// → réactivité conservée (ce sont des refs autonomes, pas un reactive).
-const { query, filtered, onlineCount, addMember, removeMember } = useMembers()
-
-function handleAddDemo() {
-  addMember(`Membre ${Date.now()}`, 'enfant')
+// Remplacement entier (spread) → Vue détecte le nouvel identifiant de tableau
+// et déclenche le rendu. crypto.randomUUID() : id UUID v4 garanti unique.
+function addMember(name: string): void {
+  members.value = [
+    ...members.value,
+    { id: crypto.randomUUID(), name, role: 'enfant', online: false },
+  ]
 }
+
+// ─── Piège réactivité — à lire, pas à brancher dans le template ────────────
+//
+// CASSÉ — destructurer un reactive() extrait une primitive JS ordinaire :
+//   const state = reactive({ count: 0 })
+//   const { count } = state   // count = 0, un number brut, plus lié au Proxy
+//   count++                   // state.count reste à 0, le template ne réagit pas
+//
+// FIX — toRefs() retourne un objet dont chaque prop est une Ref synchronisée :
+//   import { toRefs } from 'vue'
+//   const { count } = toRefs(state)
+//   count.value++             // state.count = 1, liaison bidirectionnelle
+//
+// Dans ce composant, on retourne directement des ref/computed autonomes
+// → pas besoin de toRefs (on n'a pas de reactive à destructurer).
+// ────────────────────────────────────────────────────────────────────────────
 </script>
 
 <template>
   <section class="family-members">
-    <header>
-      <h2>Membres de la famille</h2>
-      <!-- onlineCount auto-unwrapped : pas de .value dans le template -->
-      <span class="badge">{{ onlineCount }} en ligne</span>
-    </header>
+    <!-- onlineCount est ComputedRef<number> — auto-unwrap dans le template,
+         pas de .value requis. Affiche "2 en ligne" dès le premier rendu. -->
+    <h2>Membres de la famille — {{ onlineCount }} en ligne</h2>
 
-    <!-- v-model sur query — fonctionne car query est une Ref<string> -->
+    <!-- v-model = liaison bidirectionnelle sur query.value.
+         Dès que l'utilisateur tape, query.value change → filtered recalcule. -->
     <input
       v-model="query"
       type="search"
       placeholder="Filtrer par nom..."
-      aria-label="Filtrer les membres"
     />
 
-    <ul v-if="filtered.length > 0" role="list">
-      <li v-for="member in filtered" :key="member.id" class="member-item">
-        <span>{{ member.name }}</span>
+    <!-- Empty state : teste filtered.length (liste déjà filtrée),
+         pas members.value.length — si le filtre ne matche rien, on l'affiche
+         même si members n'est pas vide. -->
+    <p v-if="filtered.length === 0" class="empty-state">
+      Aucun membre ne correspond.
+    </p>
+
+    <!-- v-else : s'affiche uniquement quand filtered.length > 0 -->
+    <ul v-else>
+      <!--
+        v-for sur filtered (le computed), pas sur members.value brut.
+        :key="member.id" — id métier stable, résistant au tri/filtre futur.
+        :class objet — syntaxe lisible pour une seule classe conditionnelle.
+      -->
+      <li
+        v-for="member in filtered"
+        :key="member.id"
+        :class="{ 'member--offline': !member.online }"
+      >
+        <!-- Interpolation : auto-escapée par Vue, pas de risque XSS -->
+        {{ member.name }}
         <span class="role">{{ member.role }}</span>
-        <span v-if="member.online" class="online-dot" aria-label="En ligne" />
-        <button
-          @click="removeMember(member.id)"
-          :aria-label="`Retirer ${member.name}`"
-        >
-          ✕
-        </button>
+        <!-- v-if (pas v-show) : le nœud est ABSENT du DOM quand offline.
+             v-show garderait un span vide — inutile ici, l'état ne toggle pas. -->
+        <span v-if="member.online" class="dot-online" aria-label="En ligne" />
       </li>
     </ul>
-    <p v-else>Aucun membre ne correspond à la recherche.</p>
 
-    <button @click="handleAddDemo">+ Ajouter un membre test</button>
+    <!-- Expression inline suffisamment courte — au-delà d'un appel simple,
+         extraire dans une fonction handleAdd() dans le script. -->
+    <button @click="addMember('Charlie')">Ajouter Charlie</button>
   </section>
 </template>
+
+<style scoped>
+/* Membres hors ligne : opacity plutôt que display:none
+   pour garder la structure de liste visible (utile en mode admin) */
+.member--offline {
+  opacity: 0.45;
+}
+
+.role {
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* Point vert statut en ligne */
+.dot-online {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.empty-state {
+  color: #94a3b8;
+  font-style: italic;
+}
+</style>
 ```
+
+**Pourquoi ce corrigé est correct :**
+- `ref<Member[]>` — Vue installe un Proxy profond sur le tableau. Remplacer `members.value` en entier (spread) est la mutation la plus prévisible : Vue détecte le changement d'identité et re-rend. `push()` fonctionnerait aussi, mais modifie en place et rend les tests moins déterministes.
+- `filtered` et `onlineCount` sont deux `computed` indépendants, chacun mis en cache. Changer `query.value` ne recalcule que `filtered`, pas `onlineCount` — Vue ne suit que les dépendances réellement lues dans chaque getter.
+- Le `watch(query, ...)` avec `onCleanup` implémente un debounce sans bibliothèque. `clearTimeout` dans `onCleanup` garantit qu'un seul log sort même si l'utilisateur tape plusieurs caractères en rafale — seul le dernier `setTimeout` à survivre 300 ms produit un log.
+- `v-model="query"` fonctionne car `query` est une `Ref<string>` — Vue lit `.value` à l'affichage et l'écrit au changement d'input. Passer une primitive extraite (`let q = query.value`) casserait le binding immédiatement.
 
 ---
 
 ## Variante J+30 (fading)
 
-**Même problème, une contrainte ajoutée : tu as 20 minutes et tu ne peux pas regarder le corrigé.**
+**Même objectif, contraintes ajoutées :**
 
-Recrée `useMembers` de mémoire, mais cette fois :
-1. Ajoute un état `loading: Ref<boolean>` et `error: Ref<string | null>`.
-2. Ajoute une fonction `reload()` qui simule un fetch (`Promise` + `setTimeout`) et remplace `members.value` au retour, en basculant `loading`.
-3. Écris 2 tests Vitest couvrant le passage `loading true → false`.
+Reproduis `FamilyMemberList.vue` **de mémoire, en 25 minutes**, avec les modifications suivantes :
 
-Contrainte bonus : reproduis la perte de réactivité de la Partie B **sans** regarder — puis corrige-la avec `toRef` (une seule propriété) au lieu de `toRefs`.
+1. Remplace `const query = ref('')` et `const members = ref<Member[]>(...)` par un seul `reactive` qui regroupe les deux : `const state = reactive({ members: [...], query: '' })`. Pour passer `members` et `query` au template et garder la réactivité, applique `toRefs(state)` — explique à voix haute pourquoi le destructuring direct briserait tout.
+2. Remplace le `watch` par un `watchEffect` et identifie ce qui change : est-il déclenché au montage ? A-t-il accès à `oldVal` ? Pourquoi ce choix est-il moins adapté ici ?
+3. Ajoute un filtre cumulatif **rôle** : un `ref<'parent' | 'enfant' | ''>` et un `computed` qui combine filtre nom + filtre rôle. `{{ filteredCount }} résultat(s)` affiché en temps réel.
+4. **Sans ouvrir ce corrigé** ni le module 03.
+
+**Critère de réussite :** les trois comportements fonctionnent dans le navigateur — filtre réactif, compteur en ligne, log debouncé — et le filtre rôle est indépendant du filtre nom.
 
 ---
 
 ## Application TribuZen
 
-**Objectif** : porter l'état réactif de la liste dans le vrai repo `smaurier/tribuzen`.
+Dans le repo `smaurier/tribuzen`, `FamilyMemberList.vue` vit ici :
 
-**Fichiers à créer :**
-
-```bash
-# Dans tribuzen/
-touch src/composables/useMembers.ts
-touch src/composables/useMembers.test.ts
-touch src/components/FamilyMemberList.vue
+```
+tribuzen/
+  src/
+    components/
+      family/
+        FamilyMemberList.vue
 ```
 
-**Steps concrets :**
+**Différences par rapport au lab :**
 
-1. Copie `useMembers.ts` du corrigé dans `tribuzen/src/composables/`. Adapte l'interface `Member` aux types existants dans `tribuzen/types/index.ts` (interfaces `User`, `Family` déjà commitées).
-2. Branche `FamilyMemberList.vue` sur les données statiques (le fetch réel arrive avec le module async/props).
-3. Lance `npm test` (= `vitest run`) dans tribuzen. Les tests de `useMembers.test.ts` doivent être verts.
-4. Commit dans smaurier/tribuzen :
-   ```bash
-   git add src/composables/useMembers.ts src/composables/useMembers.test.ts src/components/FamilyMemberList.vue
-   git commit -m "feat(vue): état réactif FamilyMemberList — filtered list + debounced search"
-   ```
+- La logique `query` + `filtered` + `onlineCount` + `watch` sera extraite dans un composable `useMembers.ts` (module intermédiaire 02-composables). Pour l'instant, garde tout dans `<script setup>`.
+- L'interface `Member` sera importée depuis `src/types/family.ts` — dans le lab, on la définit inline.
+- Le log `console.log` dans le `watch` sera remplacé par un appel à un service analytics réel (même pattern `onCleanup`, service différent).
+- Les membres viendront d'une prop `members: Member[]` passée par le parent `FamilyPage.vue` (module 05 — `defineProps`). Pour l'instant, garde les données locales.
 
-**Lien avec l'existant :** l'interface `Member` peut dériver de `UserPreview` (déjà dans `types/index.ts`) :
-```ts
-// types/index.ts (existant)
-type UserPreview = Pick<User, 'id' | 'name' | 'avatar'>
+**Commit cible :**
 
-// À ajouter pour ce lab
-interface Member extends UserPreview {
-  role: 'parent' | 'enfant'
-  online: boolean
-}
 ```
-
-Ce commit est la preuve de transfert : les primitives de réactivité vues en cours existent dans un vrai produit, dans un vrai repo, avec de vrais tests.
+feat(family): FamilyMemberList — ref/computed/watch, filtre réactif, debounce analytics
+```

@@ -1,6 +1,6 @@
 # Lab 01 — Environnement et premier composant
 
-> **Outcome :** à la fin, tu sais créer un SFC Vue 3 de A à Z, le monter dans `App.vue`, et l'inspecter avec les Vue DevTools.
+> **Outcome :** à la fin, tu sais créer un SFC Vue 3 complet (`<script setup lang="ts">`, `<template>`, `<style scoped>`) de A à Z, le brancher dans `App.vue`, et le vérifier dans le navigateur avec HMR et Vue DevTools.
 > **Vrai outil :** Vite dev server (`pnpm dev`) + `pnpm typecheck` (vue-tsc) — le navigateur et TypeScript comme oracles.
 > **Feedback :** le composant s'affiche dans le navigateur ET `pnpm typecheck` passe en vert.
 
@@ -8,77 +8,64 @@
 
 ## Énoncé
 
-Tu crées `WelcomeBanner.vue`, le premier composant du front-office TribuZen. Il affiche un message de bienvenue contextuel (selon l'heure) et le prénom de l'utilisateur.
+Tu crées `WelcomeBanner.vue`, le premier composant du front-office TribuZen. Voici le cahier des charges **exact** :
 
-**Contraintes :**
-- `<script setup lang="ts">` obligatoire — TypeScript activé
-- Le prénom est une `ref<string>` (valeur hardcodée `'Alice'` pour l'instant)
-- Le message change selon l'heure du jour : Bonjour (0h-12h) / Bon après-midi (12h-18h) / Bonsoir (18h-23h)
-- `<style scoped>` — pas de pollution CSS globale
-- Branché dans `App.vue` et visible sur `http://localhost:5173`
+1. Un bloc `<script setup lang="ts">` avec :
+   - `userName` : une `ref<string>` initialisée à `'Alice'`
+   - `appVersion` : une constante string `'1.0.0'` (pas de `ref` — la valeur ne change pas)
+   - `buildGreeting(name: string): string` : retourne `'Bonjour <name> !'` (0h–11h), `'Bon après-midi <name> !'` (12h–17h), `'Bonsoir <name> !'` (18h–23h)
+2. Un `<template>` qui affiche :
+   - le résultat de `buildGreeting(userName)` dans un `<h1>` via interpolation
+   - `userName` dans un `<p>` (texte « Connecté en tant que **Alice** »)
+   - `appVersion` dans un second `<p>` (texte « TribuZen v1.0.0 »)
+3. Un `<style scoped>` avec au minimum : couleur `#16a34a` pour le `h1`, fond `#f0fdf4` et `padding: 2rem` pour `.welcome-banner`.
+4. Branché dans `App.vue` — visible sur `http://localhost:5173`.
 
-**Starter :** tu pars d'un projet créé avec `pnpm create vue@latest`, effaces le contenu généré dans `App.vue`, et crées `src/components/WelcomeBanner.vue` de A à Z.
+**Pas de gap-fill** — tu écris le composant complet à partir du starter minimal ci-dessous.
+
+### Starter minimal
+
+Scaffold le projet puis crée `src/components/WelcomeBanner.vue` :
+
+```bash
+pnpm create vue@latest tribuzen-lab01
+# TypeScript ✅  ESLint ✅  Prettier ✅  — tout le reste : No
+cd tribuzen-lab01 && pnpm install
+```
+
+```vue
+<!-- src/components/WelcomeBanner.vue — starter -->
+<script setup lang="ts">
+import { ref } from 'vue'
+
+// À toi : déclare userName (ref<string>), appVersion (constante), buildGreeting
+</script>
+
+<template>
+  <div class="welcome-banner">
+    <!-- À toi : h1 avec buildGreeting, p connecté, p version -->
+  </div>
+</template>
+
+<style scoped>
+/* À toi : .welcome-banner, h1, .version */
+</style>
+```
+
+Lance `pnpm dev` et branche `WelcomeBanner` dans `App.vue` avant de regarder le corrigé.
 
 ---
 
 ## Étapes (en friction)
 
-**Étape 1 — Scaffold le projet**
-
-```bash
-pnpm create vue@latest tribuzen-lab01
-# Sélectionner : TypeScript ✅, ESLint ✅, Prettier ✅ — tout le reste : No
-
-cd tribuzen-lab01
-pnpm install
-pnpm dev
-```
-
-Ouvre `http://localhost:5173`. Tu vois la page de démo générée par le scaffold. Laisse le serveur tourner dans ce terminal.
-
-**Étape 2 — Nettoyer `App.vue`**
-
-Ouvre `src/App.vue`. Efface tout son contenu. Remplace-le par un squelette minimal sans importer encore `WelcomeBanner` :
-
-```vue
-<template>
-  <main><!-- WelcomeBanner arrivera ici --></main>
-</template>
-```
-
-Sauvegarde. Le navigateur se met à jour via HMR — page blanche, c'est normal.
-
-**Étape 3 — Créer `src/components/WelcomeBanner.vue`**
-
-Crée le fichier vide. Construis les trois blocs dans l'ordre :
-
-1. **`<script setup lang="ts">`** — importe `ref` depuis `'vue'`, déclare `userName = ref<string>('Alice')` et une constante `appVersion = '1.0.0'`. Écris la fonction `buildGreeting(name: string): string` qui retourne un message différent selon `new Date().getHours()`.
-2. **`<template>`** — affiche `{{ buildGreeting(userName) }}` dans un `<h1>` et `{{ userName }}` dans un `<p>`. Entoure tout d'une `<div class="welcome-banner">`.
-3. **`<style scoped>`** — donne au `h1` la couleur `#16a34a`, à `.welcome-banner` un fond `#f0fdf4` et un `padding: 2rem`.
-
-Ne regarde pas le corrigé avant d'avoir une version qui fonctionne dans le navigateur.
-
-**Étape 4 — Brancher dans `App.vue`**
-
-Dans `App.vue`, importe `WelcomeBanner` depuis `'./components/WelcomeBanner.vue'` dans le `<script setup lang="ts">` et utilise `<WelcomeBanner />` dans le template. Sauvegarde — le composant doit apparaître sans rechargement.
-
-**Étape 5 — Vérifier les types TypeScript**
-
-```bash
-# Dans un second terminal (le premier fait tourner pnpm dev)
-pnpm typecheck
-```
-
-Zéro erreur = vert. Si une erreur apparaît, lis le message : il indique le fichier, la ligne, et la nature du problème. Les erreurs courantes à ce stade : `lang="ts"` manquant, `ref` non importé.
-
-**Étape 6 — Explorer avec Vue DevTools**
-
-Installe l'extension Vue DevTools (Chrome/Firefox/Edge — recherche "Vue Devtools" dans le store de ton navigateur). Ouvre F12 → onglet "Vue". Tu dois voir :
-
-- La hiérarchie `App → WelcomeBanner`
-- Les valeurs `userName: "Alice"` et `appVersion: "1.0.0"` dans le panneau de détails
-
-Modifie `userName` directement dans les DevTools — le template se met à jour en temps réel. C'est la réactivité en action.
+1. **Scaffold et nettoyage** — Crée le projet avec `pnpm create vue@latest`, installe, lance `pnpm dev`. Ouvre `src/App.vue` et vide-le (garde juste `<template><main></main></template>`). Le serveur se met à jour via HMR — page blanche attendue.
+2. **Déclare l'état réactif** — Dans `<script setup lang="ts">`, importe `ref` depuis `'vue'` et déclare `userName = ref<string>('Alice')`. Déclare aussi `appVersion = '1.0.0'` sans `ref`.
+3. **Écris `buildGreeting`** — Fonction typée `(name: string): string`. Utilise `new Date().getHours()` et deux `if` pour couvrir les trois plages horaires. Retourne le message avec le prénom interpolé via template literal.
+4. **Écris le template** — Ajoute un `<h1>` avec `` `{{ buildGreeting(userName) }}` ``, un `<p>` avec `` `{{ userName }}` ``, un `<p class="version">` avec `` `{{ appVersion }}` ``. Entoure d'une `<div class="welcome-banner">`.
+5. **Écris le style scoped** — Applique couleur, fond, padding. Vérifie dans les DevTools navigateur que l'attribut `data-v-xxxx` est bien présent sur les éléments — c'est la signature du scoping Vite.
+6. **Branche dans `App.vue`** — Importe `WelcomeBanner` dans `<script setup lang="ts">`, utilise `<WelcomeBanner />` dans le template. Sauvegarde — le composant apparaît sans rechargement de page.
+7. **Vérifie les types** — Lance `pnpm typecheck` dans un second terminal. Zéro erreur attendu. Erreurs courantes à ce stade : `lang="ts"` manquant sur le `<script>`, `ref` non importé.
+8. **Explore les DevTools** — Ouvre F12 → onglet Vue. Vérifie la hiérarchie `App → WelcomeBanner` et la valeur `userName: "Alice"`. Modifie `userName` directement dans les DevTools — le template se met à jour : c'est la réactivité Vue en action.
 
 ---
 
@@ -87,31 +74,32 @@ Modifie `userName` directement dans les DevTools — le template se met à jour 
 ### `src/main.ts` (généré par le scaffold — ne pas modifier)
 
 ```ts
-// main.ts — point d'entrée unique, exécuté directement par Vite
+// main.ts — seul fichier exécuté directement par Vite au démarrage
 import { createApp } from 'vue'
 import App from './App.vue'
-import './style.css'       // import sans variable = injection du CSS global
+import './style.css'    // import sans variable = injection du CSS global
 
-// createApp(App) : crée l'instance Vue en mémoire, App.vue comme racine
+// createApp(App) : crée l'instance Vue en mémoire, App.vue comme composant racine
 // .mount('#app') : accroche l'instance sur <div id="app"> dans index.html
-// Sans .mount(), l'application existe en mémoire mais rien ne s'affiche
+// Sans .mount(), l'application existe en mémoire mais rien ne s'affiche — page blanche silencieuse
 createApp(App).mount('#app')
 ```
 
-### `src/App.vue` — version minimale
+### `src/App.vue`
 
 ```vue
+<!-- App.vue — composant racine, parent de tous les composants TribuZen -->
 <script setup lang="ts">
-// Avec <script setup>, l'import du composant suffit
-// Pas de components: {} à déclarer — c'est un avantage majeur de <script setup>
+// Import du composant suffit avec <script setup> — pas de components: {} à déclarer
+// C'est un avantage clé de <script setup> par rapport à l'Options API
 import WelcomeBanner from './components/WelcomeBanner.vue'
 </script>
 
 <template>
-  <!-- Fragment Vue 3 : <main> seul à la racine du template — pas de div wrapper -->
+  <!-- Fragment Vue 3 : un seul élément racine suffit, pas de div wrapper obligatoire -->
   <main>
-    <!-- WelcomeBanner est utilisé comme un tag HTML standard -->
-    <!-- Vue reconnaît les PascalCase (WelcomeBanner) comme des composants -->
+    <!-- Vue reconnaît le PascalCase (WelcomeBanner) comme composant
+         vs les éléments HTML natifs en lowercase (div, main, p...) -->
     <WelcomeBanner />
   </main>
 </template>
@@ -119,61 +107,63 @@ import WelcomeBanner from './components/WelcomeBanner.vue'
 <!-- Pas de <style> ici : App.vue délègue le style à ses composants enfants -->
 ```
 
-### `src/components/WelcomeBanner.vue` — corrigé complet
+### `src/components/WelcomeBanner.vue`
 
 ```vue
+<!-- WelcomeBanner.vue — premier SFC TribuZen -->
 <script setup lang="ts">
-// ─── Imports ──────────────────────────────────────────────────────────────────
-// Import OBLIGATOIRE : Vue ne fait pas d'auto-import dans <script setup> par défaut
-// ref() : enveloppe une valeur pour la rendre réactive (mécanisme détaillé au module 03)
+// ─── Import ────────────────────────────────────────────────────────────────────
+// Import OBLIGATOIRE : Vue ne fait pas d'auto-import de ref dans <script setup> par défaut
+// Erreur classique si oublié : ReferenceError: ref is not defined au runtime
 import { ref } from 'vue'
 
 // ─── État réactif ──────────────────────────────────────────────────────────────
 // ref<string>('Alice') : TypeScript sait que userName contient une string
-// Dans le template, Vue auto-unwrap les refs → on écrit {{ userName }}, pas {{ userName.value }}
+// Dans le template, Vue auto-unwrap les refs :
+//   on écrit {{ userName }} et non {{ userName.value }}
 const userName = ref<string>('Alice')
 
 // ─── Constante non réactive ────────────────────────────────────────────────────
-// Pas besoin de ref si la valeur ne change jamais dans ce composant
-// TypeScript infère le type string depuis la valeur initiale
+// Pas de ref : la valeur ne changera jamais dans ce composant
+// TypeScript infère string depuis la valeur initiale — annotation explicite inutile ici
 const appVersion = '1.0.0'
 
 // ─── Fonction utilitaire ────────────────────────────────────────────────────────
-// Toutes les déclarations racines dans <script setup> sont auto-exposées au template
+// Déclarée au niveau racine de <script setup> → auto-exposée au template (pas de return {})
 // Paramètre et retour typés explicitement : bonne pratique TS (module 00)
 function buildGreeting(name: string): string {
   const hour = new Date().getHours()
-  // 0h–11h59 : matin
+  // 0h–11h59 → matin
   if (hour < 12) return `Bonjour ${name} !`
-  // 12h–17h59 : après-midi
+  // 12h–17h59 → après-midi
   if (hour < 18) return `Bon après-midi ${name} !`
-  // 18h–23h59 : soir
+  // 18h–23h59 → soir (cas restant — pas de troisième if nécessaire)
   return `Bonsoir ${name} !`
 }
 </script>
 
 <template>
   <!--
-    La div racine reçoit un attribut data-v-xxxx par Vite (mécanisme scoped CSS)
-    Ce attribut est invisible dans le HTML source — visible dans les DevTools navigateur
+    La div racine reçoit un attribut data-v-xxxx par Vite (mécanisme <style scoped>)
+    Cet attribut est invisible dans le HTML source — visible dans les DevTools navigateur
   -->
   <div class="welcome-banner">
 
     <!--
-      buildGreeting(userName) : appel de fonction dans {{ }}
+      buildGreeting(userName) : appel de fonction dans l'interpolation
       userName est Ref<string> — Vue auto-unwrap dans le template :
       buildGreeting reçoit la string 'Alice', pas l'objet RefImpl
-      ERREUR CLASSIQUE : écrire buildGreeting(userName.value) dans le template
-      — ça fonctionne aussi, mais ce n'est pas idiomatique Vue
+      Idiome incorrect : buildGreeting(userName.value) fonctionne aussi
+      mais n'est pas idiomatique — dans le template, on écrit userName sans .value
     -->
     <h1>{{ buildGreeting(userName) }}</h1>
 
-    <!-- userName auto-unwrappé = 'Alice' directement dans le template -->
+    <!-- userName auto-unwrappé = 'Alice' directement dans le DOM -->
     <p>Connecté en tant que <strong>{{ userName }}</strong></p>
 
     <!--
-      Expression string dans {{ }} : concaténation directe
       appVersion est une string ordinaire (pas un Ref) — pas d'auto-unwrap nécessaire
+      L'expression insère simplement '1.0.0' dans le HTML
     -->
     <p class="version">TribuZen v{{ appVersion }}</p>
 
@@ -182,27 +172,27 @@ function buildGreeting(name: string): string {
 
 <style scoped>
 /*
-  scoped : Vite compile ce bloc en ajoutant un attribut unique à chaque sélecteur.
+  scoped : Vite ajoute un attribut unique (data-v-xxxx) aux éléments du composant
+  et suffixe chaque sélecteur CSS avec cet attribut.
   Résultat compilé (exemple) :
     .welcome-banner[data-v-3a1b2c] { ... }
     h1[data-v-3a1b2c] { ... }
-
-  Ces sélecteurs ne peuvent jamais cibler des éléments d'un autre composant,
-  même si celui-ci a une classe .welcome-banner ou un <h1> identique.
+  Ces sélecteurs ne peuvent cibler aucun élément d'un autre composant,
+  même si celui-ci a la même classe ou le même tag.
 */
 
 .welcome-banner {
   padding: 2rem;
   border-radius: 0.75rem;
-  background: #f0fdf4;           /* vert très pâle — palette TribuZen */
+  background: #f0fdf4;          /* vert très pâle — palette TribuZen */
   max-width: 600px;
   margin: 2rem auto;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 h1 {
-  /* Ce sélecteur ne cible QUE les <h1> de WelcomeBanner */
-  color: #16a34a;                /* vert TribuZen */
+  /* Ce sélecteur ne cible QUE les <h1> de WelcomeBanner grâce à scoped */
+  color: #16a34a;               /* vert TribuZen */
   font-size: 1.75rem;
   margin-bottom: 0.5rem;
 }
@@ -214,45 +204,61 @@ p {
 
 .version {
   font-size: 0.8rem;
-  color: #9ca3af;                /* gris clair — texte secondaire */
+  color: #9ca3af;               /* gris clair — texte secondaire */
   margin-top: 1rem;
 }
 </style>
 ```
 
+**Pourquoi ce corrigé est correct :**
+- `ref<string>('Alice')` est typé explicitement : TypeScript sait que `userName.value` est une `string` — toute assignation d'un nombre ou booléen lèvera une erreur de type.
+- `buildGreeting` reçoit `name: string` et retourne `string` — le type de retour explicite force la fonction à couvrir tous les cas (TS refuse un retour `undefined` implicite).
+- `<style scoped>` sans l'attribut `scoped` aurait pollué le `h1` global de toute l'application — à ce stade du scaffold, ça casse le titre de la page de démo Vite.
+- Le composant ne contient pas de `return {}` : c'est `<script setup>` qui auto-expose toutes les déclarations racines au template.
+
 ---
 
 ## Variante J+30 (fading)
 
-**Même composant, page blanche, 20 minutes, corrigé interdit.**
+**Même objectif, contraintes ajoutées :**
 
-Crée un `WelcomeBanner.vue` de mémoire avec ces contraintes (légèrement plus dures) :
+Reproduis `WelcomeBanner.vue` **de mémoire, en 20 minutes**, avec les modifications suivantes :
 
-- `userName = ref<string>('Alice')` et `familyName = ref<string>('Dupont')`
-- `fullGreeting` : une **constante** (pas de ref) qui combine les deux en une expression — comment la déclarer pour qu'elle reste lisible dans le template avec `{{ }}`? (réfléchis avant de te souvenir du mécanisme approprié)
-- `buildGreeting` retourne maintenant l'un des trois types littéraux `'Bonjour' | 'Bon après-midi' | 'Bonsoir'` — annote le type de retour en conséquence
-- Le template affiche `{{ fullGreeting.toUpperCase() }}`
-- `pnpm typecheck` doit passer en vert
+1. Ajoute `familyName = ref<string>('Dupont')`.
+2. Affiche le message de bienvenue avec le nom complet : `'Bonjour Alice Dupont !'`. Construis la concaténation dans le `<script>` — pas en inline dans le template.
+3. `buildGreeting` retourne l'un des trois **types littéraux** `'Bonjour' | 'Bon après-midi' | 'Bonsoir'` — annote le type de retour en conséquence. Le message complet est assemblé séparément.
+4. **Sans ouvrir ce corrigé** ni le module 01.
 
-> **Contrainte bonus :** si tu utilises `computed` pour `fullGreeting`, tu anticipes le module 03. C'est une solution valide — mais comprends pourquoi une simple constante `const fullGreeting = \`${userName.value} ${familyName.value}\`` ne fonctionnerait PAS dans ce contexte (réfléchis à ce qui se passe quand `userName.value` change).
+**Critère de réussite :** le composant fonctionne dans le navigateur ET `pnpm typecheck` passe en vert.
+
+> **Piège intentionnel :** pour afficher le nom complet réactif, une simple constante `const fullName = \`${userName.value} ${familyName.value}\`` ne réagit **pas** aux changements ultérieurs de `userName` ou `familyName`. Pourquoi ? Réfléchis avant de chercher la réponse dans le module 03 (`computed`).
 
 ---
 
 ## Application TribuZen
 
-**Objectif :** faire tourner `WelcomeBanner.vue` dans le vrai repo `smaurier/tribuzen`.
+Dans le repo `smaurier/tribuzen`, `WelcomeBanner.vue` vit ici :
 
-**Steps :**
+```
+tribuzen/
+  src/
+    main.ts                   ← createApp(App).mount('#app') — ne pas modifier
+    App.vue                   ← racine, importe WelcomeBanner
+    components/
+      WelcomeBanner.vue       ← premier SFC TribuZen — ce lab
+```
 
-1. Copie `WelcomeBanner.vue` dans `tribuzen/src/components/WelcomeBanner.vue`.
-2. Dans `tribuzen/src/App.vue`, importe et utilise `<WelcomeBanner />`.
-3. Lance `pnpm dev` dans le repo tribuzen — le composant doit s'afficher sur `localhost:5173`.
-4. Lance `pnpm typecheck` — zéro erreur attendu.
-5. Commit :
+**Différences par rapport au lab :**
+
+- `userName` viendra du store Pinia (module avancé 02) une fois celui-ci introduit. Pour l'instant, la valeur hardcodée `'Alice'` est acceptable.
+- Le style sera progressivement remplacé par des variables CSS TribuZen (`--color-primary`, `--color-surface`) définis dans `App.vue` — mais la logique `<style scoped>` reste identique.
+- `main.ts` dans TribuZen sera enrichi avec `.use(router)` et `.use(createPinia())` (modules avancés) — la ligne `createApp(App).mount('#app')` reste inchangée.
+
+**Commit cible :**
 
 ```bash
 git add src/components/WelcomeBanner.vue src/App.vue
 git commit -m "feat(ui): WelcomeBanner — premier SFC TribuZen (lab-01)"
 ```
 
-**Vérification de transfert :** ouvre les Vue DevTools sur `localhost:5173` dans le repo tribuzen. La hiérarchie `App → WelcomeBanner` doit être visible avec `userName` dans le panneau d'état. C'est la preuve que le composant fonctionne dans le vrai produit, pas seulement dans le lab.
+**Vérification de transfert :** ouvre les Vue DevTools sur `localhost:5173` dans le repo tribuzen. La hiérarchie `App → WelcomeBanner` doit être visible avec `userName` dans le panneau d'état — c'est la preuve que le composant fonctionne dans le vrai produit, pas seulement dans le lab.

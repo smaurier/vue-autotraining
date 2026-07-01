@@ -1,43 +1,42 @@
-# Lab 00 — TypeScript avec Vue 3 (`<script setup lang="ts">`)
+# Lab 00 — Typer Vue 3
 
-> **Outcome :** à la fin, tu sais annoter `ref`/`reactive`/`computed` dans un SFC Vue 3 et lire les erreurs de `vue-tsc` pour diagnostiquer des problèmes de typage.
-> **Vrai outil :** `vue-tsc --noEmit` (= `pnpm typecheck`) — le vérificateur de types officiel pour les SFC Vue.
-> **Feedback :** zéro erreur `vue-tsc` = lab réussi.
+> **Outcome :** à la fin, tu sais annoter `ref<T>()`, `reactive` avec interface, `computed` avec union de string littéraux, et rétrécir `catch (e)` — avec `vue-tsc --noEmit` comme seul juge.
+> **Vrai outil :** Vue 3.5 + `vue-tsc --noEmit` (alias `pnpm typecheck`).
+> **Feedback :** zéro erreur `vue-tsc` = lab réussi — le coach valide en session.
 
 ---
 
 ## Énoncé
 
-Tu reçois un composant `FamilyCard.vue` avec **5 erreurs de typage délibérées**. Tu dois les corriger sans changer la logique, puis écrire `LoginForm.vue` à partir de zéro.
+Tu rejoins TribuZen. Un collègue t'a laissé `FamilyCard.vue` avec **5 erreurs de typage délibérées**. `vue-tsc --noEmit` refuse de passer en vert. Ta mission : corriger chaque erreur **sans changer la logique** du composant.
 
-### Partie A — Corriger les erreurs de typage dans `FamilyCard.vue`
+**Règle absolue :** tu ne contournes pas TypeScript pour faire taire l'erreur — tu corriges le type.
 
-Crée le fichier `src/components/FamilyCard.vue` avec ce contenu exact :
+### Starter minimal
+
+Crée `src/components/family/FamilyCard.vue` dans ton projet Vite (`02-vue/`) avec ce contenu exact :
 
 ```vue
-<!-- FamilyCard.vue — starter avec erreurs de typage intentionnelles -->
-<!-- Objectif : corriger les 5 erreurs pour que vue-tsc passe en vert -->
+<!-- FamilyCard.vue — starter avec 5 erreurs de typage intentionnelles -->
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, reactive, computed } from 'vue'
 
-// Erreur 1 : lang="ts" manquant sur <script setup>
+// Erreur 1 : lang="ts" manquant — TS ne vérifie rien dans ce fichier
 
-// Erreur 2 : ref(null) sans annotation
+// Erreur 2 : ref(null) sans annotation de type final
 const family = ref(null)
 
-// Erreur 3 : reactive avec une primitive
+// Erreur 3 : reactive utilisé sur une primitive
 const memberCount = reactive(0)
 
-// Erreur 4 : computed sur union de string sans annotation
+// Erreur 4 : computed sur union de string littéraux sans annotation
 const status = computed(() => {
   if (!family.value) return 'loading'
   if (family.value.memberCount === 0) return 'empty'
   return 'active'
 })
-// → si tu ajoutes status.value.toUpperCase() dans le template, TS doit
-//   te garantir que c'est une string (le type union devrait être explicite)
 
-// Erreur 5 : catch (e) sans rétrécissement
+// Erreur 5 : catch (e) sans rétrécissement de type
 async function loadFamily(id: string): Promise<void> {
   try {
     const res = await fetch(`/api/families/${id}`)
@@ -53,91 +52,48 @@ async function loadFamily(id: string): Promise<void> {
     <h2>{{ family.name }}</h2>
     <p>{{ memberCount }} membres</p>
     <p>Statut : {{ status }}</p>
+    <button @click="loadFamily('demo-id')">Recharger</button>
   </div>
   <p v-else>Chargement…</p>
 </template>
 ```
 
-### Partie B — Écrire `LoginForm.vue` à partir de zéro
-
-Sans regarder le corrigé du module, écris `src/components/auth/LoginForm.vue` avec :
-- `<script setup lang="ts">`
-- `email: ref<string>`, `password: ref<string>`, `loading: ref<boolean>`, `error: ref<string | null>`
-- `canSubmit: computed<boolean>` (email non vide + password ≥ 8 caractères)
-- `async function login(): Promise<void>` avec un `fetch('/api/auth/login')` et gestion de `catch (e)`
-- Template minimal : 2 inputs, 1 bouton (`:disabled="!canSubmit || loading"`), 1 paragraphe d'erreur conditionnel
-
-**Oracle :** lance `pnpm typecheck` après chaque modification. Zéro erreur = vert.
-
-```
-02-vue/
-  src/
-    components/
-      FamilyCard.vue            ← Partie A (corriger)
-      auth/
-        LoginForm.vue           ← Partie B (écrire)
-```
+Lance `pnpm typecheck` dans `02-vue/`. Lis chaque message d'erreur (numéro de ligne, type attendu, type reçu). Corrige les erreurs une par une et relance après chaque correction.
 
 ---
 
 ## Étapes (en friction)
 
-**Étape 1 — Installe et lance le vérificateur de types**
-
-```bash
-# Dans 02-vue/
-pnpm typecheck        # = vue-tsc --noEmit
-```
-
-Tu dois voir 5 erreurs (ou plus si lang="ts" est absent — `vue-tsc` peut rater des fichiers non-TS). Lis chaque message d'erreur attentivement : le numéro de ligne et le type attendu vs reçu sont dans le message.
-
-**Étape 2 — Corriger Erreur 1 : `lang="ts"`**
-
-Ajoute `lang="ts"` sur le `<script setup>`. Relance `pnpm typecheck`. Observe combien d'erreurs apparaissent maintenant — certaines n'étaient pas visibles sans TS activé.
-
-**Étape 3 — Corriger Erreur 2 : `ref(null)`**
-
-Quelle interface faut-il créer pour `Family` ? Que contient un objet famille : un `id` (string), un `name` (string), un `memberCount` (number). Écris l'interface, puis annote `ref<Family | null>(null)`.
-
-- Pourquoi `ref<Family>(null)` ne suffit-il pas ? (`null` n'est pas assignable à `Family`)
-- Quel est le type de `family.value` après la garde `v-if="family"` dans le template ?
-
-**Étape 4 — Corriger Erreur 3 : `reactive` sur une primitive**
-
-`reactive(0)` est refusé par TypeScript. Quelle primitive utiliser à la place ? Comment intégrer `memberCount` dans une interface `reactive` si on voulait regrouper l'état du composant ?
-
-**Étape 5 — Corriger Erreur 4 : `computed` sans annotation d'union**
-
-`computed(() => { ... })` infère `ComputedRef<string>` — c'est légal mais pas précis. Annote pour obtenir `ComputedRef<'loading' | 'empty' | 'active'>`. Vérifie que TypeScript t'empêche d'ajouter une branche qui retourne autre chose.
-
-**Étape 6 — Corriger Erreur 5 : `catch (e)` sans rétrécissement**
-
-`e.message` avec `e: unknown` est une erreur TS. Ajoute le rétrécissement `instanceof Error`. Que faire si `e` n'est pas une `Error` (erreur réseau brute, string, etc.) ? Valeur de fallback : `'Erreur inconnue'`.
-
-**Étape 7 — Partie B : écrire `LoginForm.vue`**
-
-Ouvre une page blanche. Ne copie pas le corrigé du module — essaie de mémoire. Objectifs vérifiables avec `vue-tsc` :
-- `canSubmit.value++` → doit être une erreur TS (computed en lecture seule)
-- `error.value = 42` → doit être une erreur TS (number pas assignable à `string | null`)
-- `e.message` sans narrowing → doit être une erreur TS
-- `loading.value = 'yes'` → doit être une erreur TS
-
-Lance `pnpm typecheck`. Si tout est vert, le lab est complet.
+1. **Lance l'oracle** — `pnpm typecheck` (= `vue-tsc --noEmit`). Compte les erreurs initiales. Note que certaines sont invisibles tant que `lang="ts"` est absent.
+2. **Erreur 1 — active TypeScript** — ajoute `lang="ts"` sur `<script setup>`. Relance. Observe combien d'erreurs *apparaissent en plus* maintenant que le vérificateur est activé sur ce fichier.
+3. **Erreur 2 — annote `ref(null)`** — déclare l'interface `Family` (champs : `id: string`, `name: string`, `memberCount: number`, `createdAt: string`). Quelle annotation permet à la ref de contenir `Family` ou `null` ? Pourquoi `ref<Family>(null)` seul ne suffit-il pas ?
+4. **Erreur 3 — corrige `reactive` sur la primitive** — `reactive(0)` est refusé par TS. Quelle primitive utiliser à la place ? La règle : `reactive` pour les objets, `ref` pour les scalaires. En bonus : comment regrouper `memberCount` et `expanded` dans un objet `reactive` annoté avec une interface ?
+5. **Erreur 4 — annote le `computed`** — `computed(() => ...)` infère `ComputedRef<string>`. Annote le générique pour obtenir exactement `'loading' | 'empty' | 'active'`. Ensuite essaie d'ajouter `return 'unknown'` dans une des branches — TS doit le refuser immédiatement.
+6. **Erreur 5 — rétrécis `catch (e)`** — `e` est `unknown` en TS strict. Ajoute `instanceof Error` avant `.message`. Prévois un fallback si `e` n'est pas une `Error`.
+7. **Vérifie le green** — `pnpm typecheck` doit retourner zéro erreur. Le lab est terminé.
 
 ---
 
 ## Corrigé complet commenté
 
-### `src/components/FamilyCard.vue` — corrigé
-
 ```vue
-<!-- FamilyCard.vue — version corrigée -->
-<script setup lang="ts">
-<!-- Correction 1 : lang="ts" ajouté sur le script setup -->
-import { ref, computed } from 'vue'
+<!-- FamilyCard.vue — corrigé, commenté ligne à ligne -->
 
-// Correction 2 : interface déclarée + ref<Family | null>(null)
-// Family | null : null = état de chargement, Family = données chargées
+<!--
+  Correction 1 : lang="ts" sur <script setup>
+  Sans cet attribut, TypeScript est silencieusement désactivé pour tout le fichier.
+  Les erreurs de type ne s'affichent ni dans l'IDE ni dans vue-tsc.
+  C'est la seule configuration nécessaire — pas de tsconfig supplémentaire.
+-->
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+// reactive n'est plus importé : memberCount est maintenant un ref (primitive).
+// Si on avait voulu regrouper l'état dans un reactive, l'import serait resté.
+
+// ── Correction 2 : interface + ref<Family | null>(null) ──────────────────
+// On déclare l'interface AVANT la ref qui l'utilise (ordre de lecture naturel).
+// Family | null : null = état avant chargement, Family = données après réponse API.
+// ref<Family>(null) seul est une erreur TS : null n'est pas assignable à Family.
 interface Family {
   id: string
   name: string
@@ -146,41 +102,52 @@ interface Family {
 }
 
 const family = ref<Family | null>(null)
-// TypeScript sait maintenant que :
-// - family.value peut être null (avant chargement)
-// - family.value peut être Family (après chargement)
-// - family.value.name est garanti string si family.value != null
+// Après cette déclaration, TS garantit que :
+// • family.value peut être null (avant fetch) ✅
+// • family.value peut être Family (après fetch) ✅
+// • family.value.name est string si family.value est non-null ✅
+// • family.value = 42 → TS Error (number pas assignable à Family | null) ✅
 
-// Correction 3 : reactive ne fonctionne pas sur les primitives
-// Deux options valides :
-// Option A — ref pour la primitive seule
-const memberCount = ref(0)  // Ref<number>
-
-// Option B — si on regroupe l'état dans un reactive (montré en commentaire)
+// ── Bonus reactive (non requis ici, mais le pattern du module) ────────────
+// Si on voulait regrouper plusieurs scalaires, on utiliserait reactive avec une interface :
 // interface FamilyCardState { memberCount: number; expanded: boolean }
 // const state: FamilyCardState = reactive({ memberCount: 0, expanded: false })
+// Note : l'annotation est sur la VARIABLE, pas sur reactive<T>() — idiome Vue recommandé.
+// ─────────────────────────────────────────────────────────────────────────
 
-// Correction 4 : annotation du type union pour le computed
-// Sans annotation : ComputedRef<string> — trop large
-// Avec annotation : TypeScript vérifie que les branches retournent bien le type
+// Correction 3 : ref pour les primitives, pas reactive
+// reactive(0) → TS Error : Argument of type 'number' is not assignable to object.
+// La règle fondamentale : ref pour les scalaires, reactive pour les objets/tableaux.
+// L'inférence suffit ici : ref(0) donne Ref<number> — pas besoin d'annoter.
+const memberCount = ref(0)
+
+// Correction 4 : annotation de type union sur computed
+// Sans annotation : computed<string> — TS ne sait pas quelles strings sont valides.
+// Avec l'annotation générique : TS vérifie que CHAQUE branche retourne
+// exactement une des trois valeurs du type union.
+// Essaie d'ajouter `return 'unknown'` → TS Error immédiat ✅
 const status = computed<'loading' | 'empty' | 'active'>(() => {
   if (!family.value) return 'loading'
   if (family.value.memberCount === 0) return 'empty'
   return 'active'
-  // Essaie d'ajouter : return 'unknown' → TS Error immédiat
 })
 
 // Correction 5 : rétrécissement de e dans catch
+// En TS strict (strict: true dans tsconfig), e est 'unknown' — pas Error.
+// instanceof Error réduit e à Error dans ce bloc → .message est string ✅
+// Le else couvre les cas où e est une string, un nombre ou autre chose jeté.
 async function loadFamily(id: string): Promise<void> {
   try {
     const res = await fetch(`/api/families/${id}`)
-    family.value = await res.json() as Family  // le JSON n'est pas typé automatiquement
+    // res.json() retourne Promise<any> — le cast as Family est nécessaire :
+    // TS ne peut pas inférer la forme d'une réponse réseau à la compilation.
+    family.value = await res.json() as Family
   } catch (e) {
-    // e est 'unknown' en TS strict — impossible d'accéder à .message directement
-    // instanceof Error réduit e à Error dans ce bloc
     if (e instanceof Error) {
-      console.error(e.message)  // ✅ string garanti
+      // Dans ce bloc, TS a rétréci e : Error → .message est string garanti ✅
+      console.error(e.message)
     } else {
+      // Fallback : e peut être une string ou un objet non-Error
       console.error('Erreur inconnue lors du chargement')
     }
   }
@@ -189,154 +156,84 @@ async function loadFamily(id: string): Promise<void> {
 
 <template>
   <div v-if="family" class="family-card">
-    <!-- Dans le template, Vue auto-unwrap les refs : pas de .value -->
+    <!--
+      Vue auto-unwrap les refs de premier niveau dans le template.
+      Écrire family.name (pas family.value.name) — Vue gère le déballage.
+      v-if="family" agit comme type guard : dans ce bloc, family est Family (non-null).
+      Écrire family.value dans le template retournerait l'objet Ref lui-même.
+    -->
     <h2>{{ family.name }}</h2>
-    <!-- memberCount est un Ref<number> — auto-unwrapped ici -->
+
+    <!--
+      memberCount est Ref<number> — auto-unwrappé.
+      Écrire memberCount, pas memberCount.value.
+    -->
     <p>{{ memberCount }} membres</p>
-    <!-- status est ComputedRef<'loading' | 'empty' | 'active'> — auto-unwrapped -->
+
+    <!--
+      status est ComputedRef<'loading' | 'empty' | 'active'> — auto-unwrappé.
+      Vue affiche la valeur de la string union directement.
+    -->
     <p>Statut : {{ status }}</p>
+
     <button @click="loadFamily('demo-id')">Recharger</button>
   </div>
   <p v-else>Chargement…</p>
 </template>
 ```
 
-### `src/components/auth/LoginForm.vue` — corrigé
-
-```vue
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-
-// ─── Types ────────────────────────────────────────────────────────────────
-// Interface locale au composant — pas besoin de l'exporter
-interface LoginCredentials {
-  email: string
-  password: string
-}
-
-// ─── État réactif ─────────────────────────────────────────────────────────
-// Primitives : inférence suffisante (valeur initiale = type final)
-const email    = ref('')      // Ref<string> — inféré
-const password = ref('')      // Ref<string> — inféré
-const loading  = ref(false)   // Ref<boolean> — inféré
-
-// null ne représente pas le type final → annotation explicite obligatoire
-const error = ref<string | null>(null)   // Ref<string | null>
-
-// ─── Computed ─────────────────────────────────────────────────────────────
-// Retourne boolean — inférence suffisante, pas besoin d'annoter computed<boolean>
-// Essaie : canSubmit.value = true → TS Error (readonly)
-const canSubmit = computed(() =>
-  email.value.trim().length > 0 && password.value.length >= 8
-)
-
-// ─── Actions ──────────────────────────────────────────────────────────────
-async function login(): Promise<void> {
-  if (!canSubmit.value) return   // garde : TS sait que canSubmit.value est boolean
-
-  loading.value = true
-  error.value = null
-
-  // Utiliser l'interface pour typer le payload : TS vérifie la forme de l'objet
-  const credentials: LoginCredentials = {
-    email: email.value,
-    password: password.value,
-    // uncomment : unknown: 'x' → TS Error (propriété non déclarée dans LoginCredentials)
-  }
-
-  try {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials),
-    })
-
-    if (!res.ok) {
-      // res.text() retourne Promise<string> — assignable à string | null ✅
-      error.value = await res.text()
-    }
-  } catch (e) {
-    // Rétrécissement requis : e est 'unknown' en TS strict
-    // instanceof Error couvre 99% des cas (fetch, JSON.parse, etc.)
-    error.value = e instanceof Error ? e.message : 'Erreur réseau'
-  } finally {
-    // finally s'exécute même si une branche a retourné — loading revient à false
-    loading.value = false
-  }
-}
-</script>
-
-<template>
-  <form @submit.prevent="login" novalidate>
-    <div class="field">
-      <label for="email">Email</label>
-      <!-- v-model sur un Ref<string> — Vue auto-unwrap + deux-way binding -->
-      <input
-        id="email"
-        v-model="email"
-        type="email"
-        autocomplete="email"
-        :disabled="loading"
-        placeholder="alice@tribuzen.app"
-      />
-    </div>
-
-    <div class="field">
-      <label for="password">Mot de passe</label>
-      <input
-        id="password"
-        v-model="password"
-        type="password"
-        autocomplete="current-password"
-        :disabled="loading"
-        placeholder="8 caractères minimum"
-      />
-    </div>
-
-    <!-- :disabled prend un boolean — TS vérifie que l'expression est bien boolean -->
-    <button type="submit" :disabled="!canSubmit || loading">
-      {{ loading ? 'Connexion en cours…' : 'Se connecter' }}
-    </button>
-
-    <!-- v-if="error" passe le type guard : error dans le slot est string (pas null) -->
-    <p v-if="error" role="alert" class="error-message">
-      {{ error }}
-    </p>
-  </form>
-</template>
-```
+**Pourquoi ce corrigé est correct :**
+- `ref<Family | null>(null)` est le pattern TribuZen standard pour tout état chargé depuis l'API : `null` en attente, `Family` après réponse — TS t'empêche de mélanger les deux.
+- L'annotation `computed<'loading' | 'empty' | 'active'>` transforme le type union en contrat vérifiable : ajouter une branche qui retourne autre chose est une erreur de compilation, pas un bug runtime découvert en prod.
+- Le rétrécissement `instanceof Error` dans `catch` est la seule façon d'accéder à `.message` de façon sûre en TS strict — pas un contournement, une pratique standard depuis TS 4.0.
 
 ---
 
 ## Variante J+30 (fading)
 
-**Même problème, une contrainte ajoutée — tu as 20 minutes, corrigé interdit.**
+**Même objectif, contraintes ajoutées — tu as 25 minutes, corrigé interdit.**
 
-Écris un composant `RegisterForm.vue` à partir d'une page blanche :
-- Champs : `email`, `password`, `confirmPassword`, `displayName`
-- `computed<string | null>` nommé `passwordError` : retourne `null` si tout va bien, sinon un message (ex. `'Les mots de passe ne correspondent pas'`)
-- `computed<boolean>` nommé `formValid` : tous les champs non vides ET `passwordError === null`
-- `async function register(): Promise<void>` avec la même gestion d'erreur
+Écris `LoginForm.vue` à partir d'une page blanche dans `src/components/auth/` :
 
-Contrainte bonus : utilise `useTemplateRef<HTMLInputElement>('email-field')` (Vue 3.5) pour focus automatiquement l'input email au montage via `onMounted`.
+1. `ref<string | null>(null)` pour `error`, inférence seule pour `email`, `password`, `loading`.
+2. `computed<boolean>` nommé `canSubmit` : email non vide ET password ≥ 8 caractères (`.trim()` sur email).
+3. `async function login(): Promise<void>` avec `fetch('/api/auth/login')`, gestion `catch (e)` + `finally` pour remettre `loading` à `false`.
+4. **Contrainte bonus :** utilise `useTemplateRef<HTMLInputElement>('email-field')` (Vue 3.5) pour focus automatiquement l'input email dans `onMounted`. Le nom de variable peut différer du nom d'attribut `ref="email-field"` — c'est l'avantage de `useTemplateRef` sur l'ancienne syntaxe.
+5. Template minimal : 2 inputs, 1 bouton `:disabled="!canSubmit || loading"`, 1 `<p v-if="error">`.
 
-Lance `pnpm typecheck` — zéro erreur attendu.
+**Critère de réussite :** `pnpm typecheck` vert **et** ces ajouts provoquent des erreurs TS :
+- `canSubmit.value = true` → readonly (computed)
+- `error.value = 42` → number pas assignable à `string | null`
+- `e.message` sans `instanceof Error` → Object is of type 'unknown'
 
 ---
 
 ## Application TribuZen
 
-**Objectif :** porter `LoginForm.vue` dans le vrai repo `smaurier/tribuzen`.
+Dans `smaurier/tribuzen`, les deux composants de ce lab trouvent leur place immédiate :
 
-**Steps :**
+```
+tribuzen/
+  src/
+    components/
+      auth/
+        LoginForm.vue      ← variante J+30 : ref<string|null>, canSubmit, useTemplateRef
+      family/
+        FamilyCard.vue     ← corrigé du lab : ref<Family|null>, computed union, catch narrowing
+    types/
+      family.ts            ← l'interface Family sera importée ici (partagée entre composants)
+```
 
-1. Copie le corrigé de `LoginForm.vue` dans `tribuzen/src/components/auth/`.
-2. Adapte l'URL du fetch à la vraie API TribuZen (ou laisse `/api/auth/login` si l'endpoint est déjà défini).
-3. Lance `vue-tsc --noEmit` dans tribuzen — zéro erreur attendu.
-4. Commit :
-   ```bash
-   git add src/components/auth/LoginForm.vue
-   git commit -m "feat(auth): LoginForm typé TS (ref<string|null>, catch instanceof Error)"
-   ```
+**Différences par rapport au lab :**
 
-**Vérification de transfert :** la commande `pnpm typecheck` dans tribuzen doit passer en vert avec `LoginForm.vue` inclus. C'est la preuve que le typage vu en cours fonctionne dans le vrai produit.
+- `Family` sera importée depuis `src/types/family.ts` plutôt que définie inline — dans le lab, on la définit localement pour isoler l'exercice de typage.
+- `loadFamily` viendra d'un composable `useFamilyStore` (module intermédiaire 01) — dans le lab, on garde le `fetch` inline pour se concentrer sur le typage.
+- `defineProps` et `defineEmits` typés (communication parent-enfant) arrivent au **module 05** — dans ce lab, on reste sur l'état local.
+
+Lance `vue-tsc --noEmit` dans tribuzen avant de committer — zéro erreur attendu.
+
+**Commit cible :**
+
+```
+feat(types): FamilyCard + LoginForm typés TS — ref<T>, computed union, catch narrowing
+```

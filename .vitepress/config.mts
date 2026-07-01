@@ -13,6 +13,17 @@ export default defineConfig({
     }
   },
 
+  // Docs statiques : on n'utilise jamais l'interpolation Vue live dans le markdown.
+  // On désactive `{{ }}` comme interpolation (délimiteurs improbables) pour que les
+  // moustaches de démonstration en prose s'affichent littéralement sans casser le build SSR.
+  vue: {
+    template: {
+      compilerOptions: {
+        delimiters: ['(%(', ')%)']
+      }
+    }
+  },
+
   ignoreDeadLinks: true,
 
   themeConfig: {
