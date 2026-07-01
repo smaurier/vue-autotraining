@@ -8,7 +8,7 @@ outcomes:
   - sait simuler erreurs, latence et réponses conditionnelles
   - sait override un handler pour un test précis
 prerequis: [19-tests-e2e-playwright]
-next: 01-performance
+next: 21-performance
 libs: [{ name: vue, version: "3.5" }, { name: msw, version: "2" }]
 tribuzen: tests TribuZen — mock de l'API famille/invitation avec MSW pour tester le front sans backend réel
 last-reviewed: 2026-07
