@@ -1,22 +1,24 @@
 ---
-titre: Réactivité & Composition API
+titre: Réactivité (Composition API)
 cours: 02-vue
-notions: [ref, reactive, computed, watch, watchEffect, toRef, toRefs, shallowRef, shallowReactive, script setup, defineProps, defineEmits, composable]
+notions: [ref, reactive, computed, watch, watchEffect, toRef, toRefs, shallowRef, shallowReactive, script setup]
 outcomes:
   - sait choisir ref vs reactive selon le cas
-  - sait diagnostiquer et corriger une perte de réactivité
-  - sait écrire un composable réutilisable propre
-prerequis: [02-template-et-directives, JavaScript ES6+]
+  - sait choisir computed / watch / watchEffect selon le besoin
+  - sait diagnostiquer et corriger une perte de réactivité (toRefs)
+prerequis: [00-typer-vue3, 02-template-et-directives, JavaScript ES6+]
 next: 04-evenements-et-v-model
 libs: [{ name: vue, version: "3.5" }]
 tribuzen: front-office TribuZen — catalogue de composants Vue réactifs
 last-reviewed: 2026-07
 ---
 
-# Réactivité & Composition API
+# Réactivité (Composition API)
 
-> **Outcomes — tu sauras FAIRE :** choisir `ref` vs `reactive` selon le contexte, diagnostiquer et corriger une perte de réactivité, écrire un composable `use...` réutilisable.
+> **Outcomes — tu sauras FAIRE :** choisir `ref` vs `reactive` selon le contexte, choisir `computed` / `watch` / `watchEffect` selon le besoin, diagnostiquer et corriger une perte de réactivité (`toRefs`).
 > **Difficulté :** :star::star::star:
+>
+> **Portée :** ce module couvre les **primitives de réactivité** de la Composition API. `defineProps` / `defineEmits` (communication parent-enfant) sont vus au **module 05**, et le pattern **composable** `use...` complet au **module intermédiaire 02-composables** — ici on ne fait que les esquisser comme motivation.
 
 ## 1. Cas concret d'abord
 
@@ -300,83 +302,63 @@ config.nested.fontSize = 16  // ❌ pas réactif
 
 Cas d'usage : intégrer une bibliothèque externe qui gère son propre état interne, ou des tableaux de milliers d'entrées où le suivi profond serait trop coûteux.
 
-### 2.11 `<script setup>`, `defineProps`, `defineEmits`
+### 2.11 `<script setup>` — le contexte d'exécution de la réactivité
 
-`<script setup>` est la syntaxe recommandée. C'est du sucre syntaxique compilé vers `setup()` : tout ce qui est déclaré en haut niveau est automatiquement exposé au template.
+`<script setup>` est la syntaxe recommandée. C'est du sucre syntaxique compilé vers `setup()` : tout ce qui est déclaré au niveau racine (refs, computed, fonctions) est automatiquement exposé au template. C'est ici que vivent toutes les primitives vues plus haut.
 
 ```vue
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 
-// defineProps et defineEmits = macros compilateur (pas d'import)
-const props = defineProps<{
-  familyId: string
-  maxMembers?: number
-}>()
-
-const emit = defineEmits<{
-  memberAdded: [member: { id: string; name: string }]
-  error: [message: string]
-}>()
-
-// ref, computed, watch s'utilisent normalement
+// État local réactif
 const members = ref<Array<{ id: string; name: string }>>([])
+
+// Valeur dérivée mise en cache
 const count = computed(() => members.value.length)
 
-watch(() => props.familyId, (newId) => {
-  loadMembers(newId)
-}, { immediate: true })
+// Effet déclenché sur changement
+watch(count, (n) => console.log(`${n} membre(s)`))
 
-async function loadMembers(id: string) {
-  const data = await fetch(`/api/families/${id}/members`).then(r => r.json())
-  members.value = data
+async function loadMembers() {
+  const data = await fetch('/api/members').then(r => r.json())
+  members.value = data // remplacement → réactif
 }
 </script>
+
+<template>
+  <p>{{ count }} membre(s)</p>
+</template>
 ```
 
-`defineProps` et `defineEmits` sont des **macros compilateur** — elles sont résolues à la compilation et n'ont pas d'import à déclarer. Les types TypeScript inline (`<{ familyId: string }>`) sont la syntaxe recommandée en Vue 3.3+.
+> **Forward-reference — hors périmètre ici.** Passer des données au composant via `defineProps` et remonter des événements via `defineEmits` (deux **macros compilateur** de `<script setup>`) relèvent de la **communication entre composants → module 05 (composants-props-emits)**. Dans ce module, on reste sur l'état réactif local.
 
-### 2.12 Composable — le pattern `use...`
+### 2.12 Vers les composables (motivation, pas encore le pattern complet)
 
-Un composable est une fonction qui encapsule de la logique réactive et la retourne sous forme de refs. Convention : nom préfixé par `use`.
+Quand une logique réactive (état + dérivés + surveillance) doit être **réutilisée** entre composants, on l'extrait dans une fonction qui retourne des refs — un *composable*, conventionnellement préfixé `use...`.
 
 ```ts
-// composables/useFamilySearch.ts
-import { ref, computed } from 'vue'
-
-export function useFamilySearch(members: Ref<Member[]>) {
-  const query = ref('')
-
-  const filtered = computed(() =>
-    query.value.trim() === ''
-      ? members.value
-      : members.value.filter(m =>
-          m.name.toLowerCase().includes(query.value.toLowerCase())
-        )
-  )
-
-  function clearSearch() {
-    query.value = ''
-  }
-
-  return { query, filtered, clearSearch }
+// Aperçu — le pattern complet (paramètres réactifs, lifecycle,
+// nettoyage, tests) est vu au module intermédiaire 02-composables.
+function useCount() {
+  const count = ref(0)
+  const double = computed(() => count.value * 2)
+  return { count, double } // des refs → destructurables sans toRefs
 }
 ```
 
-Règles d'un bon composable :
-1. Retourner des `ref`s (pas un `reactive`), pour permettre la destructuration sans `toRefs`.
-2. Appeler les lifecycle hooks (`onMounted`, `onUnmounted`) à l'intérieur — ils s'accrochent au composant courant.
-3. Accepter des refs en paramètre, pas des valeurs brutes, pour que le composable reste réactif.
-4. Nettoyer les effets de bord (`watchEffect` stop, event listeners) dans `onUnmounted`.
+Retenir seulement, pour ce module : **une fonction qui retourne des `ref`/`computed` reste réactive après destructuration** — c'est justement pourquoi on retourne des refs, pas un `reactive` (voir 2.9). Le reste (hooks de cycle de vie, paramètres `Ref<T>`, conventions) est traité au module dédié.
 
 ---
 
 ## 3. Worked examples
 
-### Exemple 1 — `useMembers` : composable complet
+### Exemple 1 — état réactif complet dans un composant (ref + computed + watch)
 
-```ts
-// composables/useMembers.ts
+On corrige le composant cassé de la section 1, en assemblant les trois primitives : `ref` pour l'état mutable, `computed` pour la valeur dérivée, `watch` pour l'effet de bord (log de recherche debouncé).
+
+```vue
+<!-- FamilyMemberList.vue — version corrigée -->
+<script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 
 interface Member {
@@ -386,66 +368,35 @@ interface Member {
   online: boolean
 }
 
-export function useMembers(initialMembers: Member[] = []) {
-  // ref pour la liste complète (remplacée en entier après fetch)
-  const members = ref<Member[]>(initialMembers)
-  const query   = ref('')
+// 1. ÉTAT — ref : le tableau est remplacé en entier à chaque mutation
+const members = ref<Member[]>([
+  { id: '1', name: 'Alice', role: 'parent', online: true },
+  { id: '2', name: 'Bob',   role: 'enfant', online: false },
+])
+const query = ref('') // primitive → ref obligatoire
 
-  // computed filtre en cache — ne recalcule que si members ou query change
-  const filtered = computed(() => {
-    const q = query.value.toLowerCase().trim()
-    return q === '' ? members.value : members.value.filter(m =>
-      m.name.toLowerCase().includes(q)
-    )
-  })
+// 2. DÉRIVÉ — computed : recalcule seulement si members ou query change
+const filtered = computed(() => {
+  const q = query.value.toLowerCase().trim()
+  return q === '' ? members.value
+    : members.value.filter(m => m.name.toLowerCase().includes(q))
+})
+const onlineCount = computed(() => members.value.filter(m => m.online).length)
 
-  const onlineCount = computed(() =>
-    members.value.filter(m => m.online).length
-  )
+// 3. EFFET — watch explicite + cleanup pour debouncer le log de recherche
+watch(query, (q, _oldQ, onCleanup) => {
+  const timer = setTimeout(() => {
+    if (q.trim()) console.log('[analytics] search:', q)
+  }, 300)
+  onCleanup(() => clearTimeout(timer)) // annule le timer précédent
+})
 
-  // watch la query pour logguer les recherches (avec debounce via cleanup)
-  let debounceTimer: ReturnType<typeof setTimeout>
-  watch(query, (q, _, onCleanup) => {
-    debounceTimer = setTimeout(() => {
-      if (q.trim()) console.log('[analytics] search:', q)
-    }, 300)
-    onCleanup(() => clearTimeout(debounceTimer))
-  })
-
-  function addMember(name: string, role: Member['role'] = 'enfant') {
-    members.value = [
-      ...members.value,
-      { id: crypto.randomUUID(), name, role, online: false }
-    ]
-  }
-
-  function removeMember(id: string) {
-    members.value = members.value.filter(m => m.id !== id)
-  }
-
-  return { members, query, filtered, onlineCount, addMember, removeMember }
-}
-```
-
-```vue
-<!-- FamilyMemberList.vue — version corrigée -->
-<script setup lang="ts">
-import { useMembers } from '@/composables/useMembers'
-
-const props = defineProps<{ familyId: string }>()
-const emit  = defineEmits<{ memberAdded: [name: string] }>()
-
-const {
-  members,
-  query,
-  filtered,
-  onlineCount,
-  addMember,
-} = useMembers()
-
-function handleAdd(name: string) {
-  addMember(name)
-  emit('memberAdded', name)
+function addMember(name: string) {
+  // remplacement du tableau → identité change → Vue re-rend
+  members.value = [
+    ...members.value,
+    { id: crypto.randomUUID(), name, role: 'enfant', online: false },
+  ]
 }
 </script>
 
@@ -453,17 +404,42 @@ function handleAdd(name: string) {
   <p>{{ onlineCount }} membre(s) en ligne</p>
   <input v-model="query" placeholder="Filtrer par nom..." />
   <ul>
-    <li v-for="m in filtered" :key="m.id">
-      {{ m.name }} — {{ m.role }}
-    </li>
+    <li v-for="m in filtered" :key="m.id">{{ m.name }} — {{ m.role }}</li>
   </ul>
-  <button @click="handleAdd('Charlie')">Ajouter Charlie</button>
+  <button @click="addMember('Charlie')">Ajouter Charlie</button>
 </template>
 ```
 
-Chaque fois que `query.value` change (via `v-model`), `filtered` se recalcule automatiquement. Chaque `addMember` remplace `members.value` en entier → Vue détecte le changement et re-rend.
+Chaque fois que `query.value` change (via `v-model`), `filtered` se recalcule automatiquement. Chaque `addMember` remplace `members.value` en entier → Vue détecte le changement d'identité et re-rend. Les trois bugs de la section 1 sont corrigés par les trois primitives correspondantes.
 
-### Exemple 2 — `computed` writable pour un filtre bidirectionnel
+### Exemple 2 — perte de réactivité et fix `toRefs`
+
+Le piège n°1 en situation réelle : on regroupe l'état dans un `reactive`, on le destructure pour raccourcir le code, et tout casse silencieusement.
+
+```ts
+import { reactive, toRefs, watchEffect } from 'vue'
+
+const form = reactive({ name: '', valid: false })
+
+// ❌ AVANT — destructuring direct : name est un string figé
+// const { name } = form
+// watchEffect(() => console.log(name)) // ne re-log jamais
+
+// ✅ APRÈS — toRefs : chaque propriété devient une Ref synchronisée
+const { name, valid } = toRefs(form)
+
+watchEffect(() => {
+  // lit name.value → dépendance trackée
+  valid.value = name.value.trim().length > 1
+})
+
+name.value = 'Alice'   // form.name = 'Alice' ET valid.value passe à true
+console.log(form.valid) // true — la liaison est bidirectionnelle
+```
+
+Règle mémo : on ne destructure **jamais** un `reactive` sans le passer par `toRefs` (ou `toRef` propriété par propriété). Un `ref`, lui, se transporte sans risque.
+
+### Exemple 3 — `computed` writable pour un filtre bidirectionnel
 
 Contexte : un filtre "Rôle" dans TribuZen qui affiche des tags sélectionnables. L'URL query param et le filtre local doivent rester synchronisés.
 
@@ -591,26 +567,24 @@ watch(count, (newVal, oldVal) => {
 
 **Assumption** : progress.md ne liste pas 02-vue dans le mapping explicite. Couche retenue : *front-office TribuZen — catalogue de composants Vue réactifs (prototype lab Vue avant adoption Nuxt)*.
 
-Dans TribuZen, la réactivité Vue 3 s'applique à trois endroits concrets :
+Dans TribuZen, les primitives de réactivité vues ici pilotent la vue `FamilyMemberList.vue` — le catalogue de membres de famille :
 
-**1. `useMembers` (catalogue de membres de famille)**
-Le composable de l'Exemple 1 est la couche exacte à créer dans `tribuzen/composables/useMembers.ts`. Il alimente `FamilyMemberList.vue` — la vue principale du fil d'actualité famille.
+**1. État de la liste — `ref<Member[]>`**
+La liste des membres est un `ref` remplacé en entier après chaque fetch/mutation (Exemple 1). C'est la source de vérité réactive du catalogue.
 
-**2. `useFamilySearch` (recherche réactive)**
-`query = ref('')` + `filtered = computed(...)` = le moteur de filtrage du catalogue de membres. Aucune dépendance externe, testable en isolation avec Vitest.
+**2. Recherche réactive — `query = ref('')` + `filtered = computed(...)`**
+Le moteur de filtrage du catalogue : la saisie est un `ref`, la liste filtrée un `computed` mis en cache. Aucune dépendance externe → testable en isolation avec Vitest (c'est l'objet du lab).
 
-**3. `defineProps` / `defineEmits` dans les composants de la liste**
-`MemberCard.vue` reçoit `{ member }` via `defineProps` et émet `memberRemoved` via `defineEmits`. La composition parent → enfant suit exactement le pattern `<script setup>` de la section 2.11.
+**3. Effets — `watch` debouncé**
+Le log analytics de recherche est un `watch(query, …)` avec `onCleanup` (debounce). Même mécanisme réutilisé plus tard pour déclencher un refetch au changement de famille.
 
-Fichiers cibles dans smaurier/tribuzen :
+> La réutilisation de cette logique entre composants (extraction en composable `useMembers`) et la communication parent→enfant (`MemberCard` via props/emits) arrivent aux modules **02-composables (intermédiaire)** et **05 (props/emits)**. Ici, on stabilise d'abord les primitives.
+
+Fichier cible dans smaurier/tribuzen :
 ```
 tribuzen/
-  composables/
-    useMembers.ts       ← Exemple 1 porté ici
-    useFamilySearch.ts  ← déclinaison filtrage seul
   components/
-    FamilyMemberList.vue
-    MemberCard.vue
+    FamilyMemberList.vue   ← état réactif de l'Exemple 1
 ```
 
 ---
@@ -625,8 +599,8 @@ tribuzen/
 6. `watchEffect` = auto-tracking + immédiat — pas d'accès à `oldVal`.
 7. `flush: 'post'` si le callback a besoin d'accéder au DOM mis à jour (après le rendu).
 8. `shallowRef` / `shallowReactive` = réactivité de surface uniquement — pour les gros objets ou intégrations externes.
-9. Dans un composable, retourner des `ref`s (pas un `reactive`) pour permettre la destructuration.
-10. `defineProps` et `defineEmits` sont des macros compilateur dans `<script setup>` — pas d'import.
+9. Une fonction qui retourne des `ref`/`computed` reste réactive après destructuration — base des composables (pattern complet au module 02-composables).
+10. `defineProps` / `defineEmits` (props/emits) ne sont **pas** dans ce module — ils relèvent du module 05.
 
 ---
 
@@ -647,4 +621,4 @@ Comment passer une prop à un composable et garder la réactivité ?|Passer une 
 
 ## Pont vers le lab
 
-> Lab associé : `labs/lab-03-reactivite/README.md`. Construire `useMembers` complet avec test Vitest + intégration dans un SFC — corrigé commenté ligne à ligne.
+> Lab associé : `labs/lab-03-reactivite/README.md`. Construire l'état réactif de `FamilyMemberList` (ref/computed/watch), reproduire puis corriger une perte de réactivité avec `toRefs`, le tout couvert par des tests Vitest — corrigé commenté ligne à ligne.
