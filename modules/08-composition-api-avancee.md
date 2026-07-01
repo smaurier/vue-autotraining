@@ -1,12 +1,14 @@
 ---
 titre: Composition API avancée
 cours: 02-vue
-notions: [watch options deep immediate flush, watchEffect, watchPostEffect, arrêt d'un watcher, effectScope, toRef et toRefs, réactivité shallowRef shallowReactive, triggerRef, customRef, unref]
+notions: [watch options deep immediate flush, watchEffect, watchPostEffect, arrêt d'un watcher, effectScope, toRef et toRefs, réactivité shallowRef shallowReactive, triggerRef, customRef, unref, provide inject InjectionKey, nextTick]
 outcomes:
   - sait choisir entre watch et watchEffect selon le besoin (lazy vs auto-track)
   - sait régler un watcher (deep, immediate, flush post) et l'arrêter proprement
   - sait préserver la réactivité en passant des refs (toRef, toRefs) entre composables
   - sait quand descendre en réactivité superficielle (shallowRef/shallowReactive) pour la perf
+  - sait injecter une dépendance typée (provide/inject + InjectionKey) depuis un parent vers un descendant
+  - sait utiliser nextTick pour lire le DOM après une mutation réactive
 prerequis: [07-options-vs-composition-api]
 next: 09-composables
 libs: [{ name: vue, version: "3.5" }]
@@ -16,7 +18,7 @@ last-reviewed: 2026-07
 
 # Composition API avancée
 
-> **Outcomes — tu sauras FAIRE :** choisir et configurer `watch`/`watchEffect` selon le besoin, arrêter un watcher proprement, regrouper des effets avec `effectScope`, passer la réactivité avec `toRef`/`toRefs`, et descendre en réactivité superficielle (`shallowRef`, `shallowReactive`) pour la performance.
+> **Outcomes — tu sauras FAIRE :** choisir et configurer `watch`/`watchEffect` selon le besoin, arrêter un watcher proprement, regrouper des effets avec `effectScope`, passer la réactivité avec `toRef`/`toRefs`, descendre en réactivité superficielle (`shallowRef`, `shallowReactive`) pour la performance, injecter une dépendance typée avec `provide`/`inject` + `InjectionKey<T>`, et attendre la mise à jour du DOM avec `nextTick`.
 > **Difficulté :** :star::star::star:
 
 ## 1. Cas concret d'abord
@@ -399,6 +401,154 @@ double(count) // → 10
 double(3)     // → 6
 ```
 
+### 2.13 `provide` / `inject` — injection de dépendances typée
+
+`provide` / `inject` permettent de passer des données d'un composant **ancêtre** vers n'importe quel **descendant** sans prop drilling (la chaîne de props intermédiaires). La clé de liaison entre les deux est un `InjectionKey<T>` — un `Symbol` TypeScript qui encode le type de la donnée partagée.
+
+```ts
+// keys/injection.ts — fichier de clés partagé
+import type { InjectionKey, Ref } from 'vue'
+
+// InjectionKey<T> = Symbol porteur du type T
+// Les deux côtés (provide/inject) importent la même clé → TypeScript
+// infère automatiquement le type sans cast explicite
+export const AuthKey: InjectionKey<Ref<AuthUser | null>> = Symbol('auth')
+
+export interface AuthUser {
+  id:   string
+  name: string
+  role: 'admin' | 'member'
+}
+```
+
+**Le parent fournit (provide) :**
+
+```vue
+<!-- AppShell.vue — composant racine TribuZen -->
+<script setup lang="ts">
+import { ref, provide } from 'vue'
+import { AuthKey } from '@/keys/injection'
+import type { AuthUser } from '@/keys/injection'
+
+const currentUser = ref<AuthUser | null>(null)
+
+// provide(clé, valeur) — accessible à TOUS les descendants
+// La ref elle-même est fournie (pas .value) → les descendants peuvent la lire réactivement
+provide(AuthKey, currentUser)
+
+async function login(email: string, password: string): Promise<void> {
+  const { user } = await fetch('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+  }).then(r => r.json())
+  currentUser.value = user
+}
+</script>
+```
+
+**Un descendant profond injecte (inject) :**
+
+```vue
+<!-- NavBar.vue — composant dans le sous-arbre, aucune prop intermédiaire -->
+<script setup lang="ts">
+import { inject } from 'vue'
+import { AuthKey } from '@/keys/injection'
+
+// inject(clé) → TypeScript sait que c'est Ref<AuthUser | null>
+// inject retourne undefined si aucun ancêtre n'a appelé provide
+const user = inject(AuthKey)
+
+// ✅ Avec valeur par défaut (garantit que user n'est jamais undefined)
+// inject(AuthKey, ref(null)) — le 2e argument est la valeur de fallback
+</script>
+
+<template>
+  <nav>
+    <span v-if="user">{{ user.name }}</span>
+    <span v-else>Non connecté</span>
+  </nav>
+</template>
+```
+
+**Valeur par défaut :**
+
+```ts
+import { inject, ref } from 'vue'
+import { AuthKey } from '@/keys/injection'
+
+// Sans ancêtre qui provide : user sera ref(null) au lieu de undefined
+const user = inject(AuthKey, ref(null))
+// TypeScript infère : Ref<AuthUser | null> — plus de undefined à gérer
+```
+
+**Règles essentielles :**
+
+| Règle | Pourquoi |
+|-------|----------|
+| Utiliser `InjectionKey<T>` — jamais une string brute | La string n'encode pas le type → TypeScript perd l'inférence |
+| Fournir la ref, pas `.value` | Le descendant doit voir les changements futurs — une valeur brute ne sera pas réactive |
+| Appeler `provide` dans `<script setup>` | provide/inject ne fonctionnent que dans le contexte d'instance (setup synchrone) |
+| Ajouter une valeur par défaut à `inject` | Évite le `undefined` implicite quand aucun parent ne provide |
+
+> **Lien composables :** `provide` / `inject` sont le pont entre la logique de composables et l'arbre de composants. Voir module 09 — `useApi` avec `inject` pour un exemple d'injection d'un client HTTP partagé.
+
+### 2.14 `nextTick` — attendre la mise à jour du DOM
+
+Vue met à jour le DOM de façon **asynchrone et groupée** (batch). Quand tu mutes un état réactif, le rendu ne se produit pas immédiatement — Vue accumule les changements et les applique lors du prochain "tick" (microtask). `nextTick()` retourne une Promise qui se résout **après** que Vue a terminé la mise à jour du DOM pour le cycle courant.
+
+**Cas d'usage typiques :**
+
+- Lire une dimension DOM (hauteur, largeur) après ajout d'un élément
+- Scroller vers un nœud qui vient d'apparaître
+- Donner le focus à un `<input>` dynamiquement affiché
+
+```ts
+import { ref, nextTick } from 'vue'
+
+const messages = ref<string[]>([])
+const listRef = ref<HTMLUListElement | null>(null)
+
+async function addMessage(text: string): Promise<void> {
+  // Mutation de l'état réactif
+  messages.value.push(text)
+
+  // ⚠️ ICI : le DOM n'est PAS encore mis à jour
+  // listRef.value.scrollHeight reflète encore l'ancienne hauteur
+
+  await nextTick()
+
+  // ✅ ICI : Vue a rendu le nouveau <li> — le DOM est à jour
+  if (listRef.value) {
+    listRef.value.scrollTop = listRef.value.scrollHeight  // scroll vers le bas
+  }
+}
+```
+
+**Forme callback (non-async) :**
+
+```ts
+import { nextTick } from 'vue'
+
+messages.value.push('nouveau message')
+
+// Alternative sans async/await
+nextTick(() => {
+  // Exécuté après la mise à jour du DOM
+  if (listRef.value) listRef.value.scrollTop = listRef.value.scrollHeight
+})
+```
+
+**Relation avec `flush: 'post'` :** `watchPostEffect` et `watch(..., { flush: 'post' })` font la même chose pour les watchers — ils s'exécutent après le DOM. `nextTick` est son équivalent pour du code impératif one-shot (pas un watcher).
+
+```ts
+// watchPostEffect ≈ watchEffect + nextTick automatique à chaque exécution
+// nextTick ≈ watchPostEffect pour un code impératif ponctuel
+
+// Quand utiliser l'un ou l'autre ?
+// → code réactif qui tourne à chaque mutation → watchPostEffect
+// → code one-shot après une action précise (bouton, add item) → nextTick
+```
+
 ---
 
 ## 3. Worked examples
@@ -668,6 +818,8 @@ tribuzen/
 8. `triggerRef(shallowRef)` force les mises à jour après mutation silencieuse de l'intérieur d'un `shallowRef`.
 9. `customRef((track, trigger) => ({ get, set }))` : appeler `track()` dans `get`, `trigger()` dans `set`.
 10. `unref(val)` : retourne `val.value` si ref, sinon `val` — utile pour les fonctions qui acceptent `MaybeRef<T>`.
+11. `provide(InjectionKey, valeur)` dans un ancêtre + `inject(InjectionKey, défaut)` dans un descendant : injection de dépendances typée sans prop drilling. Toujours utiliser `InjectionKey<T>`, jamais une string brute.
+12. `nextTick()` retourne une Promise résolue après la mise à jour DOM de Vue — indispensable pour lire des dimensions ou scroller vers un nœud ajouté dynamiquement.
 
 ---
 
@@ -682,6 +834,8 @@ Comment arrêter proprement un watcher créé après un await dans onMounted ?|w
 Pourquoi toRefs est-il nécessaire quand on retourne un reactive d'un composable ?|La destructuration d'un reactive perd la réactivité (const { count } = state → count est un number fixe). toRefs crée une Ref liée pour chaque propriété, permettant const { count } = useComposable() avec count réactif.
 Quelle est la différence entre shallowRef et ref pour un grand tableau ?|ref rend tout l'arbre réactif (conversion récursive de chaque élément). shallowRef ne surveille que le remplacement de .value. Pour 200+ éléments rarement mutés en profondeur, shallowRef est significativement plus performant.
 Pourquoi faut-il appeler triggerRef après un sort() in-place sur un shallowRef ?|shallowRef ne détecte pas les mutations internes (sort, push, splice). triggerRef force les watchers et le rendu à se déclencher comme si .value avait été remplacé.
+Pourquoi utiliser InjectionKey<T> plutôt qu'une string avec provide/inject ?|InjectionKey<T> est un Symbol TypeScript qui encode le type de la donnée. Sans lui, inject() retourne unknown et on perd l'autocomplétion et la vérification de types. Avec InjectionKey, TypeScript infère automatiquement le type sans cast.
+Quand faut-il appeler nextTick() et comment ?|Après une mutation d'état réactive, quand on veut lire le DOM mis à jour (dimensions, scroll, focus). Vue met à jour le DOM en batch asynchrone — sans nextTick, le DOM reflète encore l'ancienne version. Usage : await nextTick() ou nextTick(() => { ... }).
 ```
 
 ---

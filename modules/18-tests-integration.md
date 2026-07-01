@@ -138,7 +138,7 @@ const wrapper = mount(InvitePage, {
 Stubbe toutes les actions par défaut, permet de pré-seeder l'état initial. Utile quand on veut tester un composant dont le store a été rempli par un autre flux (déjà testé).
 
 ```ts
-// ⚠️ à gater Context7 — vérifier API exacte @pinia/testing v0.x
+// API @pinia/testing confirmée — initialState et stubActions disponibles
 import { createTestingPinia } from '@pinia/testing'
 
 const wrapper = mount(MemberList, {
@@ -184,6 +184,17 @@ expect(wrapper.text()).toContain('Zara')
 ```
 
 `flushPromises()` de `@vue/test-utils` vide la file des Promises en attente et déclenche le re-rendu de Vue. Indispensable dès qu'une action est asynchrone.
+
+Pour les cas où le DOM met plusieurs cycles à converger (état qui dépend d'une séquence de Promises enchaînées), `vi.waitFor()` de Vitest ré-évalue une assertion jusqu'à ce qu'elle passe ou que le timeout expire :
+
+```ts
+// vi.waitFor — ré-évalue jusqu'à 1000 ms par défaut
+await vi.waitFor(() => {
+  expect(wrapper.text()).toContain('Zara')
+})
+// Utile quand flushPromises() ne suffit pas (ex : plusieurs re-renders enchaînés)
+// Couvert en détail au module 20.
+```
 
 ### 2.5 Doublures aux frontières
 
@@ -469,11 +480,13 @@ Le signal pour écrire un test d'intégration : "plusieurs composants et le stor
 1. Le test d'intégration vérifie que plusieurs parties fonctionnent **ensemble** — ni les détails internes (unitaire), ni le flux complet en vrai navigateur (E2E).
 2. `global.plugins: [createPinia(), router]` branche le store et le router réels à l'instance de test.
 3. `createPinia()` = store réel (actions s'exécutent) — préférer pour les tests d'intégration véritables.
-4. `createTestingPinia({ initialState })` — utile pour pré-seeder l'état sans rejouer le flux de remplissage.
+4. `createTestingPinia({ initialState, stubActions })` (`@pinia/testing`) — utile pour pré-seeder l'état. `initialState` prend les noms de stores comme clés. `stubActions` vaut `true` par défaut (actions mocquées) ; passer `false` pour garder les vraies actions.
 5. `flushPromises()` est indispensable après toute action asynchrone (fetch, action Pinia async) avant d'asserter.
-6. Mocker uniquement aux **frontières externes** (HTTP, LocalStorage) — tout le code applicatif reste réel.
-7. Un test d'intégration = un flux utilisateur identifiable — pas un test omnibus de toute l'app.
-8. La pyramide 70/25/5 : les tests d'intégration complètent les tests unitaires, ils ne les remplacent pas.
+6. `vi.waitFor(fn)` ré-évalue `fn` jusqu'à ce qu'elle passe ou jusqu'au timeout — utile quand le DOM met plusieurs cycles à converger après `flushPromises()`.
+7. Mocker uniquement aux **frontières externes** (HTTP, LocalStorage) — tout le code applicatif reste réel.
+8. Un test d'intégration = un flux utilisateur identifiable — pas un test omnibus de toute l'app.
+9. La pyramide 70/25/5 : les tests d'intégration complètent les tests unitaires, ils ne les remplacent pas.
+10. `global.fetch = vi.fn()` suffit pour des tests simples ; pour partager les handlers entre tests et avec Playwright, utiliser MSW (module 20) est la bonne pratique.
 
 ---
 
@@ -494,3 +507,5 @@ Quelle est la règle de ratio de la pyramide des tests ?|70% unitaires (rapides,
 ## Pont vers le lab
 
 > Lab associé : `labs/lab-18-tests-integration/README.md`. Tester le flux invitation TribuZen de bout en bout — `InviteForm` + `invitationStore` + `MemberList` — avec Vitest, `@vue/test-utils`, et un `fetch` mocké. Corrigé commenté intégral.
+>
+> **Vers MSW :** remplacer `global.fetch = vi.fn()` par MSW (`setupServer` dans `vitest.setup.ts`) — **module 20** — permet de partager les handlers entre tous les tests d'intégration et les tests E2E Playwright, avec une seule source de vérité pour les mocks réseau.

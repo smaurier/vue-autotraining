@@ -1,7 +1,7 @@
 ---
 titre: Template et directives
 cours: 02-vue
-notions: [interpolation moustache, v-bind et raccourci deux-points, v-if vs v-show, v-for et clé key, v-for sur objet, directives built-in, liaison de classe et style, modificateurs de directive]
+notions: [interpolation moustache, v-bind et raccourci deux-points, v-if vs v-show, v-for et clé key, v-for sur objet, directives built-in, v-html, v-once, v-pre, liaison de classe et style, modificateurs de directive]
 outcomes:
   - sait afficher des données réactives dans le template (interpolation, v-bind)
   - sait rendre conditionnellement (v-if/v-else vs v-show) et choisir le bon
@@ -19,7 +19,7 @@ last-reviewed: 2026-07
 > **Outcomes — tu sauras FAIRE :** afficher des données réactives (interpolation, `v-bind`), conditionner le rendu (`v-if`/`v-else` vs `v-show`) et choisir le bon outil, boucler avec `v-for` en fournissant une `key` stable, lier classes et styles dynamiquement.
 > **Difficulté :** :star::star:
 >
-> **Portée :** ce module couvre la **syntaxe du template Vue 3** — tout ce qui vit dans `<template>`. L'interpolation `{{ }}` a été présentée en survol au **module 01** ; ici elle est disséquée. `v-model` (liaison bidirectionnelle) est introduit brièvement dans ce module mais disséqué avec `ref`/`computed` au **module 03**. `v-on` (`@`) est présenté dans les worked examples, mais la gestion avancée des événements (modificateurs, émissions parent-enfant) est au **module 05**. Les composants (`defineProps`, `defineEmits`) sont strictement hors périmètre ici.
+> **Portée :** ce module couvre la **syntaxe du template Vue 3** — tout ce qui vit dans `<template>`. L'interpolation `{{ }}` a été présentée en survol au **module 01** ; ici elle est disséquée. `v-model` (liaison bidirectionnelle) est introduit brièvement dans ce module mais disséqué avec `ref`/`computed` au **module 04**. `v-on` (`@`) est présenté dans les worked examples, mais la gestion avancée des événements (modificateurs, émissions parent-enfant) est au **module 05**. Les composants (`defineProps`, `defineEmits`) sont strictement hors périmètre ici.
 
 ---
 

@@ -627,7 +627,11 @@ tribuzen/
 
 3. **Tests Vitest** — tous les composables (`useAuth`, `useFamily`, `useEvent`) et composants critiques sont testés. Seuil de couverture : 80% lignes/fonctions, 75% branches.
 
+> **Lien modules 16-20 :** si tu n'as pas encore de specs dans TribuZen, pars du test fourni dans le lab associé à chaque module (tests unitaires M16, composants M17, intégration M18, e2e M19, MSW M20). La CI exécutera ces specs dès qu'elles existent dans le repo.
+
 4. **Build Vite** — `vite build` avec `--mode production`. L'analyse du bundle (`vite-bundle-visualizer`) est optionnelle, activable via `workflow_dispatch`.
+
+5. **Build Storybook** (module 30) — `pnpm build-storybook` vérifie que le design system compile sans erreur. À ajouter dans la CI dès que Storybook est intégré au projet.
 
 **Branch protection rule configurée :**
 - Statut requis : `quality` (ou `lint` + `test` + `build` si parallélisé)
@@ -668,6 +672,8 @@ jobs:
         run: pnpm test:coverage
       - name: Build
         run: pnpm build
+      - name: Build Storybook (design system — module 30)
+        run: pnpm build-storybook
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:

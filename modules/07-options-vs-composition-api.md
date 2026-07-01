@@ -560,7 +560,7 @@ La migration Options → Composition est un refactoring à risque : la logique n
 - On ne sait pas si `fetchMembers` se comporte de la même façon en cas d'erreur réseau.
 - Un `this.loading = false` oublié dans un `catch` n'est pas détecté.
 
-**Pratique recommandée :** avant de migrer, écrire un test de comportement avec Vitest + `@vue/test-utils` qui couvre le cas nominal. Le test devient le filet de sécurité de la migration. Si le test passe après migration → comportement préservé.
+**Pratique recommandée :** avant de migrer, écrire un test de comportement qui couvre le cas nominal. Le test devient le filet de sécurité de la migration. Si le test passe après migration → comportement préservé. Les outils de test Vue (Vitest, `@vue/test-utils`) sont présentés aux **modules 16-18** — si tu lis ce module sans les avoir vus, retiens le principe : *tester avant de refactorer*.
 
 ---
 

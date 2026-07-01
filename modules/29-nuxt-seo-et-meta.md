@@ -170,6 +170,7 @@ Les données structurées (schema.org) permettent à Google d'afficher des **ric
 ```vue
 <script setup lang="ts">
 // pages/evenements/[slug].vue
+const route = useRoute()
 const { data: evt } = await useFetch(`/api/evenements/${route.params.slug}`)
 
 useHead({

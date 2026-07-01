@@ -7,7 +7,7 @@ outcomes:
   - sait paginer et faire de l'infinite scroll (useInfiniteQuery)
   - sait prefetch et gérer des requêtes dépendantes
   - sait utiliser Vue Query en SSR (hydratation Nuxt)
-prerequis: [46-vue-query-tanstack]
+prerequis: [46-vue-query-tanstack, 27-nuxt-data-fetching]
 next: fin-parcours-02-vue
 libs: [{ name: vue, version: "3.5" }, { name: "@tanstack/vue-query", version: "5" }]
 tribuzen: front-office TribuZen — feed en infinite scroll, invitation en optimistic update, prefetch du détail famille au survol

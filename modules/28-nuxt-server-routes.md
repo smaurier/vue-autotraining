@@ -174,7 +174,7 @@ export default cachedEventHandler(
 )
 ```
 
-> **Nitro 2 vs Nitro 3 (Nuxt 4) :** le nom a changé. Nitro 2 (Nuxt 3) expose `cachedEventHandler`. Nitro 3 (Nuxt 4) utilise `defineCachedEventHandler`. Les deux sont fonctionnellement identiques — vérifie la version Nitro de ton projet. ⚠️ à gater Context7 si comportement inattendu en migration Nuxt 4.
+> **`cachedEventHandler` vs `defineCachedEventHandler` :** les deux sont des **alias** fonctionnellement identiques — pas un renommage cassant. Le préfixe `define*` est le style recommandé dans les projets récents (cohérence avec `defineEventHandler`). Les deux formes sont supportées ; préférer `defineCachedEventHandler` dans du nouveau code.
 
 **`cachedFunction`** — cache une fonction quelconque (utilitaire, fetch, calcul lourd) :
 
@@ -502,15 +502,16 @@ export default defineEventHandler(async (event) => {
 export default defineEventHandler(async (event) => {
   const body = await readBody<{ slug: string }>(event)
 
-  // Supprimer l'entrée du cache storage directement
-  const storage = useStorage()
-  await storage.removeItem(`nitro:functions:articles:${body.slug}.json`)
+  // Vider tout le namespace du cache pour le storage monté
+  // → invalide toutes les entrées de cachedFunction/cachedEventHandler
+  const storage = useStorage('cache')
+  await storage.clear()
 
   return { invalidated: body.slug }
 })
 ```
 
-> Le format de clé Nitro pour `cachedFunction` est `nitro:functions:<name>:<key>.json`. ⚠️ à gater Context7 si le format change en Nitro 3.
+> **Format de clé interne — instable :** Nitro stocke les entrées de `cachedFunction` selon un format de clé interne (`nitro:functions:<name>:<key>.json` dans les versions courantes). Ce format est un **détail d'implémentation non documenté comme API publique** — il peut changer sans avertissement entre versions. Ne pas construire d'invalidation sur ce format. Préférer `useStorage('cache').clear()` pour vider un namespace, ou un TTL court combiné à `swr: true` pour une revalidation automatique sans invalidation manuelle.
 
 ---
 
@@ -578,22 +579,21 @@ export default cachedEventHandler(async (event) => {
 
 Solution : combiner `swr: true` (revalidation silencieuse), une route d'invalidation POST (`/api/admin/invalidate`), et des `ETag` pour la couche HTTP. Définir `maxAge` selon la fréquence réelle de changement des données.
 
-### PIÈGE #4 — Confondre `cachedEventHandler` et `cachedFunction` (Nitro 2 vs 3)
+### PIÈGE #4 — Croire que `cachedEventHandler` est dépréciée ou cassée en Nuxt 4
 
-En Nuxt 3 (Nitro 2), l'API est `cachedEventHandler` et `cachedFunction`.
-En Nuxt 4 (Nitro 3), les fonctions sont renommées `defineCachedEventHandler` et `defineCachedFunction`.
+`cachedEventHandler` et `defineCachedEventHandler` sont des **alias** — les deux formes sont supportées et fonctionnellement identiques. Le préfixe `define*` est simplement le **style recommandé** dans les projets récents, par cohérence avec `defineEventHandler` et `defineNitroPlugin`.
 
 ```ts
-// Nuxt 3 / Nitro 2
-export default cachedEventHandler(handler, options)
-const fn = cachedFunction(fn, options)
+// Alias équivalents — résultat identique
+export default cachedEventHandler(handler, options)        // style original, toujours valide
+export default defineCachedEventHandler(handler, options)  // style recommandé — préférer ce-ci
 
-// Nuxt 4 / Nitro 3 (noms recommandés)
-export default defineCachedEventHandler(handler, options)
-const fn = defineCachedFunction(fn, options)
+// Idem pour les fonctions cachées
+const fn = cachedFunction(asyncFn, options)       // alias
+const fn = defineCachedFunction(asyncFn, options) // style recommandé
 ```
 
-Les options (`maxAge`, `swr`, `name`, `getKey`) sont identiques dans les deux versions. Vérifier la version Nitro avec `cat package.json | grep nitro` si un projet Nuxt 4 refuse l'ancienne forme.
+Les options (`maxAge`, `swr`, `staleMaxAge`, `name`, `getKey`) sont identiques dans les deux formes.
 
 ### PIÈGE #5 — `useStorage` sans driver = mémoire locale non-partagée
 

@@ -366,6 +366,14 @@ module.exports = {
         'interactive': ['warn', { maxNumericValue: 3800 }],
       },
     },
+    // ⚠️ Périmètre de categories:accessibility :
+    // Lighthouse détecte ~30-40 % des critères WCAG automatisables
+    // (labels manquants, contraste insuffisant, attributs ARIA, structure
+    // de titres…). Il ne couvre PAS l'audit manuel RGAA — navigation clavier,
+    // lecteur d'écran, zones de saisie complexes, etc.
+    // → Les modules 38-40 (a11y fondamentaux, composants, audit) couvrent
+    //   cet audit manuel. Un score categories:accessibility = 1.0 ne signifie
+    //   pas une conformité RGAA 4.1.
     upload: {
       // Stocke les rapports sur lhci.tribuzen.app (serveur LHCI auto-hébergé)
       // ou 'temporary-public-storage' pour un stockage temporaire gratuit

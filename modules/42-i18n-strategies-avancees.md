@@ -1,13 +1,13 @@
 ---
 titre: i18n — stratégies avancées
 cours: 02-vue
-notions: [lazy loading des locales, routing par langue et détection, i18n en SSR et Nuxt i18n, SEO multilingue hreflang, extraction et gestion des clés de traduction, accessibilité et attribut lang, formats ICU messages, tests d'internationalisation]
+notions: [lazy loading des locales, routing par langue et détection, i18n en SSR et Nuxt i18n, SEO multilingue hreflang, extraction et gestion des clés de traduction, accessibilité et attribut lang, formats ICU messages, support RTL right-to-left, tests d'internationalisation]
 outcomes:
   - sait charger les locales à la demande et détecter la langue
   - sait gérer l'i18n en SSR (Nuxt i18n) avec routing par langue
   - sait faire du SEO multilingue (hreflang, lang) accessible
   - sait organiser et tester les clés de traduction à l'échelle
-prerequis: [41-i18n-vue-i18n]
+prerequis: [41-i18n-vue-i18n, 25-nuxt-introduction, 27-nuxt-data-fetching]
 next: 43-auth-authentification
 libs: [{ name: vue, version: "3.5" }, { name: vue-i18n, version: "10" }]
 tribuzen: front-office TribuZen — locales lazy-loadées, routing /fr /en, hreflang + attribut lang correct (accessibilité), SSR Nuxt i18n
@@ -424,7 +424,41 @@ ICU MessageFormat permet des règles de pluralisation par langue (l'anglais a 2 
 }
 ```
 
-> ⚠️ À vérifier Context7 — vue-i18n v10 nécessite la configuration `messageCompiler` pour activer ICU. Le package `@intlify/message-compiler` doit être installé séparément. Vérifier la doc officielle `vue-i18n` v10 avant d'activer ICU en production.
+**Activation ICU via `messageCompiler` (vue-i18n v10 — confirmé) :**
+
+L'option `messageCompiler` de `createI18n()` accepte un compilateur personnalisé. Pour ICU, installer `intl-messageformat` (FormatJS) et écrire l'adaptateur :
+
+```ts
+// pnpm add intl-messageformat
+import IntlMessageFormat from 'intl-messageformat'
+import type { MessageCompiler, MessageContext } from 'vue-i18n'
+
+// Adaptateur : délègue la compilation ICU à intl-messageformat
+export const messageCompiler: MessageCompiler = (message, { locale, key, onError }) => {
+  if (typeof message === 'string') {
+    const formatter = new IntlMessageFormat(message, locale)
+    return (ctx: MessageContext) => formatter.format(ctx.values) as string
+  }
+  // AST pré-compilé non supporté par cette implémentation minimale
+  onError?.(new Error('AST non supporté') as any)
+  return () => key
+}
+```
+
+```ts
+// Passer le compilateur à createI18n — active ICU pour toutes les locales
+import { createI18n } from 'vue-i18n'
+import { messageCompiler } from './messageCompiler'
+
+export const i18n = createI18n({
+  legacy: false,
+  locale: 'fr',
+  messageCompiler,
+  messages: { fr: { members: '{count, plural, =0 {Aucun membre} one {# membre} other {# membres}}' } },
+})
+```
+
+> Pour un projet sans traducteur externe (Phrase, Lokalise, Crowdin), le format natif vue-i18n (interpolations nommées + pipe pluriel) est suffisant et sans dépendance supplémentaire. ICU apporte de la valeur quand les traducteurs livrent du contenu au format ICU depuis un outil de CAT.
 
 **Composant `<i18n-t>` pour les interpolations avec balises HTML :**
 
@@ -543,6 +577,45 @@ describe('attribut lang sur <html>', () => {
   })
 })
 ```
+
+### 2.9 Support RTL (right-to-left)
+
+Certaines langues s'écrivent de droite à gauche : **arabe** (`ar`), **hébreu** (`he`), **persan/dari** (`fa`), **ourdou** (`ur`). Si TribuZen vient à supporter l'une de ces locales, deux attributs HTML doivent être synchronisés en parallèle de `lang` :
+
+| Attribut | Valeur | Effet |
+|----------|--------|-------|
+| `lang="ar"` | Code ISO 639-1 | Moteur de synthèse vocale correct (RGAA 8.3) |
+| `dir="rtl"` | Right-to-left | Renversement du flux texte + mise en page |
+
+**Synchronisation `lang` + `dir` au changement de locale :**
+
+```ts
+// utils/applyLocale.ts
+const RTL_LOCALES = new Set(['ar', 'he', 'fa', 'ur'])
+
+export function applyLocaleToDocument(locale: string): void {
+  document.documentElement.setAttribute('lang', locale)
+  document.documentElement.setAttribute('dir', RTL_LOCALES.has(locale) ? 'rtl' : 'ltr')
+}
+```
+
+```ts
+// Appel dans le watcher de locale (setLocale ou composable useLocale)
+import { watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { applyLocaleToDocument } from '@/utils/applyLocale'
+
+const { locale } = useI18n()
+watch(locale, applyLocaleToDocument, { immediate: true })
+```
+
+**Ce que `dir="rtl"` change dans le navigateur :**
+- Les éléments `text-align: start` deviennent alignés à droite.
+- Flexbox et Grid avec `flex-direction: row` s'inversent automatiquement.
+- Les propriétés logiques CSS (`margin-inline-start`, `padding-inline-end`) s'adaptent sans retouche.
+- Les barres de défilement et les listes à puces changent de côté.
+
+> **Scope TribuZen :** le curriculum couvre fr/en (LTR). Cette section documente le pattern pour l'équipe si des locales RTL sont ajoutées. Poser `dir` sur `<html>` suffit — les navigateurs et les frameworks CSS modernes s'adaptent automatiquement.
 
 ---
 
@@ -879,10 +952,12 @@ Qu'est-ce qu'un hreflang x-default et quand l'utilise-t-on ?|hreflang="x-default
 Comment éviter les tests i18n qui s'influencent mutuellement ?|Utiliser une factory createTestI18n() appelée dans chaque it(). Chaque test a une instance isolée — la locale d'un test ne pollue pas le suivant.
 Dans Nuxt i18n, quelle option active le lazy loading des fichiers de traduction ?|lazy: true dans la config i18n de nuxt.config.ts, combiné à langDir (chemin du dossier) et file dans chaque entrée locales[]. Nuxt génère les chunks automatiquement.
 Quel composant vue-i18n utilise-t-on pour interpoler un lien ou un composant Vue dans une traduction ?|<i18n-t keypath="ma.cle" tag="span"> avec un slot nommé <template #nomDuSlot>. Interdit d'utiliser v-html pour insérer du HTML dans les traductions (risque XSS).
+Quels deux attributs HTML faut-il synchroniser pour supporter une locale RTL (arabe, hébreu) ?|lang="ar" (pour le moteur de synthèse vocale — RGAA 8.3) et dir="rtl" (pour le sens d'écriture et la mise en page). Les deux se posent sur <html> au changement de locale.
 ```
 
 ---
 
 ## Pont vers le lab
 
-> Lab associé : `labs/lab-42-i18n-strategies-avancees/README.md`. Implémente le lazy loading, le sélecteur de langue accessible et les tests i18n sur un projet Vite starter — avec Vitest comme oracle.
+> Lab associé : `labs/lab-42-i18n-strategies-avancees/README.md`. Implémente le lazy loading, le sélecteur de langue accessible et les tests i18n sur un projet Vite starter.
+> **Vrai outil :** Vitest — le coach valide les assertions en session.

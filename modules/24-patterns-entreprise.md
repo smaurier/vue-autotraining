@@ -1,7 +1,7 @@
 ---
 titre: Patterns d'entreprise
 cours: 02-vue
-notions: [injection de dépendances provide inject typé, error boundaries onErrorCaptured, feature flags, higher order components et composables de composition, plugin Vue et app.use, gestion centralisée des erreurs et logs, patterns de configuration par environnement, factory de composables]
+notions: [injection de dépendances provide inject typé, error boundaries onErrorCaptured, feature flags, higher order components et composables de composition, plugin Vue et app.use, gestion centralisée des erreurs et logs, patterns de configuration par environnement, factory de composables, Repository pattern interface et implémentation, Monorepo pnpm-workspace Turborepo, migration Vue 2 vers Vue 3 @vue/compat]
 outcomes:
   - sait injecter des dépendances typées avec provide/inject (InjectionKey)
   - sait capturer et gérer les erreurs d'un sous-arbre (onErrorCaptured)
@@ -464,6 +464,250 @@ Importer `config` partout plutôt qu'accéder directement à `import.meta.env` d
 
 ---
 
+### 2.7 Repository pattern — interface + implémentation HTTP + InMemory
+
+Le Repository pattern sépare **le contrat** (l'interface) de **l'implémentation** (HTTP en prod, InMemory en test). Le code applicatif dépend du contrat — jamais de `fetch` directement dans les composables.
+
+**Étape 1 — Le contrat (`src/domain/ports/PostRepository.ts`) :**
+
+```ts
+// Ce fichier définit CE QUE le repository sait faire — pas COMMENT
+export interface PostRepository {
+  findAll(): Promise<Post[]>
+  findById(id: string): Promise<Post>
+  create(data: CreatePostDto): Promise<Post>
+  delete(id: string): Promise<void>
+}
+```
+
+**Étape 2 — Implémentation HTTP (`src/infrastructure/HttpPostRepository.ts`) :**
+
+```ts
+import type { PostRepository } from '@/domain/ports/PostRepository'
+import type { ApiClient } from '@/injection-keys'
+
+export class HttpPostRepository implements PostRepository {
+  constructor(private readonly api: ApiClient) {}
+
+  async findAll(): Promise<Post[]> {
+    return this.api.get<Post[]>('/posts')
+  }
+
+  async findById(id: string): Promise<Post> {
+    return this.api.get<Post>(`/posts/${id}`)
+  }
+
+  async create(data: CreatePostDto): Promise<Post> {
+    return this.api.post<Post>('/posts', data)
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.api.delete(`/posts/${id}`)
+  }
+}
+```
+
+**Étape 3 — Implémentation InMemory pour les tests (`src/infrastructure/InMemoryPostRepository.ts`) :**
+
+```ts
+import type { PostRepository } from '@/domain/ports/PostRepository'
+
+export class InMemoryPostRepository implements PostRepository {
+  private posts: Post[] = []
+
+  // Pré-remplir pour les tests
+  seed(posts: Post[]): this {
+    this.posts = [...posts]
+    return this
+  }
+
+  async findAll(): Promise<Post[]> {
+    return [...this.posts]
+  }
+
+  async findById(id: string): Promise<Post> {
+    const found = this.posts.find(p => p.id === id)
+    if (!found) throw new Error(`Post ${id} introuvable`)
+    return found
+  }
+
+  async create(data: CreatePostDto): Promise<Post> {
+    const post: Post = { id: crypto.randomUUID(), ...data, createdAt: new Date().toISOString() }
+    this.posts.push(post)
+    return post
+  }
+
+  async delete(id: string): Promise<void> {
+    this.posts = this.posts.filter(p => p.id !== id)
+  }
+}
+```
+
+**Injection via `provide`/`inject` (cohérence avec §2.1) :**
+
+```ts
+// src/injection-keys.ts
+import type { InjectionKey } from 'vue'
+import type { PostRepository } from '@/domain/ports/PostRepository'
+
+export const POST_REPO_KEY: InjectionKey<PostRepository> = Symbol('postRepository')
+```
+
+```ts
+// App.vue — injecte l'implémentation HTTP en prod
+import { HttpPostRepository } from '@/infrastructure/HttpPostRepository'
+provide(POST_REPO_KEY, new HttpPostRepository(apiClient))
+```
+
+```ts
+// tests/FeedList.test.ts — InMemory, pas de fetch réseau
+const repo = new InMemoryPostRepository().seed([{ id: '1', content: 'Test' }])
+app.provide(POST_REPO_KEY, repo)
+```
+
+**Valeur :** un composable peut être testé sans serveur, sans MSW, sans `vi.fn()` sur `fetch` — l'implémentation InMemory est déterministe et ultra-rapide.
+
+---
+
+### 2.8 Monorepo — pnpm-workspace, Turborepo / Nx
+
+Un monorepo regroupe plusieurs packages et applications dans un seul dépôt git. Les packages partagés (design system, utilitaires, types) sont importés directement sans passer par npm.
+
+**Structure typique :**
+
+```
+tribuzen-monorepo/
+  packages/
+    ui/                   ← Design system Vue (ButtonPrimary, AvatarGroup…)
+      src/
+        index.ts          ← re-export barrel
+      package.json        ← name: "@tribuzen/ui"
+    shared/               ← Types TS et utilitaires partagés
+      src/
+        types.ts
+      package.json        ← name: "@tribuzen/shared"
+  apps/
+    web/                  ← SPA Vue (front-office famille)
+      package.json
+    admin/                ← Nuxt (back-office)
+      package.json
+  pnpm-workspace.yaml
+  turbo.json
+```
+
+**`pnpm-workspace.yaml` — déclare les packages :**
+
+```yaml
+packages:
+  - "packages/*"
+  - "apps/*"
+```
+
+**Import inter-packages :**
+
+```ts
+// apps/web/package.json — déclarer la dépendance locale
+{
+  "dependencies": {
+    "@tribuzen/ui": "workspace:*",
+    "@tribuzen/shared": "workspace:*"
+  }
+}
+```
+
+```ts
+// apps/web/src/components/FeedCard.vue
+import { AvatarGroup } from '@tribuzen/ui'
+import type { Post } from '@tribuzen/shared'
+```
+
+**Turborepo / Nx — orchestration des builds :**
+
+- **Turborepo** (`turbo.json`) : cache des tâches, pipeline de build parallèle. Si `@tribuzen/ui` n'a pas changé depuis le dernier build, Turborepo réutilise le cache — le build CI passe de 5 min à 30 s.
+- **Nx** : similaire, plus complet pour les grandes équipes (générateurs, dependency graph visuel).
+
+```json
+// turbo.json — exemple minimal
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
+    }
+  }
+}
+```
+
+**Quand adopter un monorepo :** dès qu'un composant ou un type doit être partagé entre deux apps. Le coût de setup (`pnpm-workspace.yaml` + Turborepo) est faible ; le gain de synchronisation entre packages est immédiat.
+
+---
+
+### 2.9 Migration Vue 2 → Vue 3 — `@vue/compat` et étapes progressives
+
+En entreprise, la majorité des projets Vue existants sont en Vue 2. La migration n'est pas un big-bang — `@vue/compat` permet de faire tourner du code Vue 2 dans Vue 3 pendant la transition.
+
+**Étapes progressives :**
+
+```
+Étape 1 — Installer @vue/compat
+   pnpm add @vue/compat
+   Aliaser "vue" vers "@vue/compat" dans vite.config.ts
+   → L'app démarre en mode Vue 3 avec compatibilité Vue 2 activée
+   → Des warnings apparaissent pour chaque API dépréciée utilisée
+
+Étape 2 — Migrer composant par composant
+   Traiter les warnings un à un : Options API → Composition API,
+   $listeners → v-on inherit, .sync modifier → v-model:propName,
+   Vue.set / Vue.delete → réactivité directe Vue 3
+
+Étape 3 — Remplacer les mixins par des composables
+   Les mixins (source de conflits de nommage) → composables Vue 3
+   ex: mixin authMixin → composable useAuth()
+
+Étape 4 — Migrer Vuex vers Pinia
+   Vuex 4 fonctionne dans Vue 3, mais Pinia est la cible officielle
+   Migration store par store, pas en une seule fois
+
+Étape 5 — Désactiver @vue/compat
+   Retirer l'alias dans vite.config.ts
+   Corriger les derniers usages d'API Vue 2 non encore traités
+```
+
+**Configuration Vite pour activer `@vue/compat` :**
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      // Remplace les imports de 'vue' par '@vue/compat' le temps de la migration
+      'vue': '@vue/compat',
+    },
+  },
+  plugins: [
+    vue({
+      template: {
+        compilerOptions: {
+          // Active les warnings de compatibilité dans les templates
+          compatConfig: { MODE: 2 },
+        },
+      },
+    }),
+  ],
+})
+```
+
+**Règle d'or :** ne jamais geler les features en cours de migration. Utiliser les feature flags (§2.3) pour activer/désactiver le code migré par portion, et s'appuyer sur les tests de non-régression à chaque étape.
+
+---
+
 ## 3. Worked examples
 
 ### Exemple 1 — InjectionKey ApiClient + ErrorBoundary (TribuZen)
@@ -743,6 +987,53 @@ const client = inject(API_CLIENT_KEY)  // ✅ — exécuté pendant setup()
 
 ---
 
+### PIÈGE #5 — `onErrorCaptured` n'intercepte PAS les erreurs async des event handlers
+
+C'est le piège le plus fréquent quand on implémente un `ErrorBoundary` : les erreurs lancées dans un handler d'événement async ne remontent **pas** vers `onErrorCaptured`.
+
+```ts
+// ❌ ErrorBoundary parent NE reçoit PAS cette erreur
+// Le handler @click asynchrone s'exécute hors du contexte de rendu Vue
+<script setup lang="ts">
+async function handleSubmit(): Promise<void> {
+  const result = await api.post('/posts', formData.value)
+  // Si api.post() rejette → l'erreur n'est PAS capturée par onErrorCaptured
+  // Elle atterrit dans app.config.errorHandler ou reste non gérée
+}
+</script>
+
+<template>
+  <form @submit.prevent="handleSubmit">...</form>
+</template>
+```
+
+**Pourquoi :** `onErrorCaptured` intercepte les erreurs dans `setup()`, la fonction `render()`, les watchers, et les lifecycle hooks. Les event handlers async (`@click`, `@submit`, `@change`) sont déclenchés par des événements DOM — ils s'exécutent en dehors du cycle de rendu Vue et Vue ne peut pas les intercepter automatiquement.
+
+**Le correct — `try/catch` explicite dans chaque handler async :**
+
+```ts
+// ✅ Gérer l'erreur dans le handler lui-même
+async function handleSubmit(): Promise<void> {
+  try {
+    await api.post('/posts', formData.value)
+    emit('submitted')
+  } catch (err) {
+    // Option A : état d'erreur local dans le composant
+    submitError.value = err instanceof Error ? err.message : 'Erreur lors de l\'envoi'
+
+    // Option B : logger centralisé (plugin §2.5)
+    logger?.error('handleSubmit failed', err as Error)
+
+    // Option C : re-throw dans un rendu synchrone pour déclencher onErrorCaptured
+    // (rare, pattern avancé — ne pas utiliser par défaut)
+  }
+}
+```
+
+**Règle :** toute `async function` déclenchée par un event handler (`@click`, `@submit`, `@change`…) doit avoir son propre `try/catch`. `onErrorCaptured` est pour les erreurs de **rendu et de cycle de vie**, pas pour les handlers async d'événements DOM.
+
+---
+
 ## 5. Ancrage TribuZen
 
 Dans TribuZen, ces quatre patterns s'emboîtent dans la couche front-office :
@@ -802,11 +1093,15 @@ tribuzen/
 1. `InjectionKey<T>` est un Symbol typé — c'est la seule façon d'obtenir un typage bout-en-bout entre `provide` et `inject` en TypeScript.
 2. `inject` retourne `T | undefined` quand aucune valeur par défaut n'est fournie — toujours gérer ce cas.
 3. `onErrorCaptured` retourne `false` pour stopper la propagation ; tout autre retour (y compris `true`) laisse l'erreur remonter.
-4. Un plugin Vue expose `{ install(app: App) {} }` — l'état doit être créé dans `install`, jamais au niveau module.
-5. `app.config.errorHandler` est le filet de sécurité global ; `onErrorCaptured` est le contrôle local par sous-arbre.
-6. Les feature flags compilés (`import.meta.env.VITE_FF_*`) sont évalués au build — tree-shaker peut éliminer le code mort. Les flags runtime (via `inject`) permettent le toggle sans redéploiement.
-7. `import.meta.env.VITE_*` : seules les variables préfixées `VITE_` sont exposées au bundle client.
-8. La factory de composables (`createResourceComposable`) évite de dupliquer la logique loading/error/reset — un seul endroit à corriger si le pattern change.
+4. `onErrorCaptured` n'intercepte PAS les erreurs async des event handlers DOM — chaque `async function` déclenchée par `@click` ou `@submit` doit avoir son propre `try/catch`.
+5. Un plugin Vue expose `{ install(app: App) {} }` — l'état doit être créé dans `install`, jamais au niveau module.
+6. `app.config.errorHandler` est le filet de sécurité global ; `onErrorCaptured` est le contrôle local par sous-arbre.
+7. Les feature flags compilés (`import.meta.env.VITE_FF_*`) sont évalués au build — tree-shaker peut éliminer le code mort. Les flags runtime (via `inject`) permettent le toggle sans redéploiement.
+8. `import.meta.env.VITE_*` : seules les variables préfixées `VITE_` sont exposées au bundle client.
+9. La factory de composables (`createResourceComposable`) évite de dupliquer la logique loading/error/reset — un seul endroit à corriger si le pattern change.
+10. Le Repository pattern sépare l'interface (contrat) de l'implémentation (HTTP en prod, InMemory en test) — injecté via `provide`/`inject` pour la testabilité.
+11. Un monorepo pnpm-workspace partage des packages sans publication npm — Turborepo ou Nx orchestrent les builds et le cache CI.
+12. La migration Vue 2→3 se fait via `@vue/compat` (alias dans vite.config), composant par composant, avec feature flags pour activer/désactiver les portions migrées.
 
 ---
 
@@ -821,7 +1116,27 @@ Quel préfixe rend une variable d'environnement Vite accessible côté client ?|
 Quelle est la différence entre app.config.errorHandler et onErrorCaptured ?|app.config.errorHandler est global (toute l'app, dernier recours). onErrorCaptured est local à un composant et son sous-arbre, et peut stopper la propagation avec return false.
 Comment injecter une valeur réactive via provide/inject ?|provide(KEY, ref(value)) ou provide(KEY, reactive(obj)). Le descendant inject(KEY) obtient la même référence réactive — les mutations sont visibles immédiatement.
 À quel moment de l'exécution inject() doit-il être appelé ?|De façon synchrone au niveau racine de setup() ou <script setup>. Jamais dans un callback asynchrone, un setTimeout, ou un lifecycle hook — inject() serait undefined et Vue avertit.
+Pourquoi onErrorCaptured ne capture-t-il pas les erreurs dans un handler @click async ?|Les event handlers async s'exécutent en dehors du cycle de rendu Vue (déclenchés par des événements DOM). onErrorCaptured n'intercepte que les erreurs de setup(), render(), watchers et lifecycle hooks. Solution : try/catch explicite dans chaque handler async.
+Quelle est la valeur du Repository pattern pour la testabilité ?|Il sépare le contrat (interface) de l'implémentation. En prod : HttpRepository (vraie API). En test : InMemoryRepository (tableau en mémoire, pas de réseau, déterministe). Le composable dépend du contrat via inject() — swapper l'implémentation sans toucher le composable.
+Quel fichier configure les packages d'un monorepo pnpm ?|pnpm-workspace.yaml — il liste les dossiers (packages: ["packages/*", "apps/*"]). pnpm résout les dépendances locales (workspace:*) sans publication npm. Turborepo ou Nx ajoutent le cache de build et l'orchestration.
+Quel outil permet de migrer Vue 2 vers Vue 3 sans réécriture totale ?|@vue/compat — aliaser 'vue' vers '@vue/compat' dans vite.config.ts active le mode compatibilité. L'app tourne en Vue 3, les APIs Vue 2 dépréciées affichent des warnings. On migre composant par composant en traitant les warnings, puis on retire l'alias quand tout est migré.
 ```
+
+---
+
+## Vers le module 25 — Nuxt
+
+Les patterns de ce module ont des équivalents directs dans Nuxt. La logique ne change pas — la plomberie d'injection change.
+
+| Pattern Vue (module 24) | Équivalent Nuxt (modules 25-29) |
+|---|---|
+| `provide(API_CLIENT_KEY, client)` + `inject(API_CLIENT_KEY)` | `useNuxtApp().$fetch` — client HTTP fourni par Nuxt, SSR-aware |
+| `provide(THEME_KEY, theme)` + `inject(THEME_KEY)` | `useNuxtApp().provide('theme', theme)` — auto-exposé via `useNuxtApp()` |
+| Feature flags `import.meta.env.VITE_FF_*` (compilés) | `useRuntimeConfig()` — config exposée server + client, changeable sans rebuild |
+| Plugin `app.use(LoggerPlugin)` (Vite/Vue) | Plugin Nuxt `plugins/logger.ts` + Nitro middleware pour le côté serveur |
+| `app.config.errorHandler` | `nuxtApp.hook('app:error', handler)` — hook SSR-compatible |
+
+Un `InjectionKey` Vue reste utilisable dans Nuxt via `provide`/`inject` natif ; `useNuxtApp()` en ajoute une couche automatique pour les dépendances du framework (router, payload, fetch).
 
 ---
 

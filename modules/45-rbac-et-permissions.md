@@ -1,7 +1,7 @@
 ---
 titre: RBAC et permissions
 cours: 02-vue
-notions: [modèle RBAC rôles et permissions, ABAC en survol, directive personnalisée v-can, composable usePermissions, masquage UI vs sécurité réelle serveur, guards de route par rôle, gestion fine par ressource, cohérence front et back]
+notions: [modèle RBAC rôles et permissions, ABAC en survol, directive personnalisée v-can, composable usePermissions, composant déclaratif CanAccess avec slot fallback, masquage UI vs sécurité réelle serveur, guards de route par rôle, gestion fine par ressource, cohérence front et back]
 outcomes:
   - sait modéliser des rôles et permissions (RBAC) côté front
   - sait conditionner l'UI par permission (directive, composable)
@@ -426,6 +426,64 @@ export function usePermissions() {
 
 L'option B est plus robuste sur le long terme : le back est toujours la source de vérité, et les changements de permissions ne nécessitent pas de redeployer le front.
 
+### 2.9 Composant déclaratif `<CanAccess>` avec slot `#fallback`
+
+`v-if + hasPermission()` est lisible mais éparpille la logique de permission dans chaque template. Le composant `<CanAccess>` encapsule ce pattern et offre un slot `#fallback` pour afficher un état dégradé (message, bouton désactivé…) sans double condition dans le template.
+
+```vue
+<!-- src/components/ui/CanAccess.vue -->
+<script setup lang="ts">
+import { usePermissions } from '@/composables/usePermissions'
+import type { Permission } from '@/types/permissions'
+
+const props = defineProps<{ permission: Permission }>()
+const { hasPermission } = usePermissions()
+</script>
+
+<template>
+  <!-- Slot default : affiché si la permission est présente -->
+  <slot v-if="hasPermission(props.permission)" />
+  <!-- Slot fallback : affiché sinon (rien si le slot n'est pas fourni) -->
+  <slot v-else name="fallback" />
+</template>
+```
+
+**Usage dans les templates :**
+
+```vue
+<template>
+  <!-- Cas simple : rien n'est rendu si pas la permission -->
+  <CanAccess permission="family:invite">
+    <button @click="openInviteModal">Inviter un membre</button>
+  </CanAccess>
+
+  <!-- Cas avec fallback explicite : le membre voit un message explicatif -->
+  <CanAccess permission="family:kick">
+    <button @click="kickMember(member.id)">Exclure</button>
+
+    <template #fallback>
+      <span class="text-muted text-sm">Réservé aux admins de la famille</span>
+    </template>
+  </CanAccess>
+
+  <!-- Cas multi-permissions : combiner avec un composable -->
+  <CanAccess permission="post:delete-any">
+    <button @click="deletePost(post.id)">Supprimer (modération)</button>
+  </CanAccess>
+</template>
+```
+
+**`<CanAccess>` vs `v-if` via composable :**
+
+| | `v-if + hasPermission()` | `<CanAccess>` |
+|---|---|---|
+| Lisibilité template | Bonne | Excellente — l'intention est nommée |
+| Fallback explicite | `v-else` à écrire manuellement | Slot `#fallback` intégré |
+| Réutilisabilité | Aucune — dupliqué par composant | Un seul composant, importé partout |
+| Testabilité | Tester le composant parent | Tester `CanAccess` isolément |
+
+> `<CanAccess>` est une **alternative déclarative** à `v-if + hasPermission()` — les deux suppriment le nœud DOM (contrairement à `v-can` qui utilise `display:none`). Préférer `<CanAccess>` quand un fallback visible est nécessaire, `v-if` direct quand c'est un simple masquage sans message.
+
 ---
 
 ## 3. Worked examples
@@ -774,6 +832,7 @@ Qu'est-ce que l'ABAC et quand l'utiliser ?|Attribute-Based Access Control — la
 Comment protéger une route Vue Router par permission ?|Ajouter meta.requiredPermission à la route, puis dans router.beforeEach appeler hasPermission() depuis usePermissions et retourner { path: '/forbidden' } si refusé.
 Comment garantir la cohérence des permissions entre front et back ?|Soit partager la table ROLE_PERMISSIONS via un package commun (monorepo), soit faire retourner les permissions par l'API à la connexion — le back reste source de vérité, le front consomme.
 Quel anti-pattern remplace usePermissions dans les codebases legacy ?|Tester user.role directement dans les composants (v-if="user.role === 'admin'"). Problème: la logique est éparpillée, fragile au renommage, non testable unitairement.
+Quelle est la différence entre le composant CanAccess et v-if via hasPermission() ?|Les deux suppriment le nœud DOM. CanAccess encapsule le pattern et offre un slot #fallback pour afficher un état dégradé sans double condition dans le template — plus lisible quand un message "non autorisé" doit être affiché.
 ```
 
 ---
