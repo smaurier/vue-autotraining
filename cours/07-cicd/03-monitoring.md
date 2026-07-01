@@ -199,7 +199,7 @@ pour évaluer l'expérience utilisateur sur un site web.
 | Métrique | Nom complet              | Ce que ça mesure                                                | Seuil acceptable    |
 | -------- | ------------------------ | --------------------------------------------------------------- | ------------------- |
 | **LCP**  | Largest Contentful Paint | Temps avant que le contenu principal soit visible               | < 2.5 secondes      |
-| **FID**  | First Input Delay        | Temps avant que l'app réagisse au premier clic                  | < 100 millisecondes |
+| **INP**  | Interaction to Next Paint | Réactivité globale aux interactions (remplace FID depuis 03/2024) | < 200 millisecondes |
 | **CLS**  | Cumulative Layout Shift  | Est-ce que les éléments bougent/sautent pendant le chargement ? | < 0.1               |
 | **FCP**  | First Contentful Paint   | Temps avant que quelque chose s'affiche                         | < 1.8 secondes      |
 | **TTFB** | Time To First Byte       | Temps avant que le serveur réponde                              | < 800 millisecondes |
@@ -211,7 +211,7 @@ pour évaluer l'expérience utilisateur sur un site web.
 // Ce fichier mesure les performances de l'app et les envoie à ton serveur
 
 // On importe les fonctions de mesure depuis la librairie "web-vitals"
-import { onCLS, onFID, onLCP, onFCP, onTTFB } from "web-vitals";
+import { onCLS, onINP, onLCP, onFCP, onTTFB } from "web-vitals";
 
 // On définit le type d'une métrique (nom + valeur numérique)
 type Metric = { name: string; value: number };
@@ -230,7 +230,7 @@ function sendMetric(metric: Metric): void {
 export function initWebVitals(): void {
   // Chaque fonction mesure une métrique et appelle sendMetric automatiquement
   onCLS(sendMetric); // Mesure la stabilité visuelle
-  onFID(sendMetric); // Mesure la réactivité au premier clic
+  onINP(sendMetric); // Mesure la réactivité globale aux interactions (remplace FID)
   onLCP(sendMetric); // Mesure le temps de chargement du contenu principal
   onFCP(sendMetric); // Mesure le temps avant le premier affichage
   onTTFB(sendMetric); // Mesure le temps de réponse du serveur
@@ -344,7 +344,7 @@ En production, voici les **métriques clés** à surveiller :
 | --------------------------- | --------------------------------------------------- | ---------------- | --------------------------------- |
 | **Error rate**              | % de requêtes qui échouent                          | < 0.1%           | Ton app a des bugs en production  |
 | **LCP**                     | Temps de chargement du contenu                      | < 2.5s           | L'app est trop lente              |
-| **FID**                     | Temps de réaction au premier clic                   | < 100ms          | L'app semble "gelée"              |
+| **INP**                     | Réactivité aux interactions (remplace FID 03/2024)  | < 200ms          | L'app semble "gelée"              |
 | **CLS**                     | Éléments qui bougent pendant le chargement          | < 0.1            | L'interface "saute" — mauvaise UX |
 | **API response time (p95)** | Temps de réponse du serveur (pour 95% des requêtes) | < 500ms          | Le backend est trop lent          |
 
@@ -471,7 +471,7 @@ onErrorCaptured((error) => {
 Intègre la mesure des Web Vitals :
 
 ```ts
-import { onLCP, onFID, onCLS } from "web-vitals";
+import { onLCP, onINP, onCLS } from "web-vitals";
 
 // Envoie les métriques à ton service d'analytics
 function sendToAnalytics(metric: { name: string; value: number }) {
@@ -486,7 +486,7 @@ function sendToAnalytics(metric: { name: string; value: number }) {
 <summary>Solution</summary>
 
 ```ts
-import { onLCP, onFID, onCLS } from "web-vitals";
+import { onLCP, onINP, onCLS } from "web-vitals";
 
 function sendToAnalytics(metric: { name: string; value: number }) {
   console.log(`[Web Vitals] ${metric.name}: ${metric.value}`);
@@ -494,7 +494,7 @@ function sendToAnalytics(metric: { name: string; value: number }) {
 }
 
 onLCP(sendToAnalytics);
-onFID(sendToAnalytics);
+onINP(sendToAnalytics);
 onCLS(sendToAnalytics);
 ```
 

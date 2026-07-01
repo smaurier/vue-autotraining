@@ -116,7 +116,7 @@ Ce fichier configure **l'apparence globale** des stories (styles, réglages visu
 // Ce fichier configure comment les stories s'AFFICHENT
 
 // On importe le type Preview pour l'autocomplétion
-import type { Preview } from "@storybook/vue3";
+import type { Preview } from "@storybook/vue3-vite";
 
 // On importe les styles CSS de notre application
 // Comme ça, les composants dans Storybook auront les mêmes styles

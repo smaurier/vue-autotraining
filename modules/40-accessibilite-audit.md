@@ -360,7 +360,7 @@ jobs:
 
 ### 2.7 Méthodologie RGAA 4.1 — grille des critères et taux de conformité
 
-Le **Référentiel Général d'Amélioration de l'Accessibilité (RGAA) 4.1** est la transposition française du standard WCAG 2.1. Il est obligatoire pour les services publics numériques en vertu de la **directive EAA (European Accessibility Act, 2019/882 UE)**, transposée en droit français via **LCEN art. 47 + décret 2019-768**, et de plus en plus exigé dans les appels d'offres privés.
+Le **Référentiel Général d'Amélioration de l'Accessibilité (RGAA) 4.1** est la transposition française du standard WCAG 2.1. **Deux textes distincts à ne pas confondre** : (1) l'obligation historique du **secteur public** découle de la **directive 2016/2102** (accessibilité des sites publics), transposée en droit français via **LCEN art. 47 + décret 2019-768** ; (2) la **directive EAA (European Accessibility Act, 2019/882 UE)** étend l'obligation à de nombreux **services privés** (e-commerce, banque, transport…), transposée en France par l'**ordonnance 2023-859** (applicable depuis le 28/06/2025). Le RGAA sert de référentiel de contrôle dans les deux cas, et il est de plus en plus exigé dans les appels d'offres privés.
 
 **Structure RGAA 4.1**
 
@@ -760,7 +760,7 @@ tribuzen/
 ```
 Quel pourcentage de critères a11y est détectable automatiquement (axe-core/Lighthouse) ?|~30-40 %. Les 60-70 % restants requièrent interaction, jugement sémantique, navigation clavier ou test lecteur d'écran.
 Comment intégrer jest-axe dans un test Vitest + @vue/test-utils ?|`expect.extend(toHaveNoViolations)` puis `const results = await axe(wrapper.element, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] } })` puis `expect(results).toHaveNoViolations()`.
-Quel est le seuil de conformité RGAA couramment retenu pour les organismes publics ?|75 % — interprétation pratique de « conformité substantielle » ; ce seuil numérique n'est pas fixé par la loi (le décret 2019-768 ne l'énonce pas). L'obligation légale découle de la directive EAA (2019/882 UE), transposée via LCEN art. 47 + décret 2019-768.
+Quel est le seuil de conformité RGAA couramment retenu pour les organismes publics ?|75 % — interprétation pratique de « conformité substantielle » ; ce seuil numérique n'est pas fixé par la loi (le décret 2019-768 ne l'énonce pas). Obligation secteur public = directive 2016/2102 via LCEN art. 47 + décret 2019-768 ; l'EAA (2019/882 UE, ordonnance 2023-859) étend au secteur privé.
 Comment se calcule le taux de conformité RGAA par page ?|Taux = critères Conformes / (critères Conformes + Non conformes) × 100. Les critères Non Applicables sont exclus.
 Combien de thèmes et de critères comporte RGAA 4.1 ?|13 thèmes, 106 critères.
 Pourquoi appeler axe() après avoir déclenché un état de composant (ex: erreurs) ?|jest-axe analyse le HTML statique au moment de l'appel. Un état non déclenché (erreurs cachées, modale fermée) n'est pas analysé.
