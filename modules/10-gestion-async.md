@@ -1,12 +1,14 @@
 ---
 titre: Gestion de l'asynchrone
 cours: 02-vue
-notions: [états loading error data, async dans setup, await de premier niveau et Suspense, composant async defineAsyncComponent, annulation avec AbortController, race conditions et garde de dernière requête, retry et backoff, gestion d'erreur onErrorCaptured]
+notions: [états loading error data, async dans setup, await de premier niveau et Suspense, composant async defineAsyncComponent, annulation avec AbortController, race conditions et garde de dernière requête, retry et backoff, gestion d'erreur onErrorCaptured, optimistic update et rollback]
 outcomes:
   - sait modéliser proprement les états d'un appel async (idle/loading/error/data)
   - sait charger des données au montage et afficher les états dans le template
   - sait éviter une race condition (ignorer une réponse périmée) et annuler une requête
   - sait charger un composant à la demande avec defineAsyncComponent (et Suspense en survol)
+  - sait implémenter un optimistic update avec rollback (patron wasFavorite + catch)
+  - sait identifier le piège du top-level await sans Suspense (écran blanc silencieux)
 prerequis: [09-composables]
 next: 11-formulaires-et-validation
 libs: [{ name: vue, version: "3.5" }]
@@ -344,6 +346,60 @@ const family = await fetchWithBackoff(
 
 > **Jitter :** en production avec de nombreux clients simultanés, ajouter un délai aléatoire (`delay + Math.random() * delay`) pour éviter que tous réessaient exactement au même instant après un incident (thundering herd).
 
+### 2.9 Mise à jour optimiste (Optimistic Update)
+
+L'optimistic update est un patron UI qui inverse l'ordre habituel "requête → réponse → mise à jour" : on met à jour l'interface **immédiatement** (on est optimiste — on suppose que le serveur va accepter), on envoie la requête en arrière-plan, et on **annule** (rollback) si le serveur répond avec une erreur.
+
+**Avantage :** l'interface semble instantanée même sur réseau lent. **Risque :** si le serveur rejette, l'UI doit revenir à son état précédent.
+
+```ts
+// Patron wasFavorite + rollback — TribuZen (routine favorites)
+async function toggleFavorite(routineId: string): Promise<void> {
+  const routine = routines.value.find(r => r.id === routineId)
+  if (!routine) return
+
+  // Étape 1 — Sauvegarder l'état actuel (capture before)
+  const wasFavorite = routine.favorite
+
+  // Étape 2 — Mise à jour immédiate de l'UI (optimiste)
+  routine.favorite = !routine.favorite
+
+  try {
+    // Étape 3 — Envoyer au serveur (en arrière-plan)
+    const res = await fetch(`/api/routines/${routineId}/favorite`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ favorite: routine.favorite }),
+    })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    // ✅ Serveur a confirmé — l'UI est déjà correcte, rien à faire
+  } catch (e) {
+    // Étape 4 — Rollback : restaurer l'état avant la mutation
+    routine.favorite = wasFavorite
+    error.value = 'Impossible de mettre à jour le favori — veuillez réessayer.'
+  }
+}
+```
+
+**Le piège du rollback :** si tu mutes un tableau trié ou filtré, le rollback peut nécessiter de restaurer l'index ou l'ordre, pas juste une propriété scalaire. Pour les mutations complexes, sauvegarder un snapshot complet avant la mutation :
+
+```ts
+// Snapshot d'objet complet avant mutation complexe
+const snapshot = JSON.parse(JSON.stringify(routine)) as Routine
+
+routine.status = 'done'
+routine.completedAt = new Date().toISOString()
+
+try {
+  await fetch(...)
+} catch {
+  // Restaurer l'objet entier
+  Object.assign(routine, snapshot)
+}
+```
+
+**Quand l'utiliser ?** Actions à faible risque d'échec serveur (toggle favori, marquer comme lu, réordonner), où l'utilisateur bénéficie d'un retour instantané. À éviter pour les mutations critiques (paiement, suppression définitive) où un rollback visible serait désorienter.
+
 ### 2.8 `onErrorCaptured` — intercepter les erreurs depuis le parent
 
 `onErrorCaptured` est un lifecycle hook enregistré dans un composant **parent** pour intercepter les erreurs émises par ses **descendants** (enfants, petits-enfants…). Il capte notamment les erreurs async des composants enveloppés dans `<Suspense>` — c'est le mécanisme d'"Error Boundary" de Vue.
@@ -571,6 +627,50 @@ async function loadFamily(id: string) {
 
 Le symptôme est difficile à reproduire en dev (latence locale très faible) mais se manifeste sur réseau lent ou avec des API de cache/CDN à latence variable.
 
+### PIÈGE #4 — `await` de premier niveau sans `<Suspense>` : écran blanc silencieux
+
+```vue
+<!-- ❌ Composant avec top-level await sans Suspense dans le parent -->
+<script setup lang="ts">
+// Ce await rend le composant "async" — Vue ne le montera pas
+// tant que cette Promise n'est pas résolue
+const res  = await fetch('/api/family/current')
+const data = await res.json()
+</script>
+```
+
+Sans `<Suspense>` dans le parent :
+- Le composant ne se monte **jamais** tant que les awaits ne sont pas résolus.
+- Pendant l'attente, le parent affiche **rien** — écran blanc, pas de spinner.
+- Si le fetch échoue, le composant ne se monte **jamais** — pas d'error state visible.
+
+```vue
+<!-- ❌ Parent sans Suspense — l'utilisateur voit un écran blanc jusqu'à résolution -->
+<template>
+  <FamilyDashboard />
+</template>
+
+<!-- ✅ Parent avec Suspense — le fallback gère la phase d'attente -->
+<template>
+  <Suspense>
+    <template #default>
+      <FamilyDashboard />
+    </template>
+    <template #fallback>
+      <div>Chargement du dashboard…</div>
+    </template>
+  </Suspense>
+</template>
+```
+
+**Règle pratique :** le top-level await est puissant mais exige que **chaque** composant parent dans la chaîne soit conscient de `<Suspense>`. Un composant async oublié dans un parent sans Suspense provoque un écran blanc difficile à diagnostiquer. Pour du code de production stable, préférer le pattern `onMounted` + 3 refs (§ 2.2) qui ne requiert aucune convention de composant parent.
+
+```ts
+// Signal d'alarme : tu utilises top-level await ET l'UI ne s'affiche jamais
+// → vérifier que le parent (ou un ancêtre) a un <Suspense>
+// → vérifier que l'erreur n'est pas silencieuse (ajouter <ErrorBoundary> autour)
+```
+
 ### PIÈGE #3 — Avaler les erreurs dans le catch
 
 ```ts
@@ -631,6 +731,8 @@ tribuzen/
 6. La race condition se résout par annulation active (`AbortController`) ou par garde `requestId` (ignorer les réponses périmées).
 7. Le backoff exponentiel double le délai entre tentatives (`baseDelay × 2ⁿ`) — réduit la pression sur un serveur qui récupère d'une surcharge.
 8. `onErrorCaptured` dans un parent intercepte les erreurs des descendants — pattern "Error Boundary" pour `<Suspense>` et lifecycle hooks.
+9. Optimistic update : sauvegarder l'état avant mutation (`wasFavorite`), mettre à jour l'UI immédiatement, envoyer la requête, restaurer dans le `catch` si rejet serveur.
+10. Top-level `await` sans `<Suspense>` = composant async invisible : le parent n'affiche rien pendant l'attente et les erreurs sont silencieuses — préférer `onMounted` + 3 refs pour la prod.
 
 ---
 
@@ -644,6 +746,8 @@ Quelle est la différence entre defineAsyncComponent et un fetch dans onMounted 
 Pourquoi annuler la requête dans onUnmounted ?|Pour libérer les ressources réseau et éviter de mettre à jour l'état d'un composant déjà démonté — source de fuites mémoire et de mises à jour fantômes.
 Que doit retourner onErrorCaptured pour empêcher la propagation de l'erreur vers les parents ?|Retourner false. Sans return false, l'erreur continue de remonter vers les ancêtres jusqu'au gestionnaire d'erreur global.
 Quelle est la formule du backoff exponentiel et pourquoi ajouter du jitter ?|Délai = baseDelay × 2^attempt (500ms, 1s, 2s pour 3 tentatives). Le jitter (+ Math.random() × delay) évite que de nombreux clients réessaient exactement au même instant après un incident — thundering herd.
+Comment fonctionne le patron "optimistic update" et quel est le risque principal ?|On sauvegarde l'état avant mutation (wasFavorite), on met à jour l'UI immédiatement, on envoie la requête. Si le serveur rejette (catch), on restaure l'état précédent (rollback : routine.favorite = wasFavorite). Le risque est un rollback visible qui perturbe l'utilisateur si le serveur répond avec une erreur.
+Pourquoi un top-level await dans script setup sans Suspense produit-il un écran blanc ?|Le composant devient async et ne se monte pas tant que les awaits ne sont pas résolus. Sans Suspense dans le parent, aucun fallback n'est affiché — l'utilisateur voit un écran vide et les erreurs sont silencieuses. Préférer onMounted + 3 refs, ou entourer d'un Suspense + ErrorBoundary.
 ```
 
 ---

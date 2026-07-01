@@ -1,7 +1,7 @@
 ---
 titre: Performance
 cours: 02-vue
-notions: [coût du rendu réactif, v-once et v-memo, computed vs méthode, lazy loading de composants defineAsyncComponent, code splitting, virtualisation de longues listes, shallowRef pour grosses structures, mesurer avec les DevTools et Lighthouse, éviter les re-rendus inutiles]
+notions: [coût du rendu réactif, v-once et v-memo, computed vs méthode, lazy loading de composants defineAsyncComponent, code splitting, virtualisation de longues listes, shallowRef pour grosses structures, mesurer avec les DevTools et Lighthouse, éviter les re-rendus inutiles, KeepAlive et cache de composants, onActivated et onDeactivated]
 outcomes:
   - sait identifier un re-rendu ou un calcul inutile et le corriger
   - sait appliquer v-once, v-memo, computed au bon endroit
@@ -117,7 +117,7 @@ Vue 3.5 + le compilateur hoistent déjà les nœuds vraiment statiques (sans int
 
 **Tableau vide `v-memo="[]"` :** équivalent à `v-once` — le sous-arbre n'est jamais re-rendu. C'est rarement ce qu'on veut avec des données dynamiques.
 
-⚠️ À gater Context7 : les edge cases de `v-memo` quand la liste est réordonnée (tri) — la combinaison `:key` + `v-memo` peut produire des comportements inattendus si la clé change en même temps qu'une dépendance du memo.
+**Edge case — liste réordonnée (tri) :** quand la liste est triée, `:key` peut changer pour une position donnée en même temps qu'une dépendance du tableau `v-memo`. Vue force un re-rendu complet dans ce cas — comportement correct mais qui peut surprendre. Si le tri est fréquent, inclure la propriété de tri dans le tableau `v-memo` ou reconsidérer si `v-memo` est pertinent sur une liste triée dynamiquement.
 
 ### 2.4 `computed` vs méthode — cache vs recalcul
 
@@ -292,7 +292,7 @@ const virtualizer = useVirtualizer({
 
 **Pourquoi `transform: translateY` et pas `top` :** `transform` utilise le GPU (layer composite) et ne provoque pas de layout recalculation. `top` dans un flux normal déclenche un reflow.
 
-⚠️ À gater Context7 : `useVirtualizer` de `@tanstack/vue-virtual` — vérifier la version et l'API exacte, notamment `getVirtualItems()` vs `virtualItems` selon la version.
+**API `@tanstack/vue-virtual` :** `getVirtualItems()` retourne les items visibles en tant que getter (tableau recalculé à chaque scroll). La propriété `virtualItems` était présente dans les versions antérieures à 3.x — utiliser `getVirtualItems()` dans les versions récentes.
 
 ### 2.7 `shallowRef` pour grosses structures immuables
 
@@ -381,7 +381,7 @@ Le compilateur Vue 3 effectue plusieurs optimisations automatiques qui réduisen
 **Vapor mode (expérimental, Vue 3.5+) :** nouveau mode de compilation qui élimine le Virtual DOM pour les composants opt-in. Génère du code impératif qui manipule le DOM directement. Gains mesurés : ~30-50% moins de mémoire, updates plus rapides pour les composants à haute fréquence.
 
 ```vue
-<!-- ⚠️ Vapor est opt-in par composant — syntaxe exacte à vérifier avec Context7 -->
+<!-- Vapor est opt-in par composant — même syntaxe SFC, compilateur différent -->
 <!-- Status 2026 : expérimental, pas recommandé en production -->
 <script setup vapor lang="ts">
 // Même code — le compilateur choisit la stratégie
@@ -389,6 +389,105 @@ Le compilateur Vue 3 effectue plusieurs optimisations automatiques qui réduisen
 ```
 
 **Implication pratique :** `v-once` et `v-memo` restent nécessaires pour les cas que le compilateur ne peut pas déduire (données potentiellement changeantes mais qu'on choisit volontairement de figer). Pour le contenu vraiment statique, le compilateur gère.
+
+### 2.10 KeepAlive — conserver les composants entre navigations
+
+`<KeepAlive>` est un composant Vue built-in qui met en **cache** les composants dynamiques au lieu de les détruire quand ils sont retirés du DOM. À la réactivation, l'état est restauré instantanément — aucune requête, aucun reset du formulaire, aucun recalcul.
+
+**Cas d'usage principal — navigation par onglets :**
+
+```vue
+<script setup lang="ts">
+import { shallowRef } from 'vue'
+import TabFeed from './TabFeed.vue'
+import TabAlbums from './TabAlbums.vue'
+import TabCalendar from './TabCalendar.vue'
+
+const tabs = [
+  { id: 'feed', label: 'Fil', component: TabFeed },
+  { id: 'albums', label: 'Albums', component: TabAlbums },
+  { id: 'calendar', label: 'Calendrier', component: TabCalendar },
+]
+// shallowRef : les composants eux-mêmes ne sont pas des données réactives à deep-tracker
+const currentTab = shallowRef(TabFeed)
+</script>
+
+<template>
+  <nav>
+    <button
+      v-for="tab in tabs"
+      :key="tab.id"
+      @click="currentTab = tab.component"
+    >
+      {{ tab.label }}
+    </button>
+  </nav>
+
+  <!--
+    Sans KeepAlive : chaque changement d'onglet détruit le composant actif
+    et monte le nouveau → perte de l'état (scroll, données chargées, formulaire).
+
+    Avec KeepAlive : le composant est mis en pause et conservé en mémoire.
+    :max="3" = stratégie LRU — au-delà de 3 composants en cache,
+    le moins récemment utilisé est détruit (onUnmounted appelé).
+  -->
+  <KeepAlive :max="3">
+    <component :is="currentTab" />
+  </KeepAlive>
+</template>
+```
+
+**Hooks de cycle de vie spécifiques :**
+
+Les composants mis en cache ne sont pas "montés" / "démontés" à chaque visite — ils sont **activés** et **désactivés**. `onMounted` et `onUnmounted` ne se déclenchent qu'une seule fois (au premier montage / à la destruction définitive par LRU).
+
+```ts
+// TabFeed.vue
+import { onActivated, onDeactivated, onMounted } from 'vue'
+
+onMounted(() => {
+  // Exécuté UNE SEULE FOIS — premier montage dans le DOM
+  console.log('TabFeed monté pour la première fois')
+})
+
+onActivated(() => {
+  // Exécuté à CHAQUE activation (retour du cache ou premier montage)
+  // → bon endroit pour rafraîchir des données time-sensitive
+  //   (flux WebSocket, notifications, données avec TTL court)
+  refreshFeed()
+})
+
+onDeactivated(() => {
+  // Exécuté quand le composant part en cache (onglet quitté)
+  // → bon endroit pour pauser les timers, les souscriptions WebSocket
+  pauseWebSocketSubscription()
+})
+```
+
+**Filtrage `include` / `exclude` :**
+
+```vue
+<!-- Ne met en cache QUE les composants dont le name option = TabFeed ou TabAlbums -->
+<KeepAlive include="TabFeed,TabAlbums">
+  <component :is="currentTab" />
+</KeepAlive>
+
+<!-- Cache tout SAUF TabCalendar (données fraîches à chaque visite obligatoire) -->
+<KeepAlive exclude="TabCalendar">
+  <component :is="currentTab" />
+</KeepAlive>
+```
+
+`include` / `exclude` comparent le `name` du composant (défini via `defineOptions({ name: 'TabFeed' })` dans `<script setup>` ou implicitement par le nom du fichier SFC).
+
+**Résumé KeepAlive :**
+
+| Scénario | Recommandation |
+|---|---|
+| Navigation par onglets avec état formulaire | `<KeepAlive>` — évite le reset |
+| Onglet avec données ultra-fraîches (chat en direct) | `exclude` ou pas de KeepAlive — forcer le rechargement |
+| Mémoire limitée (mobile) | `:max="2"` ou `":max="3"` selon les composants |
+| Onglet rarement visité | `exclude` — économise la mémoire |
 
 ---
 
@@ -722,6 +821,7 @@ perf(feed): virtualiser le feed famille + v-memo sur PostCard
 6. La virtualisation des listes (`@tanstack/vue-virtual`) ne rend que les items visibles — nécessaire dès 200-300 items avec des composants non triviaux.
 7. `shallowRef` ne surveille que l'assignation de `.value` — pour les mutations internes, utiliser le pattern immutable ou `triggerRef`.
 8. Vue 3.5 + compiler optimisations (static hoisting, PatchFlags) réduisent le besoin de `v-once` sur le contenu vraiment statique — Vapor mode reste expérimental en 2026.
+9. `<KeepAlive :max="N">` met en cache les composants dynamiques — `onActivated` se déclenche à chaque retour du cache, `onDeactivated` quand le composant y entre. `onMounted` ne se déclenche qu'une fois.
 
 ---
 
@@ -736,6 +836,8 @@ Comment forcer Vue à détecter une mutation interne d'un shallowRef ?|Appeler t
 Qu'est-ce que defineAsyncComponent apporte par rapport à un import dynamique brut ?|defineAsyncComponent encapsule l'import dynamique en un composant utilisable dans le template, avec gestion des états (loading, error) via loadingComponent/errorComponent, delay et timeout. Vite crée automatiquement un chunk séparé pour le fichier importé.
 Quel outil Vue permet d'identifier les composants qui se re-rendent trop souvent ?|Vue DevTools → onglet Performance. On enregistre une action (scroll, interaction), puis le flame chart montre quels composants ont été re-rendus et combien de temps chacun a pris.
 Pourquoi la virtualisation d'une longue liste utilise-t-elle un div "fantôme" à hauteur totale ?|Pour donner à la scrollbar une hauteur proportionnelle à la liste entière, même si seuls 20-30 items sont dans le DOM. Sans lui, la scrollbar reflète seulement les items rendus (~20) et non les 500 réels.
+Quelle est la différence entre onMounted et onActivated dans un composant sous KeepAlive ?|onMounted s'exécute UNE SEULE FOIS au premier montage dans le DOM. onActivated s'exécute à chaque fois que le composant est réactivé depuis le cache (retour sur l'onglet). Pour rafraîchir des données à chaque visite, utiliser onActivated, pas onMounted.
+À quoi sert l'attribut :max sur KeepAlive ?|:max="N" limite le nombre de composants simultanément en cache. Vue utilise une stratégie LRU (Least Recently Used) : quand la limite est atteinte, le composant le moins récemment affiché est détruit (onUnmounted appelé) pour libérer la mémoire.
 ```
 
 ---

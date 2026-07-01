@@ -470,6 +470,98 @@ function selectFamily(id: string) {
 
 Les deux composants partagent la même **logique** (`useFamily`) mais ont chacun leur propre **état** (instances indépendantes de `family`, `loading`, `error`).
 
+### Exemple 3 — Composition de composables : `useSearchFamily`
+
+Les composables se composent entre eux exactement comme des fonctions. Un composable de "haut niveau" peut assembler plusieurs composables plus petits. C'est le vrai pouvoir de la Composition API : la logique se compose verticalement.
+
+```ts
+// composables/useDebounce.ts
+import { ref, watch } from 'vue'
+
+export function useDebounce<T>(source: () => T, delay = 300) {
+  const debounced = ref<T>(source())
+
+  let timer: ReturnType<typeof setTimeout>
+  watch(source, (val) => {
+    clearTimeout(timer)
+    timer = setTimeout(() => { debounced.value = val as T }, delay)
+  })
+
+  return { debounced }
+}
+```
+
+```ts
+// composables/useSearchFamily.ts
+// Composition de 3 composables : useDebounce + useFamily + useAsyncData
+import { ref, computed } from 'vue'
+import { useDebounce }  from './useDebounce'
+import { useFamily }    from './useFamily'
+import { useAsyncData } from './useAsyncData'
+
+export function useSearchFamily() {
+  // État local : le texte brut tapé par l'utilisateur
+  const query = ref('')
+
+  // Composable 1 — debounce : on n'interroge l'API qu'après 400ms d'inactivité
+  const { debounced: debouncedQuery } = useDebounce(() => query.value, 400)
+
+  // Composable 2 — famille sélectionnée manuellement
+  const selectedFamilyId = ref<string | null>(null)
+  const { family, loading: familyLoading } = useFamily(() => selectedFamilyId.value)
+
+  // Composable 3 — recherche paginée déclenchée sur la query debouncée
+  const { data: results, loading: searchLoading, execute: search } = useAsyncData<string[]>(
+    async (signal) => {
+      const q = debouncedQuery.value
+      if (!q) return []
+      const res = await fetch(`/api/families/search?q=${encodeURIComponent(q)}`, { signal })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      return res.json() as Promise<string[]>
+    },
+  )
+
+  // Computed dérivé des deux états — aucune logique dupliquée
+  const isLoading = computed(() => familyLoading.value || searchLoading.value)
+
+  return { query, debouncedQuery, results, family, isLoading, search, selectedFamilyId }
+}
+```
+
+```vue
+<!-- SearchPanel.vue -->
+<script setup lang="ts">
+import { watch } from 'vue'
+import { useSearchFamily } from '@/composables/useSearchFamily'
+
+// Une seule ligne, toute la logique encapsulée
+const { query, results, family, isLoading, search, selectedFamilyId } = useSearchFamily()
+
+// Relancer la recherche à chaque changement de la query debouncée
+watch(query, () => search())
+</script>
+
+<template>
+  <input v-model="query" placeholder="Rechercher une famille…" />
+  <p v-if="isLoading">Recherche en cours…</p>
+  <ul v-else>
+    <li
+      v-for="id in results"
+      :key="id"
+      @click="selectedFamilyId = id"
+    >{{ id }}</li>
+  </ul>
+  <div v-if="family">{{ family.name }}</div>
+</template>
+```
+
+**Ce que montre cet exemple :**
+- `useSearchFamily` assemble `useDebounce` + `useFamily` + `useAsyncData` — chacun reste simple et testable indépendamment.
+- Le composant final n'a aucune logique d'async ou de debounce — il consomme seulement des refs et des fonctions.
+- Les composables sont transparents entre eux : `useFamily` ne sait pas qu'il est utilisé dans une recherche.
+
+> **Note — `useApi` avec `inject` (voir module 08) :** dans une codebase avec un client HTTP centralisé, `useAsyncData` n'appelle pas `fetch` directement. Il injecte via `inject(ApiClientKey)` un client typé fourni par `provide` dans `AppShell.vue`. Cela permet de mocker le client en tests et de gérer les headers d'auth dans un seul endroit. Voir §2.13 du module 08 pour le pattern `provide`/`inject` + `InjectionKey<T>`.
+
 ---
 
 ## 4. Pièges & misconceptions

@@ -1,7 +1,7 @@
 ---
 titre: Vue Router
 cours: 02-vue
-notions: [createRouter et history mode, routes et composants, routes dynamiques et params, routes imbriquées, navigation programmatique, navigation guards beforeEach, meta et contrôle d'accès, lazy loading des routes, RouterLink et RouterView]
+notions: [createRouter et history mode, scrollBehavior, routes et composants, routes dynamiques et params, routes imbriquées, navigation programmatique, navigation guards beforeEach, afterEach, meta et contrôle d'accès, lazy loading des routes, RouterLink et RouterView, onBeforeRouteUpdate, onBeforeRouteLeave]
 outcomes:
   - sait configurer Vue Router (routes, history mode) dans une app Vue 3
   - sait créer des routes dynamiques et lire les params de façon réactive
@@ -393,8 +393,7 @@ const routes: RouteRecordRaw[] = [
 **Grouper des chunks par feature** avec le commentaire Vite/Rollup `/* @vite-chunk-name: ... */` :
 
 ```ts
-// ⚠️ à vérifier Context7 — la syntaxe du magic comment varie selon Vite/Rollup
-// Exemple indicatif :
+// Magic comment Vite/Rollup pour nommer explicitement les chunks (optionnel)
 {
   path: '/family/:familyId/settings',
   component: () => import(/* @vite-chunk-name: "family" */ '@/views/FamilySettingsView.vue'),
@@ -462,6 +461,96 @@ En pratique, Vite crée automatiquement des chunks par import dynamique — le c
   </RouterView>
 </template>
 ```
+
+### 2.10 `afterEach` et `scrollBehavior`
+
+**`afterEach`** s'exécute après chaque navigation réussie. Contrairement à `beforeEach`, il ne peut ni bloquer ni rediriger — uniquement observer. Usage principal : analytics, mise à jour de titre, logging des échecs.
+
+```ts
+// router/index.ts — à placer après createRouter(...)
+router.afterEach((to, from, failure) => {
+  // Mise à jour du titre depuis meta.title
+  if (to.meta.title) {
+    document.title = `${to.meta.title} | TribuZen`
+  }
+
+  // Troisième argument optionnel — NavigationFailure si la navigation a été bloquée
+  if (failure) {
+    console.warn('[Router] navigation bloquée vers', to.fullPath, failure.type)
+  }
+})
+```
+
+**`scrollBehavior`** — option de `createRouter()` qui contrôle le scroll lors des navigations. Sans cette option Vue Router préserve la position — comportement différent d'un rechargement de page classique.
+
+```ts
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    // savedPosition est non-null quand l'utilisateur clique Retour/Suivant
+    if (savedPosition) {
+      return savedPosition                             // restaure la position mémorisée
+    }
+    if (to.hash) {
+      return { el: to.hash, behavior: 'smooth' }      // scroll vers l'ancre
+    }
+    return { top: 0 }                                 // haut de page à chaque navigation
+  },
+})
+```
+
+### 2.11 Guards in-component — `onBeforeRouteUpdate` et `onBeforeRouteLeave`
+
+Ces deux hooks s'importent depuis `'vue-router'` et se déclarent dans `<script setup>`. Ils agissent sur le composant actif sans polluer le guard global.
+
+**`onBeforeRouteLeave`** — déclenché quand l'utilisateur va quitter le composant. Cas typique : formulaire à moitié rempli — demander une confirmation avant de perdre les données.
+
+**`onBeforeRouteUpdate`** — déclenché quand la route change mais que le composant est réutilisé (mêmes paramètres nommés, valeurs différentes). Cas typique : navigation de `/family/42` vers `/family/99`.
+
+```vue
+<!-- InviteForm.vue — protection contre la perte de données non soumises -->
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
+
+const email = ref('')
+const isDirty = computed(() => email.value.length > 0)
+
+// Guard leave — intercepte avant le démontage du composant
+onBeforeRouteLeave((to, from) => {
+  if (isDirty.value) {
+    const confirmed = window.confirm(
+      'Des données non enregistrées seront perdues. Quitter quand même ?'
+    )
+    if (!confirmed) return false   // false = annule la navigation
+  }
+  // return undefined = laisse passer
+})
+
+// Guard update — rechargement des données si les params changent
+onBeforeRouteUpdate(async (to, from) => {
+  // Même composant réutilisé, familyId différent → recharger
+  if (to.params.familyId !== from.params.familyId) {
+    await loadFamilyData(to.params.familyId as string)
+  }
+})
+
+async function loadFamilyData(familyId: string): Promise<void> {
+  // fetch /api/families/:familyId ...
+}
+</script>
+```
+
+**Résumé des guards disponibles dans Vue Router 4 :**
+
+| Guard | Portée | Déclaré dans |
+|-------|--------|--------------|
+| `router.beforeEach` | Global — toutes les navigations | `router/index.ts` |
+| `router.afterEach` | Global — post-navigation | `router/index.ts` |
+| `beforeEnter` | Par route | Objet `RouteRecordRaw` |
+| `onBeforeRouteUpdate` | In-component (réutilisation) | `<script setup>` |
+| `onBeforeRouteLeave` | In-component (quitter) | `<script setup>` |
 
 ---
 
@@ -822,6 +911,9 @@ tribuzen/
 8. `meta.requiresAuth` est le pattern standard pour marquer les routes protégées — étendre `RouteMeta` via declare module pour le typage.
 9. `() => import('@/views/Foo.vue')` crée un chunk Vite séparé chargé à la première visite de la route.
 10. `<RouterLink>` est la balise `<a>` de la SPA — ajoute automatiquement `.router-link-active` et `.router-link-exact-active`.
+11. `afterEach(to, from, failure)` s'exécute après chaque navigation réussie — pour analytics et logging ; ne peut pas bloquer ni rediriger.
+12. `scrollBehavior(to, from, savedPosition)` dans `createRouter()` contrôle la position du scroll — `{ top: 0 }` pour toujours commencer en haut, `savedPosition` pour restaurer la position lors du retour arrière.
+13. `onBeforeRouteLeave` protège un formulaire non sauvegardé (retourner `false` annule la navigation) ; `onBeforeRouteUpdate` recharge les données quand les params changent sans démonter le composant.
 
 ---
 
@@ -836,6 +928,8 @@ Quelle est la différence entre useRoute() et useRouter() ?|useRoute() retourne 
 Comment activer le lazy loading d'un composant de route ?|Utiliser () => import('@/views/FooView.vue') comme valeur de component — au lieu d'un import statique. Vite crée un chunk JS séparé chargé uniquement à la première visite de la route.
 Comment protéger une route avec meta.requiresAuth ?|1. Ajouter meta: { requiresAuth: true } sur la route. 2. Étendre RouteMeta via declare module 'vue-router' { interface RouteMeta { requiresAuth?: boolean } }. 3. Dans beforeEach, vérifier to.meta.requiresAuth et rediriger si non authentifié.
 Quel est le rôle de router.replace() vs router.push() ?|push() ajoute une entrée dans l'historique (bouton Retour disponible). replace() remplace l'entrée courante sans créer d'historique. Cas d'usage de replace : redirection après login — on ne veut pas que Retour ramène à la page de connexion.
+Que font onBeforeRouteLeave et onBeforeRouteUpdate dans Vue Router 4 ?|onBeforeRouteLeave — déclenché quand le composant va être quitté (retourner false annule la navigation — protège un formulaire non sauvegardé). onBeforeRouteUpdate — déclenché quand la route change mais que le composant est réutilisé (params différents) — recharger les données sans redémonter.
+Comment contrôler la position du scroll lors des navigations Vue Router ?|Définir scrollBehavior(to, from, savedPosition) dans createRouter(). Retourner savedPosition pour restaurer la position lors du retour arrière. Retourner { top: 0 } pour toujours commencer en haut de page. Retourner { el: to.hash, behavior: 'smooth' } pour scroller vers une ancre.
 ```
 
 ---

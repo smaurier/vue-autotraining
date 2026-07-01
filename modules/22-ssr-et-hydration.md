@@ -466,7 +466,7 @@ Ce que Nuxt gère automatiquement :
 - `useCookie`, `useRequestHeaders` — accès SSR-safe aux requêtes
 - `useState` — état partagé serveur→client sans flash
 
-Le module 23 (Architecture front) et le cours Nuxt (cours 03) détaillent ces APIs.
+Les modules 25-29 (bloc Nuxt) détaillent ces APIs — notamment `useAsyncData` et `$fetch` (module 27), `useState` et `useNuxtApp` (module 25).
 
 ---
 

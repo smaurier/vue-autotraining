@@ -447,6 +447,8 @@ Chaque `defineModel('nomArg')` correspond à un `v-model:nomArg` côté parent.
 
 On reprend le brouillon du cas concret et on applique tout ce qui précède.
 
+> **Preview — `defineEmits` (module 05) :** cet exemple utilise `defineEmits` pour signaler au composant parent qu'une invitation a été envoyée. `defineEmits` fait partie de la communication parent-enfant, expliquée en détail au **module 05 — Composants, props et emits**. Pour ce module, retiens seulement que c'est la façon dont un composant enfant remonte un événement vers son parent — tu n'as pas besoin de comprendre le mécanisme complet maintenant.
+
 ```vue
 <!-- InvitationForm.vue — version corrigée -->
 <script setup lang="ts">

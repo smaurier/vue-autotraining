@@ -91,7 +91,7 @@ useAsyncData('contact-42', handler)  HTML reçu contient :
 
 ```ts
 const {
-  data,     // Ref<DataT | null>           — données (null tant que non résolues)
+  data,     // ShallowRef<DataT | undefined> — données (undefined tant que non résolues)
   pending,  // Ref<boolean>                — true pendant le chargement
   error,    // Ref<FetchError | null>      — erreur ou null
   status,   // Ref<'idle' | 'pending' | 'success' | 'error'>
@@ -101,7 +101,7 @@ const {
 } = await useFetch<DataT>('/api/endpoint', options)
 ```
 
-> **Nuxt 4 :** `data` est `Ref<DataT | undefined>` (pas `null`). L'option `getCachedData` permet une stratégie de cache personnalisée.
+> **Nuxt 4 :** `data` est un **`ShallowRef<DataT | undefined>`** (pas `null`, et pas un `ref` profond). Remplacer `data.value` entier déclenche la réactivité ; modifier une propriété interne (`data.value.name = …`) ne le fait pas. L'option `getCachedData` permet une stratégie de cache personnalisée.
 
 ### 2.3 `useAsyncData` — contrôle explicite
 
@@ -341,13 +341,13 @@ export default defineNuxtConfig({
 |---|---|---|---|---|---|
 | SSG | `prerender: true` | Build time | Fichier statique | Jusqu'au rebuild | Pages immuables |
 | SSR | `{}` (défaut) | Chaque requête | Aucun | Toujours frais | Données user-specific |
-| SWR | `swr: TTL` | Premier hit, puis cache | Serveur/proxy | Stale pendant TTL | Contenu partagé, change régulièrement |
-| ISR | `isr: TTL` | Premier hit, puis cache CDN | CDN + serveur | Stale pendant TTL | Contenu public high-traffic |
+| SWR | `swr: TTL` | SSR dynamique, mis en cache | Serveur/proxy (+ CDN via Cache-Control) | Stale pendant TTL | Contenu partagé, change régulièrement |
+| ISR | `isr: TTL` | Prerender au 1er hit, fichier statique | CDN + serveur | Stale pendant TTL | Contenu public high-traffic |
 
-**SWR vs ISR — même comportement, emplacement de cache différent :**
-- `swr` → cache sur le serveur Nitro ou un reverse proxy (Nginx, Caddy, Varnish)
-- `isr` → cache sur le serveur **ET** poussé sur le réseau CDN (Vercel Edge, Netlify CDN)
-- `isr: true` sans TTL numérique → contenu reste en CDN **jusqu'au prochain déploiement**
+**SWR vs ISR — frontière réelle (mode de rendu, pas uniquement l'emplacement du cache) :**
+- `swr` → **SSR dynamique** : chaque régénération re-exécute le rendu serveur ; le résultat est mis en cache sur le serveur Nitro ou un reverse proxy avec stale-while-revalidate. Un CDN peut aussi mettre la réponse en cache si tu ajoutes manuellement un header `Cache-Control: s-maxage`.
+- `isr` → **prerender au 1er hit** : Nuxt génère un fichier HTML statique à la première requête et le pousse automatiquement sur le CDN sur les plateformes supportées (Vercel Edge, Netlify CDN). Les régénérations produisent un nouveau fichier statique. Les deux modes utilisent le pattern stale-while-revalidate.
+- `isr: true` sans TTL numérique → fichier en CDN **jusqu'au prochain déploiement** (pas de revalidation temporelle).
 
 **Flux ISR pour `/contacts/42` avec `isr: 3600` :**
 1. **Première requête** → Nuxt/Nitro exécute `useAsyncData` serveur, génère HTML + `_payload.json`, met en cache CDN.
@@ -662,8 +662,8 @@ tribuzen/
 6. `lazy: true` ≠ `server: false` : `lazy: true` est SSR + non-bloquant ; `server: false` exclut totalement le SSR.
 7. `transform` modifie la réponse après réception ; `pick` sélectionne des clés de premier niveau — les deux réduisent le payload.
 8. `watch: [ref]` relance la requête quand la ref change ; `refresh()` la relance manuellement après une mutation.
-9. `routeRules: { '/path/**': { swr: 3600 } }` → SWR : cache serveur/proxy, stale-while-revalidate toutes les 3600s.
-10. `routeRules: { '/path/**': { isr: 3600 } }` → ISR : comme SWR + cache CDN ; `isr: true` = CDN permanent jusqu'au prochain déploiement.
+9. `routeRules: { '/path/**': { swr: 3600 } }` → SWR : SSR dynamique mis en cache sur le serveur/proxy, stale-while-revalidate toutes les 3600s.
+10. `routeRules: { '/path/**': { isr: 3600 } }` → ISR : prerender un fichier statique au 1er hit, poussé sur le CDN ; stale-while-revalidate toutes les 3600s. `isr: true` = fichier CDN permanent jusqu'au prochain déploiement.
 
 ---
 
@@ -674,7 +674,7 @@ Pourquoi useFetch évite-t-il la double requête en SSR ?|Les données récupér
 Quelle est la différence principale entre useFetch et useAsyncData ?|useFetch = wrapper autour de useAsyncData + $fetch avec clé auto-générée depuis l'URL. useAsyncData prend une clé explicite + un handler arbitraire, offre plus de contrôle (multi-requêtes, source non-HTTP, getCachedData Nuxt 4).
 Quand utiliser $fetch plutôt que useFetch ou useAsyncData ?|Pour les actions utilisateur (clic, formulaire, mutations POST/PUT/DELETE). $fetch n'est pas lié au cycle SSR — pas de payload, pas de clé, pas de dédup. L'utiliser au top-level de script setup provoque une double requête.
 Quelle est la différence entre lazy: true et server: false ?|lazy: true = fetch exécuté côté serveur (données dans le payload SSR), mais la navigation n'est pas bloquée. server: false = fetch jamais exécuté côté serveur — données absentes du HTML, pas de SEO.
-Quelle différence entre swr: 3600 et isr: 3600 dans routeRules ?|swr: 3600 = cache sur le serveur Nitro ou un reverse proxy, revalide en arrière-plan toutes les 3600s. isr: 3600 = idem + poussé sur le réseau CDN (Vercel, Netlify). Plus haute performance pour le trafic public.
+Quelle différence entre swr: 3600 et isr: 3600 dans routeRules ?|swr: 3600 = SSR dynamique mis en cache sur le serveur Nitro ou un reverse proxy, stale-while-revalidate toutes les 3600s. isr: 3600 = prerender un fichier HTML statique au 1er hit + mise en cache automatique sur le CDN (Vercel, Netlify) ; stale-while-revalidate toutes les 3600s. Les deux utilisent SWR comme mécanisme de revalidation, ISR ajoute la mise en CDN et le rendu statique.
 Que se passe-t-il si la clé useAsyncData est instable entre serveur et client ?|Nuxt ne retrouve pas les données dans window.__NUXT__ → relance une requête côté client → double requête, perd l'avantage SSR. Construire la clé depuis des paramètres déterministes (route.params.id casté en String).
 Que fait l'option transform dans useFetch et quand l'utiliser plutôt que pick ?|transform reçoit la réponse brute et retourne une valeur transformée stockée dans data. Utiliser transform pour extraire un sous-objet (response.data.items) ou reformater. pick sélectionne uniquement des clés de PREMIER NIVEAU de la réponse brute — insuffisant pour les réponses imbriquées.
 Que signifie isr: true sans valeur numérique dans routeRules ?|Le contenu est mis en cache CDN de façon permanente jusqu'au prochain déploiement. Il n'y a pas de TTL — la revalidation n'arrive qu'à la prochaine mise en production. Attention aux contenus dynamiques qui peuvent devenir périmés sans redéploiement.

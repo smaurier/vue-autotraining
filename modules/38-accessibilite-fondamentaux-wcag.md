@@ -467,7 +467,9 @@ ARIA (Accessible Rich Internet Applications, W3C WAI) est une **spécification t
 
 ### 2.8 `prefers-reduced-motion`
 
-La media query `prefers-reduced-motion` reflète la préférence système de l'utilisateur (réglage OS "Réduire les animations"). Elle est couverte par WCAG 2.3.3 (AAA) — Animation from Interactions — et par le critère RGAA 13.8.
+La media query `prefers-reduced-motion` reflète la préférence système de l'utilisateur (réglage OS "Réduire les animations").
+
+**Cadrage normatif :** `prefers-reduced-motion` est une bonne pratique alignée sur **WCAG 2.3.3 — Animation from Interactions (niveau AAA, hors périmètre RGAA 4.1)**. Elle n'est pas une obligation RGAA, mais reste **fortement recommandée**. À ne pas confondre avec **RGAA 13.8**, qui porte sur le **contrôle utilisateur des contenus animés autolancés** (lecture automatique — bouton play/pause/stop, correspondant à WCAG 2.2.2 Pause, Stop, Hide, niveau AA). Ces deux notions sont distinctes : RGAA 13.8 impose qu'une animation démarrant automatiquement puisse être stoppée par l'utilisateur ; `prefers-reduced-motion` permet de respecter la préférence OS pour réduire globalement toutes les animations, indépendamment du caractère autolancé.
 
 ```vue
 <!-- AnimatedCard.vue -->
@@ -553,7 +555,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <article class="card" aria-label="Groupe {{ group.name }}">
+  <article class="card" :aria-label="`Groupe ${group.name}`">
     <!--
       Image décorative : alt="" vide.
       L'information "groupe" est déjà dans le texte adjacent (group.name).
@@ -576,7 +578,7 @@ const emit = defineEmits<{
     -->
     <button
       class="card__dismiss"
-      aria-label="Ignorer le groupe {{ group.name }}"
+      :aria-label="`Ignorer le groupe ${group.name}`"
       @click="emit('dismiss', group.id)"
     >
       <span aria-hidden="true">×</span>

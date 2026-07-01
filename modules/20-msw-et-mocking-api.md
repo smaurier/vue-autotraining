@@ -263,6 +263,20 @@ export const handlers = [
 ]
 ```
 
+**`vi.waitFor(fn, options?)`** — utilitaire Vitest qui ré-évalue `fn` jusqu'à ce qu'elle ne lance plus d'erreur, ou jusqu'au timeout (défaut 1000 ms). Indispensable avec MSW car le composant reçoit la réponse de façon asynchrone et le DOM peut ne pas être mis à jour immédiatement après `flushPromises()`. Avec `vi.useFakeTimers()` actif, `vi.waitFor()` avance automatiquement les timers entre chaque tentative.
+
+```ts
+// Attendre que le texte apparaisse dans le DOM (jusqu'à 1000 ms par défaut)
+await vi.waitFor(() => {
+  expect(wrapper.text()).toContain('Invitation envoyée')
+})
+
+// Timeout personnalisé pour des mocks avec delay() élevé
+await vi.waitFor(() => {
+  expect(wrapper.find('[data-testid="success"]').exists()).toBe(true)
+}, { timeout: 2000 })
+```
+
 ```ts
 // InvitationPanel.test.ts
 import { describe, it, expect } from 'vitest'
@@ -678,6 +692,8 @@ Pourquoi déclarer :familyId dans le pattern d'URL plutôt que l'URL exacte ?|ht
 ## Pont vers le lab
 
 > Lab associé : `labs/lab-20-msw-et-mocking-api/README.md`. Tester `InvitationPanel.vue` avec MSW 2 — handlers TribuZen, états d'erreur, override par test, corrigé intégral commenté.
+>
+> **Vers le module 21 — Performance :** les handlers MSW avec `delay()` permettent de valider les états de chargement (`v-if="loading"`, skeletons, `<Suspense>`) avant de mesurer les vraies performances réseau. Le module 21 couvre le profiling Vue DevTools, `KeepAlive` (avec `onActivated`/`onDeactivated`), les Web Workers et le bundle splitting — autant de patrons qui s'appuient sur des mocks réseau stables (MSW) pour être testables en isolation. Un handler MSW bien pensé aujourd'hui est un outil de profiling demain.
 
 ---
 

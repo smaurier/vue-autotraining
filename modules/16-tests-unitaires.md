@@ -1,7 +1,7 @@
 ---
 titre: Tests unitaires (Vitest)
 cours: 02-vue
-notions: [configuration Vitest pour Vue, describe it expect, matchers courants, tester une fonction pure, tester un composable, mock avec vi.fn et vi.mock, tester la réactivité ref computed, coverage]
+notions: [configuration Vitest pour Vue, describe it expect, matchers courants, tester une fonction pure, tester un composable, mock avec vi.fn et vi.mock, vi.mocked, tester la réactivité ref computed, coverage, beforeEach/afterEach et clearAllMocks, vi.useFakeTimers et advanceTimersByTime, test.each]
 outcomes:
   - sait configurer Vitest dans un projet Vue 3
   - sait tester une fonction métier pure et un composable réactif
@@ -296,6 +296,22 @@ spy.mockReturnValue({ ok: false, reason: 'already_member' })
 spy.mockRestore()
 ```
 
+**`vi.mocked()` — typage TypeScript sur les mocks :**
+
+Quand un module est remplacé par `vi.mock()`, TypeScript ne sait pas que ses exports sont devenus des `vi.fn()`. `vi.mocked()` caste le type pour accéder aux méthodes mock sans erreur TS :
+
+```ts
+import { fetchFamilyMembers } from '../services/familyService'
+
+// Sans vi.mocked() — TypeScript voit le type original, pas vi.fn()
+// fetchFamilyMembers.mockResolvedValue(...)  // ❌ TypeScript error
+
+// Avec vi.mocked() — le type est correctement inféré comme MockedFunction
+vi.mocked(fetchFamilyMembers).mockResolvedValue(['alice@tz.app', 'bob@tz.app'])  // ✅
+```
+
+C'est pourquoi dans les worked examples (§3) on écrit `vi.mocked(fetchFamilyMembers).mockResolvedValue(...)` dans `beforeEach` — c'est la façon correcte d'accéder aux méthodes de mock avec TypeScript.
+
 **Résumé — quand utiliser quoi :**
 
 | Outil | Usage |
@@ -303,6 +319,7 @@ spy.mockRestore()
 | `vi.fn()` | Créer une dépendance fictive passée en argument (injection) |
 | `vi.mock()` | Remplacer un module importé entier (fetch, service, logger) |
 | `vi.spyOn()` | Observer (et optionnellement remplacer) une méthode existante |
+| `vi.mocked()` | Caster le type d'un mock pour accéder aux méthodes `.mockResolvedValue` etc. en TS |
 
 ### 2.7 Coverage — lire et cibler
 
@@ -353,6 +370,158 @@ export default defineConfig({
 **Ce qui compte :** couvrir les branches (`Branch %`) est plus utile que les lignes — une ligne exécutée mais avec un seul chemin conditionnel testé donne 100% Stmts mais 50% Branch.
 
 **Ce qui ne compte pas :** viser 100% coverage sur du code de configuration, des fichiers de types, des composants UI — concentre le coverage sur `domain/` et `composables/`.
+
+### 2.8 Setup et teardown — `beforeEach`, `afterEach`, `beforeAll`, `afterAll`
+
+Ces hooks structurent la préparation et le nettoyage autour des tests. Vitest les exécute à des moments précis du cycle de vie d'un `describe`.
+
+```ts
+import { beforeEach, afterEach, beforeAll, afterAll, describe, it, vi } from 'vitest'
+
+describe('useInvitationStatus', () => {
+  // beforeAll — une seule fois avant tous les tests du describe
+  beforeAll(() => {
+    // Initialiser des ressources coûteuses (serveur, connexion DB...)
+  })
+
+  // beforeEach — avant CHAQUE test — idéal pour reset l'état des mocks
+  beforeEach(() => {
+    vi.mocked(fetchFamilyMembers).mockResolvedValue(['bob@tz.app'])
+    // Chaque test repart avec le même mock → tests indépendants
+  })
+
+  // afterEach — après CHAQUE test — nettoyage et reset
+  afterEach(() => {
+    vi.clearAllMocks()   // remet les compteurs d'appels à zéro
+  })
+
+  // afterAll — une seule fois après tous les tests
+  afterAll(() => {
+    // Libérer les ressources
+  })
+
+  it('test 1...', () => { /* ... */ })
+  it('test 2...', () => { /* ... */ })
+})
+```
+
+**`vi.clearAllMocks()` vs `vi.resetAllMocks()` vs `vi.restoreAllMocks()` :**
+
+| Fonction | Effet |
+|----------|-------|
+| `vi.clearAllMocks()` | Efface les compteurs d'appels et les appels enregistrés |
+| `vi.resetAllMocks()` | Idem + supprime les `mockReturnValue` / `mockResolvedValue` configurés |
+| `vi.restoreAllMocks()` | Idem + restaure les implémentations originales des `vi.spyOn` |
+
+### 2.9 Faux timers — `vi.useFakeTimers()` et `advanceTimersByTime`
+
+Certaines logiques (debounce, throttle, retry avec délai) utilisent `setTimeout`/`setInterval`. Sans faux timers, un test qui attend 500 ms attend réellement 500 ms. `vi.useFakeTimers()` remplace les timers natifs par des faux contrôlables ; `vi.advanceTimersByTime(ms)` avance le temps fictif sans attendre.
+
+**Exemple — composable debounce (barre de recherche TribuZen) :**
+
+```ts
+// src/composables/useSearch.ts
+import { ref } from 'vue'
+
+export function useSearch(onSearch: (query: string) => void, delay = 300) {
+  const query = ref('')
+  let timer: ReturnType<typeof setTimeout>
+
+  function handleInput(value: string) {
+    query.value = value
+    clearTimeout(timer)
+    timer = setTimeout(() => onSearch(value), delay)
+  }
+
+  return { query, handleInput }
+}
+```
+
+```ts
+// src/composables/useSearch.test.ts
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { useSearch } from './useSearch'
+
+describe('useSearch — debounce', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()    // remplace setTimeout par le timer fictif
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()    // restaure les vrais timers — obligatoire
+  })
+
+  it("n'appelle pas onSearch immédiatement", () => {
+    const onSearch = vi.fn()
+    const { handleInput } = useSearch(onSearch, 300)
+    handleInput('tribuzen')
+    // Aucun délai écoulé → onSearch pas encore appelé
+    expect(onSearch).not.toHaveBeenCalled()
+  })
+
+  it('appelle onSearch après 300 ms', () => {
+    const onSearch = vi.fn()
+    const { handleInput } = useSearch(onSearch, 300)
+    handleInput('tribuzen')
+    vi.advanceTimersByTime(300)   // avance le temps fictif de 300 ms
+    expect(onSearch).toHaveBeenCalledWith('tribuzen')
+    expect(onSearch).toHaveBeenCalledTimes(1)
+  })
+
+  it('annule le timer précédent si une nouvelle saisie arrive', () => {
+    const onSearch = vi.fn()
+    const { handleInput } = useSearch(onSearch, 300)
+    handleInput('tri')
+    vi.advanceTimersByTime(200)   // 200 ms — pas encore déclenché
+    handleInput('tribu')          // réinitialise le timer
+    vi.advanceTimersByTime(300)   // 300 ms depuis la 2e saisie
+    // onSearch une seule fois, avec la valeur finale
+    expect(onSearch).toHaveBeenCalledTimes(1)
+    expect(onSearch).toHaveBeenCalledWith('tribu')
+  })
+})
+```
+
+**Pattern obligatoire :** appeler `vi.useRealTimers()` dans `afterEach` — sinon les timers fictifs contaminent les tests suivants.
+
+### 2.10 Tests paramétriques — `test.each`
+
+`test.each` (alias `it.each`) exécute le même test avec un tableau de valeurs différentes. Évite de dupliquer des `it` qui ne diffèrent que par leurs données.
+
+```ts
+import { describe, it, expect } from 'vitest'
+import { canInvite } from '../domain/invitation'
+
+describe('canInvite — cas multiples', () => {
+  // Syntaxe tableau — chaque ligne = arguments dans l'ordre
+  it.each([
+    ['alice@tz', 'alice@tz', [],           false, 'self_invitation'],
+    ['alice@tz', 'bob@tz',   ['bob@tz'],   false, 'already_member'],
+    ['alice@tz', 'dave@tz',  ['bob@tz'],   true,  'ok'],
+  ])('canInvite(%s, %s, %o) → ok=%s reason=%s',
+    (inviterId, targetEmail, members, expectedOk, expectedReason) => {
+      const result = canInvite(inviterId as string, targetEmail as string, members as string[])
+      expect(result.ok).toBe(expectedOk)
+      expect(result.reason).toBe(expectedReason)
+    }
+  )
+})
+```
+
+```ts
+// Syntaxe objet (plus lisible pour plusieurs champs)
+it.each([
+  { inviterId: 'alice@tz', target: 'alice@tz', members: [],         ok: false, reason: 'self_invitation' },
+  { inviterId: 'alice@tz', target: 'bob@tz',   members: ['bob@tz'], ok: false, reason: 'already_member' },
+  { inviterId: 'alice@tz', target: 'dave@tz',  members: ['bob@tz'], ok: true,  reason: 'ok' },
+])('$inviterId invite $target → ok=$ok', ({ inviterId, target, members, ok, reason }) => {
+  const result = canInvite(inviterId, target, members)
+  expect(result.ok).toBe(ok)
+  expect(result.reason).toBe(reason)
+})
+```
+
+**Quand utiliser `test.each` :** quand trois tests ou plus partagent la même logique et ne diffèrent que par les données. En dessous de trois cas, des `it` séparés restent plus lisibles et donnent de meilleurs messages d'échec.
 
 ---
 
@@ -609,6 +778,10 @@ test(composables): useInvitationStatus — réactivité ref/computed, nextTick
 6. `vi.fn()` = créer un espion passé en argument ; `vi.mock()` = remplacer un module entier (hoisté) ; `vi.spyOn()` = observer une méthode existante.
 7. `vi.mock()` est hoisté avant les `import` — la factory ne peut pas référencer des `const` du fichier de test.
 8. Coverage utile = couvrir les branches (`Branch %`) de `domain/` et `composables/` — pas les fichiers de config ni les composants UI.
+9. `beforeEach(fn)` / `afterEach(fn)` — setup/teardown par describe ; `vi.clearAllMocks()` dans `afterEach` remet les compteurs à zéro entre chaque test.
+10. `vi.mocked(fn)` caste le type TypeScript d'une fonction mockée pour accéder à `.mockResolvedValue`, `.mockReturnValue` etc. sans erreur TS — à utiliser dès que le module est remplacé par `vi.mock()`.
+11. `vi.useFakeTimers()` dans `beforeEach` + `vi.useRealTimers()` dans `afterEach` — `vi.advanceTimersByTime(ms)` avance le temps fictif sans attendre réellement ; indispensable pour tester debounce/throttle.
+12. `test.each(data)(name, fn)` exécute le même test avec plusieurs jeux de données — évite de dupliquer les `it` identiques, améliore la lisibilité et la couverture des cas limites.
 
 ---
 
@@ -622,6 +795,8 @@ Quand utiliser vi.fn() vs vi.mock() vs vi.spyOn() ?|vi.fn() crée une fonction e
 Pourquoi vi.mock() ne peut pas référencer des const définies dans le fichier de test ?|Vitest hisse vi.mock() avant tous les imports. Les const du fichier ne sont pas encore déclarées à ce moment — utiliser ReferenceError. La factory doit utiliser des valeurs inline.
 Quelle est la différence entre tester l'implémentation et tester le comportement ?|Tester l'implémentation = vérifier comment le code est écrit (ordre des if, nom des variables internes). Tester le comportement = vérifier ce que le code produit (entrée → sortie). Un bon test survit à une refactorisation qui ne change pas le comportement.
 Comment mesurer la couverture des branches plutôt que des lignes ?|vitest run --coverage avec provider v8 affiche Branch % séparément. Une branche = chaque chemin d'un if/else ou ternaire. 100% Stmts avec 50% Branch signifie qu'une moitié des conditions n'est jamais testée.
+Pourquoi appeler vi.useRealTimers() dans afterEach après vi.useFakeTimers() ?|Les faux timers persistent entre les tests s'ils ne sont pas réinitialisés. Sans vi.useRealTimers() dans afterEach, le test suivant hérite des timers fictifs et peut devenir flaky. Pattern : vi.useFakeTimers() dans beforeEach, vi.useRealTimers() dans afterEach.
+Quelle est la syntaxe de test.each pour tester plusieurs jeux de données ?|it.each([ [arg1A, arg1B], [arg2A, arg2B] ])('nom %s', (argA, argB) => { /* assertions */ }) — syntaxe tableau. Ou it.each([ { inviterId: 'a', ok: true } ])('$inviterId → $ok', ({ inviterId, ok }) => { }) — syntaxe objet plus lisible.
 ```
 
 ---

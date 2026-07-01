@@ -76,6 +76,25 @@ for (const v of results.violations) {
 }
 ```
 
+**Outil complémentaire — feedback IDE en temps réel**
+
+`eslint-plugin-vuejs-accessibility` ajoute des règles ESLint spécifiques aux composants Vue (images sans alt, boutons sans nom accessible, rôles ARIA invalides, etc.). Contrairement à axe-core qui analyse le DOM rendu, il remonte les erreurs **à l'écriture**, avant même le build.
+
+```bash
+pnpm add -D eslint-plugin-vuejs-accessibility
+```
+
+```js
+// eslint.config.js (flat config)
+import vueA11y from 'eslint-plugin-vuejs-accessibility'
+
+export default [
+  ...vueA11y.configs['flat/recommended'],
+]
+```
+
+Ce plugin complète axe-core : l'un agit dans l'IDE (écriture), l'autre dans le navigateur ou les tests (exécution).
+
 ### 2.2 Limites structurelles de l'automatique (~30-40 %)
 
 Le chiffre de 30-40 % n'est pas arbitraire : il correspond à la proportion de critères WCAG/RGAA dont la conformité est vérifiable sans interaction ni interprétation humaine. Les critères résiduels (~60-70 %) exigent l'un ou plusieurs de ces facteurs :
@@ -341,7 +360,7 @@ jobs:
 
 ### 2.7 Méthodologie RGAA 4.1 — grille des critères et taux de conformité
 
-Le **Référentiel Général d'Amélioration de l'Accessibilité (RGAA) 4.1** est la transposition française du standard WCAG 2.1. Il est obligatoire pour les services publics numériques (loi EAAA) et de plus en plus exigé dans les appels d'offres privés.
+Le **Référentiel Général d'Amélioration de l'Accessibilité (RGAA) 4.1** est la transposition française du standard WCAG 2.1. Il est obligatoire pour les services publics numériques en vertu de la **directive EAA (European Accessibility Act, 2019/882 UE)**, transposée en droit français via **LCEN art. 47 + décret 2019-768**, et de plus en plus exigé dans les appels d'offres privés.
 
 **Structure RGAA 4.1**
 
@@ -381,7 +400,7 @@ Taux par page = (nb critères C sur cette page) / (nb critères C + NC sur cette
 Taux global = moyenne arithmétique des taux par page
 ```
 
-Les critères NA sont exclus du calcul. Le **seuil de conformité** exigé par la loi pour les organismes publics est de **75 %**.
+Les critères NA sont exclus du calcul. Le **seuil de 75 %** est communément retenu pour la conformité substantielle des organismes publics — c'est une **interprétation pratique**, pas un seuil numérique fixé par un texte légal (le décret 2019-768 n'énonce pas ce chiffre).
 
 **Échantillon de pages**
 
@@ -741,7 +760,7 @@ tribuzen/
 ```
 Quel pourcentage de critères a11y est détectable automatiquement (axe-core/Lighthouse) ?|~30-40 %. Les 60-70 % restants requièrent interaction, jugement sémantique, navigation clavier ou test lecteur d'écran.
 Comment intégrer jest-axe dans un test Vitest + @vue/test-utils ?|`expect.extend(toHaveNoViolations)` puis `const results = await axe(wrapper.element, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] } })` puis `expect(results).toHaveNoViolations()`.
-Quel est le seuil de conformité RGAA exigé pour les organismes publics ?|75 % de taux de conformité global (loi EAAA).
+Quel est le seuil de conformité RGAA couramment retenu pour les organismes publics ?|75 % — interprétation pratique de « conformité substantielle » ; ce seuil numérique n'est pas fixé par la loi (le décret 2019-768 ne l'énonce pas). L'obligation légale découle de la directive EAA (2019/882 UE), transposée via LCEN art. 47 + décret 2019-768.
 Comment se calcule le taux de conformité RGAA par page ?|Taux = critères Conformes / (critères Conformes + Non conformes) × 100. Les critères Non Applicables sont exclus.
 Combien de thèmes et de critères comporte RGAA 4.1 ?|13 thèmes, 106 critères.
 Pourquoi appeler axe() après avoir déclenché un état de composant (ex: erreurs) ?|jest-axe analyse le HTML statique au moment de l'appel. Un état non déclenché (erreurs cachées, modale fermée) n'est pas analysé.

@@ -99,15 +99,18 @@ Modification profonde incluse sans rien déclarer : `state.user.profile.avatar =
 
 ### 2.3 Sous le capot : RefImpl vs Proxy
 
+Le tableau ci-dessous résume les différences pratiques entre les deux primitives :
+
 | | `ref` | `reactive` |
 |---|---|---|
-| Mécanisme | `RefImpl` — classe avec `get/set value()` | ES2015 `Proxy` sur l'objet entier |
-| Marqueur interne | `__v_isRef: true` | `__v_isReactive: true` |
+| Mécanisme | Objet avec `get/set value()` | ES2015 `Proxy` sur l'objet entier |
 | Accès | `.value` obligatoire en script | direct (`state.prop`) |
 | Primitives | Oui | **Non** — les primitives ne peuvent pas être Proxy |
 | Destructuring | Sûr (la ref reste une ref) | **Perd la réactivité** (voir Piège #2) |
 
-Vue 3 utilise un système d'`effect scope` : chaque `ref` ou propriété `reactive` s'enregistre dans le graphe de dépendances actif. Toute lecture d'une valeur réactive pendant l'exécution d'un `effect` (render, computed, watch) crée un lien. Toute écriture notifie les effets abonnés.
+> **Pour les curieux (hors périmètre de ce module)**
+>
+> En interne, `ref` est implémenté comme une classe `RefImpl` exposant un marqueur `__v_isRef: true`. `reactive` utilise un Proxy ES2015 et expose `__v_isReactive: true`. Vue 3 s'appuie sur un système d'*effect scope* : chaque lecture d'une valeur réactive pendant l'exécution d'un `effect` (render, computed, watch) crée un lien de dépendance ; chaque écriture notifie les effets abonnés. Ces détails d'implémentation sont utiles pour lire le code source de Vue ou déboguer des cas très avancés — ils ne sont pas nécessaires pour utiliser `ref` et `reactive` efficacement.
 
 ### 2.4 Quand utiliser lequel
 
@@ -439,33 +442,42 @@ console.log(form.valid) // true — la liaison est bidirectionnelle
 
 Règle mémo : on ne destructure **jamais** un `reactive` sans le passer par `toRefs` (ou `toRef` propriété par propriété). Un `ref`, lui, se transporte sans risque.
 
-### Exemple 3 — `computed` writable pour un filtre bidirectionnel
+### Exemple 3 — `computed` writable pour un filtre de rôle synchronisé
 
-Contexte : un filtre "Rôle" dans TribuZen qui affiche des tags sélectionnables. L'URL query param et le filtre local doivent rester synchronisés.
+Contexte : un sélecteur de rôle dans TribuZen. L'interface affiche un libellé formaté dérivé du rôle brut. On veut pouvoir lire le libellé **et** le modifier via `v-model` — le setter retraduit le libellé vers le rôle brut.
 
 ```ts
 import { ref, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
 
-const route  = useRoute()
-const router = useRouter()
+// Source de vérité locale : le rôle brut (clé API)
+const rawRole = ref<'parent' | 'enfant' | ''>('')
 
-// La vraie source de vérité : le query param URL
-const selectedRole = computed<string>({
+// Libellés affichés dans le sélecteur
+const ROLE_LABELS: Record<string, string> = {
+  parent: 'Parent',
+  enfant: 'Enfant',
+  '':     'Tous',
+}
+
+// computed writable :
+//   get() → transforme la clé en libellé (affichage)
+//   set() → retraduit le libellé en clé (écriture dans la source)
+const roleLabel = computed<string>({
   get() {
-    return (route.query.role as string) ?? ''
+    return ROLE_LABELS[rawRole.value] ?? 'Tous'
   },
-  set(role: string) {
-    router.replace({ query: { ...route.query, role: role || undefined } })
-  }
+  set(label: string) {
+    const found = Object.entries(ROLE_LABELS).find(([, v]) => v === label)
+    rawRole.value = (found ? found[0] : '') as 'parent' | 'enfant' | ''
+  },
 })
 
-// Dans le template : v-model="selectedRole" fonctionne directement
-// Sélectionner "parent" → l'URL devient ?role=parent
-// Revenir en arrière dans le navigateur → selectedRole se met à jour
+// Utilisation dans le template : v-model="roleLabel"
+// Sélectionner "Parent" → rawRole.value devient 'parent'
+// rawRole.value = 'enfant' → roleLabel.value affiche 'Enfant'
 ```
 
-Un `computed` writable est le bon outil quand la valeur dérivée a une source externe (URL, store, prop parent). Le setter normalise la mutation vers la vraie source.
+Un `computed` writable est le bon outil quand une valeur dérivée doit être modifiable sans que le composant manipule directement la source brute. Le getter transforme, le setter normalise.
 
 ---
 

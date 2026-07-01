@@ -1,7 +1,7 @@
 ---
 titre: Tests de composants (Vue Test Utils)
 cours: 02-vue
-notions: [mount et shallowMount, trouver des éléments find et findComponent, tester le rendu, simuler des événements trigger, tester props et emits, tester les slots, tester l'asynchrone dans un composant, Testing Library vue en survol]
+notions: [mount et shallowMount, trouver des éléments find findAll findComponent, tester le rendu, simuler des événements trigger, tester props et emits, tester les slots, tester l'asynchrone dans un composant, global.stubs et global.mocks, RouterLinkStub, unmount, Testing Library vue en survol]
 outcomes:
   - sait monter un composant et vérifier son rendu avec Vue Test Utils
   - sait simuler une interaction utilisateur (clic, saisie) et vérifier l'effet
@@ -144,6 +144,20 @@ wrapper.findComponent('.family-card')         // par sélecteur CSS (fragile —
 // ✅ Préférer get quand l'élément doit exister (sinon le test doit échouer)
 const btn = wrapper.get('button')          // erreur claire si absent
 const card = wrapper.findComponent(FamilyCard) // findComponent n'a pas d'équivalent get
+```
+
+**`wrapper.findAll(selector)`** retourne un **tableau de DOMWrapper** pour tous les éléments correspondant au sélecteur. Utile pour vérifier le nombre d'éléments et itérer sur leur contenu :
+
+```ts
+// Vérifier que FamilyList rend autant de cartes que de familles passées en prop
+const cards = wrapper.findAll('.family-card')
+expect(cards).toHaveLength(3)
+expect(cards[0].text()).toContain('Les Martin')
+expect(cards[2].text()).toContain('Les Dupont')
+
+// findAll retourne un tableau vide si aucun élément — jamais undefined
+const nonExistent = wrapper.findAll('.inexistant')
+expect(nonExistent).toHaveLength(0)
 ```
 
 ### 2.3 Tester le rendu — inspecter le DOM et le contenu
@@ -345,7 +359,63 @@ await fireEvent.click(screen.getByRole('button', { name: /sélectionner/i }))
 | Cas d'usage | Tests bas niveau + emits | Tests user-centric |
 | Dépendance | Directe | Wrapper sur Vue Test Utils |
 
-Pour les tests de composants TribuZen de ce module, Vue Test Utils direct est suffisant et plus transparent. Testing Library vaut la peine si le projet adopte une approche "Behaviour Driven Testing" cohérente. ⚠️ à vérifier Context7 si tu intègres les deux dans le même projet.
+Pour les tests de composants TribuZen de ce module, Vue Test Utils direct est suffisant et plus transparent. Testing Library vaut la peine si le projet adopte une approche "Behaviour Driven Testing" cohérente. Les deux peuvent coexister dans le même projet en ciblant des cas différents.
+
+### 2.10 `global.stubs`, `global.mocks`, `RouterLinkStub` et `unmount`
+
+**`global.stubs`** — remplace des composants enfants par des stubs légers. Essentiel quand le composant utilise `<RouterLink>` ou un composant lourd qui n'a pas besoin d'être rendu réellement. Vue Test Utils exporte `RouterLinkStub` — un stub minimal qui simule `<RouterLink>` sans router réel :
+
+```ts
+import { mount, RouterLinkStub } from '@vue/test-utils'
+import FamilyCard from '../FamilyCard.vue'
+
+it('affiche un lien vers la page famille', () => {
+  const wrapper = mount(FamilyCard, {
+    props: { family: famille },
+    global: {
+      stubs: {
+        RouterLink: RouterLinkStub,   // RouterLink stubé, pas de createRouter() nécessaire
+      },
+    },
+  })
+
+  const link = wrapper.findComponent(RouterLinkStub)
+  // Vérifier la prop :to sans naviguer réellement
+  expect(link.props().to).toEqual({ name: 'family', params: { familyId: 'f1' } })
+})
+```
+
+Syntaxe alternative avec tableau (stub par nom) :
+
+```ts
+global: {
+  stubs: ['RouterLink', 'BaseIcon'],   // remplacés par <router-link-stub>, <base-icon-stub>
+}
+```
+
+**`global.mocks`** — injecte des propriétés globales (`$t`, `$route`, `$store`) dans tous les composants montés. Utile pour mocker des injectables globaux sans charger le vrai plugin :
+
+```ts
+const wrapper = mount(FamilyCard, {
+  global: {
+    mocks: {
+      $t: (key: string) => key,   // i18n — retourne la clé au lieu de la traduction
+    },
+  },
+})
+```
+
+**`wrapper.unmount()`** — démonte explicitement le composant et déclenche `onUnmounted()`. Utile dans les tests impliquant des timers ou des subscriptions pour éviter les fuites entre tests :
+
+```ts
+const wrapper = mount(FamilyCard, { props: { family: famille } })
+
+// ... test ...
+
+wrapper.unmount()   // déclenche onUnmounted() — libère les event listeners et timers
+```
+
+> **Note sur le mocking réseau :** `global.fetch = vi.fn()` suffit pour des tests de composants simples. Pour partager des handlers entre plusieurs tests et entre Vitest et Playwright, la bonne approche est MSW — couvert au **module 20**.
 
 ---
 
@@ -572,6 +642,10 @@ Les tests de `FamilyPage.vue` (plusieurs FamilyCard, routing, Pinia) relèvent d
 6. `wrapper.emitted('select')` retourne `undefined` si jamais émis, ou un tableau de tableaux d'arguments sinon — structure `[args_émission_0, args_émission_1, ...]`.
 7. `flushPromises()` de `@vue/test-utils` est nécessaire quand le composant fait des appels asynchrones (fetch, setTimeout) après une interaction.
 8. Tester le comportement observable (texte, classes, événements) — jamais l'état interne via `wrapper.vm`.
+9. `wrapper.findAll(selector)` retourne un tableau de DOMWrapper — utiliser `.toHaveLength(n)` pour vérifier le nombre d'éléments rendus.
+10. `global.stubs: { RouterLink: RouterLinkStub }` stub `<RouterLink>` pour tester un composant avec des liens sans charger Vue Router complet.
+11. `global.mocks: { $t: key => key }` injecte des propriétés globales sans monter les vrais plugins (utile pour vue-i18n).
+12. `wrapper.unmount()` déclenche `onUnmounted()` et libère les event listeners — à appeler dans les tests impliquant des timers ou des subscriptions.
 
 ---
 
@@ -586,6 +660,8 @@ Quand utiliser flushPromises() plutôt que await trigger() ?|Quand le composant 
 Comment passer des props à un composant dans Vue Test Utils ?|mount(Component, { props: { propName: valeur } }). Mettre à jour après montage avec await wrapper.setProps({ propName: nouvelleValeur }).
 Comment tester le contenu d'un slot dans Vue Test Utils ?|mount(Component, { slots: { default: '<p>Contenu</p>', header: '<h3>Titre</h3>' } }) puis wrapper.html() ou wrapper.text() pour asserter le rendu du slot.
 Que retourne wrapper.emitted('monEvent') si l'événement n'a jamais été émis ?|undefined. Toujours vérifier .toBeTruthy() avant d'accéder aux émissions pour éviter un TypeError. Pattern : expect(wrapper.emitted('select')).toBeTruthy() puis expect(wrapper.emitted('select')![0]).toEqual([args]).
+Comment stubber RouterLink dans un test de composant sans charger Vue Router ?|import { mount, RouterLinkStub } from '@vue/test-utils' puis mount(Component, { global: { stubs: { RouterLink: RouterLinkStub } } }). RouterLinkStub est un composant minimal exporté par @vue/test-utils qui simule RouterLink sans router réel. Vérifier la prop :to avec wrapper.findComponent(RouterLinkStub).props().to.
+Que retourne wrapper.findAll() si aucun élément ne correspond au sélecteur ?|Un tableau vide ([]) — jamais undefined. Contrairement à find() qui retourne un DOMWrapper vide, findAll() retourne toujours un tableau, ce qui permet d'utiliser .toHaveLength(0) directement.
 ```
 
 ---
@@ -593,3 +669,5 @@ Que retourne wrapper.emitted('monEvent') si l'événement n'a jamais été émis
 ## Pont vers le lab
 
 > Lab associé : `02-vue/labs/lab-17-tests-composants/README.md`. Écriture complète des tests de `FamilyCard.vue` avec Vue Test Utils — rendu, emits, cas limite — avec `vitest --run` comme oracle. Corrigé commenté intégral.
+>
+> **Note réseau :** pour les composants qui appellent une API, ce module utilise `vi.spyOn(global, 'fetch')` ou `vi.stubGlobal('fetch', vi.fn())`. La bonne approche pour partager les mocks réseau entre plusieurs tests est MSW (`setupServer`) — couvert au **module 20**.

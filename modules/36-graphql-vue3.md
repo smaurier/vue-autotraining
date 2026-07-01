@@ -1,7 +1,7 @@
 ---
 titre: GraphQL avec Vue
 cours: 02-vue
-notions: [principes GraphQL query mutation, client Apollo ou urql pour Vue, useQuery et useMutation, variables et cache, typage généré codegen, gestion loading error, subscriptions en survol, comparaison avec REST]
+notions: [principes GraphQL query mutation, client Apollo ou urql pour Vue, useQuery et useMutation, variables et cache, typage généré codegen, gestion loading error, subscriptions en survol, comparaison avec REST, fragments GraphQL]
 outcomes:
   - sait interroger une API GraphQL depuis Vue (useQuery/useMutation)
   - sait typer les opérations avec la génération de types (codegen)
@@ -467,6 +467,76 @@ Dans TribuZen, les subscriptions serviraient à notifier en temps réel l'accept
 
 **Règle pratique :** préférer REST pour les APIs CRUD simples et les petites équipes. GraphQL devient rentable dès que plusieurs clients (web, mobile) consomment des données avec des besoins différents, ou quand les relations de données sont profondes.
 
+### 2.11 Fragments GraphQL — réutilisation de sélections de champs
+
+Un **fragment** est une unité nommée de sélection de champs, réutilisable dans plusieurs opérations. Il évite la duplication de la même liste de champs quand plusieurs queries touchent le même type.
+
+**Syntaxe :**
+
+```graphql
+# Déclaration du fragment sur le type Member
+fragment MemberFields on Member {
+  id
+  displayName
+  role
+}
+
+# Deux opérations différentes réutilisent le même fragment via la syntaxe spread `...`
+query GetFamily($id: ID!) {
+  family(id: $id) {
+    id
+    name
+    members {
+      ...MemberFields
+    }
+  }
+}
+
+query GetGroupMembers($groupId: ID!) {
+  group(id: $groupId) {
+    id
+    members {
+      ...MemberFields  # réutilisation sans duplication
+    }
+  }
+}
+```
+
+**Usage avec `gql` dans Vue :**
+
+```ts
+import { gql } from '@urql/vue'
+
+// Fragment déclaré une seule fois, exportable
+export const MEMBER_FIELDS = gql`
+  fragment MemberFields on Member {
+    id
+    displayName
+    role
+  }
+`
+
+// La query l'inclut par interpolation du template tag
+export const GET_FAMILY = gql`
+  ${MEMBER_FIELDS}
+  query GetFamily($id: ID!) {
+    family(id: $id) {
+      id
+      name
+      members {
+        ...MemberFields
+      }
+    }
+  }
+`
+```
+
+**Pourquoi utiliser des fragments :**
+- **DRY** — une seule déclaration des champs communs ; une modification se propage à toutes les queries
+- **Cohérence** — toutes les queries qui touchent `Member` ramènent exactement les mêmes champs
+- **Composabilité** — chaque composant Vue peut définir le fragment correspondant à ses besoins de rendu ; la query parente les compose
+- **Codegen** — `@graphql-codegen/client-preset` génère un type `MemberFieldsFragment`, permettant de typer les props d'un composant exactement sur les champs du fragment, sans interface TypeScript dupliquée
+
 ---
 
 ## 3. Worked examples
@@ -829,6 +899,7 @@ export function installUrql(app: App): void {
 8. Codegen (`@graphql-codegen/client-preset`) génère les types TypeScript depuis le schéma — plus d'interfaces manuelles à maintenir.
 9. GraphQL vs REST — GraphQL rentable quand données imbriquées, plusieurs clients avec besoins différents, équipe frontend/backend séparée.
 10. Subscriptions = GraphQL temps réel via WebSocket — à introduire seulement si le besoin temps réel est avéré.
+11. Les fragments GraphQL nomment une sélection de champs réutilisable dans plusieurs opérations — DRY, cohérence des champs entre queries, typage par fragment avec codegen.
 
 ---
 
@@ -843,6 +914,7 @@ Quelle est la différence entre networkError et graphQLErrors dans CombinedError
 Quel requestPolicy choisir pour afficher le cache immédiatement et rafraîchir en fond ?|requestPolicy: 'cache-and-network'. Affiche les données cachées sans attendre, puis émet une requête réseau pour mettre à jour. Idéal pour les listes rarement modifiées.
 Quel avantage concret apporte codegen (@graphql-codegen/client-preset) avec urql ?|Génère automatiquement les types TypeScript depuis le schéma serveur. Plus d'interfaces manuelles à écrire et maintenir. useQuery<GetFamiliesQuery> donne un typage complet sur data.value sans effort.
 Quand préférer GraphQL à REST pour une nouvelle API ?|Quand plusieurs clients (web, mobile) consomment des données avec des besoins différents, quand les relations de données sont profondes (N+1 REST), ou quand le frontend doit être autonome du backend pour choisir ses champs.
+Qu'est-ce qu'un fragment GraphQL et quel avantage apporte-t-il avec urql/Vue ?|Un fragment est une sélection nommée de champs réutilisable : `fragment MemberFields on Member { id displayName role }`. Avantages : DRY (une modification se propage à toutes les queries), cohérence des champs entre opérations, composabilité par composant Vue. Codegen génère un type `MemberFieldsFragment` — les props sont typées sans interface TypeScript dupliquée.
 ```
 
 ---
