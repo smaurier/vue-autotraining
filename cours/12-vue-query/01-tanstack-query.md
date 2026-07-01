@@ -161,7 +161,7 @@ async function fetchUsers(): Promise<User[]> {
 // On "déstructure" le résultat = on récupère plusieurs variables d'un coup
 const {
   data: users,   // Les données reçues (tableau d'utilisateurs ou undefined si pas encore chargé)
-  isLoading,     // true/false : est-ce que c'est le PREMIER chargement ?
+  isPending,     // v5 : true au PREMIER chargement (isLoading = isPending && isFetching)
   isFetching,    // true/false : est-ce qu'un chargement est en cours (même en arrière-plan) ?
   isError,       // true/false : est-ce qu'il y a eu une erreur ?
   error,         // L'erreur elle-même (ou null si pas d'erreur)
@@ -187,7 +187,7 @@ const {
   <!-- v-if / v-else-if / v-else : afficher une chose OU une autre -->
 
   <!-- Si c'est en train de charger (première fois) -->
-  <div v-if="isLoading">Chargement...</div>
+  <div v-if="isPending">Chargement...</div>
 
   <!-- Sinon, s'il y a une erreur -->
   <div v-else-if="isError">{{ error?.message }}</div>
@@ -467,7 +467,7 @@ export function useCreateUserMutation() {
 import { useUsersQuery, useCreateUserMutation } from '@/composables/useUsersQuery'
 
 // C'est propre : une ligne pour chaque besoin
-const { data: users, isLoading } = useUsersQuery()
+const { data: users, isPending } = useUsersQuery()
 const { mutate: createUser, isPending } = useCreateUserMutation()
 </script>
 ```
@@ -486,7 +486,7 @@ const { mutate: createUser, isPending } = useCreateUserMutation()
 
 ### Les 3 choses à retenir
 
-1. **`useQuery`** = lire des données (GET) → donne `data`, `isLoading`, `isError`
+1. **`useQuery`** = lire des données (GET) → donne `data`, `isPending`, `isError`
 2. **`useMutation`** = écrire des données (POST/PUT/DELETE) → donne `mutate`, `isPending`
 3. **`queryKey`** = l'étiquette du cache → doit contenir tout ce qui change le résultat
 
