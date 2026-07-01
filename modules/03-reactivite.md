@@ -6,8 +6,8 @@ outcomes:
   - sait choisir ref vs reactive selon le cas
   - sait diagnostiquer et corriger une perte de réactivité
   - sait écrire un composable réutilisable propre
-prerequis: [JavaScript ES6+, SFC Vue (template, v-bind, v-model basics)]
-next: 02-composants-avances
+prerequis: [02-template-et-directives, JavaScript ES6+]
+next: 04-evenements-et-v-model
 libs: [{ name: vue, version: "3.5" }]
 tribuzen: front-office TribuZen — catalogue de composants Vue réactifs
 last-reviewed: 2026-07
@@ -647,4 +647,4 @@ Comment passer une prop à un composable et garder la réactivité ?|Passer une 
 
 ## Pont vers le lab
 
-> Lab associé : `labs/lab-01-reactivite/README.md`. Construire `useMembers` complet avec test Vitest + intégration dans un SFC — corrigé commenté ligne à ligne.
+> Lab associé : `labs/lab-03-reactivite/README.md`. Construire `useMembers` complet avec test Vitest + intégration dans un SFC — corrigé commenté ligne à ligne.
