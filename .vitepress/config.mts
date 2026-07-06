@@ -13,9 +13,11 @@ export default defineConfig({
     }
   },
 
-  // Docs statiques : on n'utilise jamais l'interpolation Vue live dans le markdown.
-  // On désactive `{{ }}` comme interpolation (délimiteurs improbables) pour que les
-  // moustaches de démonstration en prose s'affichent littéralement sans casser le build SSR.
+  // ⚠️ DETTE CONNUE : cet override neutralise les moustaches Vue `{{ }}` enseignées en prose
+  // MAIS casse aussi le `{{ }}` du thème par défaut (menu/outline affichés littéralement).
+  // Fix propre à faire : retirer l'override + v-pre/escape les `{{ }}` de prose du contenu
+  // (cours Vue = ~586 occurrences, majorité en blocs code déjà safe ; cf.
+  // docs/curriculum/DETTE-vitepress-delimiters.md).
   vue: {
     template: {
       compilerOptions: {
