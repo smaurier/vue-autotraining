@@ -19,7 +19,7 @@ last-reviewed: 2026-07
 > **Outcomes — tu sauras FAIRE :** afficher des données réactives (interpolation, `v-bind`), conditionner le rendu (`v-if`/`v-else` vs `v-show`) et choisir le bon outil, boucler avec `v-for` en fournissant une `key` stable, lier classes et styles dynamiquement.
 > **Difficulté :** :star::star:
 >
-> **Portée :** ce module couvre la **syntaxe du template Vue 3** — tout ce qui vit dans `<template>`. L'interpolation `{{ }}` a été présentée en survol au **module 01** ; ici elle est disséquée. `v-model` (liaison bidirectionnelle) est introduit brièvement dans ce module mais disséqué avec `ref`/`computed` au **module 04**. `v-on` (`@`) est présenté dans les worked examples, mais la gestion avancée des événements (modificateurs, émissions parent-enfant) est au **module 05**. Les composants (`defineProps`, `defineEmits`) sont strictement hors périmètre ici.
+> **Portée :** ce module couvre la **syntaxe du template Vue 3** — tout ce qui vit dans `<template>`. L'interpolation <code v-pre>{{ }}</code> a été présentée en survol au **module 01** ; ici elle est disséquée. `v-model` (liaison bidirectionnelle) est introduit brièvement dans ce module mais disséqué avec `ref`/`computed` au **module 04**. `v-on` (`@`) est présenté dans les worked examples, mais la gestion avancée des événements (modificateurs, émissions parent-enfant) est au **module 05**. Les composants (`defineProps`, `defineEmits`) sont strictement hors périmètre ici.
 
 ---
 
@@ -64,9 +64,9 @@ Tous les `???` ci-dessus se résolvent avec les directives de ce module. À la f
 
 ## 2. Théorie complète, concise
 
-### 2.1 Interpolation moustache `{{ }}`
+### 2.1 Interpolation moustache <code v-pre>{{ }}</code>
 
-`{{ expression }}` évalue une expression JavaScript et insère le résultat en tant que **texte brut** dans le DOM. Toute expression valide fonctionne — appel de méthode, opérateur ternaire, accès imbriqué.
+<code v-pre>{{ expression }}</code> évalue une expression JavaScript et insère le résultat en tant que **texte brut** dans le DOM. Toute expression valide fonctionne — appel de méthode, opérateur ternaire, accès imbriqué.
 
 ```vue
 <script setup lang="ts">
@@ -90,7 +90,7 @@ const tags = ['Vue', 'TypeScript']
 </template>
 ```
 
-**Ce que `{{ }}` ne fait PAS :** il n'interprète pas le HTML. `{{ '<strong>gras</strong>' }}` affiche la chaîne littérale. Pour insérer du HTML, voir `v-html` (§2.7) et ses avertissements de sécurité.
+**Ce que <code v-pre>{{ }}</code> ne fait PAS :** il n'interprète pas le HTML. <code v-pre>{{ '&lt;strong&gt;gras&lt;/strong&gt;' }}</code> affiche la chaîne littérale. Pour insérer du HTML, voir `v-html` (§2.7) et ses avertissements de sécurité.
 
 **`v-once` — rendu une seule fois :**
 
@@ -384,10 +384,10 @@ Les propriétés CSS doivent être en **camelCase** (`backgroundColor`, `fontSiz
 |---|---|---|
 | `v-model` | Liaison bidirectionnelle (`input` ↔ réf) | Sucre syntaxique `:value` + `@input` — détaillé au module 03 |
 | `v-html` | Injecte du HTML brut | ⚠️ **XSS** si contenu utilisateur non sanitisé — n'utiliser qu'avec du HTML maîtrisé |
-| `v-text` | Équivalent de `{{ }}` en attribut | Remplace tout le contenu textuel de l'élément — `{{ }}` est préférable |
+| `v-text` | Équivalent de <code v-pre>{{ }}</code> en attribut | Remplace tout le contenu textuel de l'élément — <code v-pre>{{ }}</code> est préférable |
 | `v-once` | Rendu unique, pas de re-render | Optimisation pour le contenu statique (ex: titres immuables) |
-| `v-pre` | Passe le bloc sans compilation Vue | Utile pour afficher des moustaches littérales `{{ }}` dans la doc |
-| `v-cloak` | Cache le composant jusqu'à compilation | Évite le flash de `{{ nom }}` avant que Vue prenne le contrôle |
+| `v-pre` | Passe le bloc sans compilation Vue | Utile pour afficher des moustaches littérales <code v-pre>{{ }}</code> dans la doc |
+| `v-cloak` | Cache le composant jusqu'à compilation | Évite le flash de <code v-pre>{{ nom }}</code> avant que Vue prenne le contrôle |
 
 ---
 
@@ -495,7 +495,7 @@ function memberClass(m: Member) {
 - L'empty state (`v-if … v-else`) est la paire idiomatique Vue — pas deux `v-show`.
 - `:key="member.id"` utilise l'id métier — résistant au tri ou au filtre futur.
 - La fonction `memberClass()` extrait la logique de classe du template pour le garder lisible.
-- `{{ member.name }}` est auto-escapé — si le nom contenait `<script>`, il s'afficherait comme texte brut.
+- <code v-pre>{{ member.name }}</code> est auto-escapé — si le nom contenait `<script>`, il s'afficherait comme texte brut.
 
 ---
 
@@ -652,7 +652,7 @@ tribuzen/
 
 ## 6. Points clés
 
-1. `{{ expression }}` évalue du JavaScript et insère du texte brut auto-escapé — jamais du HTML brut.
+1. <code v-pre>{{ expression }}</code> évalue du JavaScript et insère du texte brut auto-escapé — jamais du HTML brut.
 2. `:attr="expr"` (raccourci de `v-bind:attr`) connecte un attribut HTML à une expression JavaScript ; sans `:`, la valeur est une chaîne statique.
 3. `v-if` supprime l'élément du DOM quand la condition est fausse ; `v-show` applique `display: none` — l'élément reste monté.
 4. Choisir `v-show` pour les toggles fréquents (menu, panneau) ; `v-if` pour les conditions rares ou définitives (rôle, empty state, chargement).

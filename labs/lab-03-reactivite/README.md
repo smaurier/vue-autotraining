@@ -258,7 +258,7 @@ Reproduis `FamilyMemberList.vue` **de mémoire, en 25 minutes**, avec les modifi
 
 1. Remplace `const query = ref('')` et `const members = ref<Member[]>(...)` par un seul `reactive` qui regroupe les deux : `const state = reactive({ members: [...], query: '' })`. Pour passer `members` et `query` au template et garder la réactivité, applique `toRefs(state)` — explique à voix haute pourquoi le destructuring direct briserait tout.
 2. Remplace le `watch` par un `watchEffect` et identifie ce qui change : est-il déclenché au montage ? A-t-il accès à `oldVal` ? Pourquoi ce choix est-il moins adapté ici ?
-3. Ajoute un filtre cumulatif **rôle** : un `ref<'parent' | 'enfant' | ''>` et un `computed` qui combine filtre nom + filtre rôle. `{{ filteredCount }} résultat(s)` affiché en temps réel.
+3. Ajoute un filtre cumulatif **rôle** : un `ref<'parent' | 'enfant' | ''>` et un `computed` qui combine filtre nom + filtre rôle. <code v-pre>{{ filteredCount }} résultat(s)</code> affiché en temps réel.
 4. **Sans ouvrir ce corrigé** ni le module 03.
 
 **Critère de réussite :** les trois comportements fonctionnent dans le navigateur — filtre réactif, compteur en ligne, log debouncé — et le filtre rôle est indépendant du filtre nom.

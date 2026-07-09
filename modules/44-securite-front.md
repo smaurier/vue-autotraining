@@ -62,7 +62,7 @@ Résultat        : cookie de session volé → session hijacking
 
 ### 2.2 Échappement automatique de Vue
 
-Vue échappe systématiquement le contenu interpolé avec `{{ }}`. L'échappement HTML remplace les caractères spéciaux par leurs entités HTML :
+Vue échappe systématiquement le contenu interpolé avec <code v-pre>{{ }}</code>. L'échappement HTML remplace les caractères spéciaux par leurs entités HTML :
 
 | Caractère | Entité HTML | Effet |
 |-----------|-------------|-------|
@@ -84,7 +84,7 @@ const userInput = ref('<script>alert("xss")</script>')
 </template>
 ```
 
-Cette protection est automatique et ne peut pas être désactivée accidentellement sur les interpolations `{{ }}`.
+Cette protection est automatique et ne peut pas être désactivée accidentellement sur les interpolations <code v-pre>{{ }}</code>.
 
 ### 2.3 Danger de `v-html` — et sanitization avec DOMPurify
 
@@ -633,7 +633,7 @@ tribuzen/
 
 ## 6. Points clés
 
-1. Vue échappe automatiquement `{{ }}` — le XSS via interpolation est impossible par défaut.
+1. Vue échappe automatiquement <code v-pre>{{ }}</code> — le XSS via interpolation est impossible par défaut.
 2. `v-html` contourne cette protection — n'utiliser que sur du HTML sanitizé par DOMPurify.
 3. `DOMPurify.sanitize(html)` retire scripts, événements inline et protocoles `javascript:` en conservant le HTML de présentation.
 4. Le CSRF exploite les cookies envoyés automatiquement par le navigateur — le token CSRF dans un header bloque l'attaque car un site tiers ne peut pas lire les cookies cross-origin.

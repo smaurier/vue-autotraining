@@ -197,7 +197,7 @@ const base   = config.public.apiBase     // ✅ disponible partout
 
 - **Vercel :** Settings → Environment Variables → ajouter `NUXT_JWT_SECRET`
 - **Netlify :** Site settings → Environment variables → même chose
-- **GitHub Actions :** Settings → Secrets and variables → Actions → ajouter le secret, puis l'injecter dans le workflow avec `${{ secrets.NUXT_JWT_SECRET }}`
+- **GitHub Actions :** Settings → Secrets and variables → Actions → ajouter le secret, puis l'injecter dans le workflow avec <code v-pre>${{ secrets.NUXT_JWT_SECRET }}</code>
 
 Ne jamais committer de valeurs secrètes réelles dans `.env` ou `nuxt.config.ts`. Le fichier `.env` local doit être dans `.gitignore`.
 

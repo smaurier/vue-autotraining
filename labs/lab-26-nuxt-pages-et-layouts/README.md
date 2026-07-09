@@ -80,7 +80,7 @@ tribuzen-pages/
 
 5. **Crée `pages/feed.vue`** — avec `definePageMeta({ middleware: 'auth' })`. Contenu minimal : titre "Feed TribuZen" + un `NuxtLink` vers `/family/42`.
 
-6. **Crée `pages/family/[id].vue`** — lit `route.params.id` et affiche "Famille #{{ familyId }}". `definePageMeta({ middleware: 'auth' })`. Ajoute un `NuxtLink` retour vers `/feed`.
+6. **Crée `pages/family/[id].vue`** — lit `route.params.id<code v-pre> et affiche "Famille #{{ familyId }}". </code>definePageMeta({ middleware: 'auth' })`. Ajoute un `NuxtLink` retour vers `/feed`.
 
 7. **Crée les pages profil imbriquées** :
    - `pages/profile/index.vue` — deux onglets `NuxtLink` vers `/profile/info` et `/profile/settings`, puis `<NuxtPage />`.

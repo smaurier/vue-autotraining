@@ -18,13 +18,9 @@ export default defineConfig({
   // Fix propre à faire : retirer l'override + v-pre/escape les `{{ }}` de prose du contenu
   // (cours Vue = ~586 occurrences, majorité en blocs code déjà safe ; cf.
   // docs/curriculum/DETTE-vitepress-delimiters.md).
-  vue: {
-    template: {
-      compilerOptions: {
-        delimiters: ['(%(', ')%)']
-      }
-    }
-  },
+  // NB : override `delimiters` retiré (il cassait le {{ }} du thème par défaut).
+  // cf docs/curriculum/DETTE-vitepress-delimiters.md
+
 
   ignoreDeadLinks: true,
 

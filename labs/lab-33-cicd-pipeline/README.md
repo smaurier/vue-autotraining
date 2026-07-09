@@ -75,7 +75,7 @@ pnpm add -D vitest @vitest/coverage-v8 jsdom @vue/test-utils
 
 7. **Ajoute les quatre steps de vérification** : Lint, Typecheck, Tests, Build. Chaque step a un `name:` lisible et un `run:` qui appelle le script `package.json` correspondant.
 
-8. **Ajoute le step `upload-artifact`** avec `actions/upload-artifact@v4`. Le nom de l'artefact doit inclure `${{ github.sha }}`.
+8. **Ajoute le step `upload-artifact`** avec `actions/upload-artifact@v4`. Le nom de l'artefact doit inclure <code v-pre>${{ github.sha }}</code>.
 
 9. **Push sur GitHub** et observe l'onglet "Actions". La CI doit être verte au premier run.
 
@@ -318,4 +318,4 @@ tribuzen/
 ci: add GitHub Actions pipeline (lint, typecheck, vitest, build)
 ```
 
-**Prochaine étape (module 34) :** ajouter un job `deploy` dans `cd.yml` qui récupère l'artefact `tribuzen-dist-${{ github.sha }}` et le déploie sur Vercel — uniquement sur push vers `main` et après que la CI est verte.
+**Prochaine étape (module 34) :** ajouter un job `deploy` dans `cd.yml` qui récupère l'artefact <code v-pre>tribuzen-dist-${{ github.sha }}</code> et le déploie sur Vercel — uniquement sur push vers `main` et après que la CI est verte.
