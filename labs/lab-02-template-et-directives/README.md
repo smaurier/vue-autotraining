@@ -210,7 +210,7 @@ const visibleMembers = computed(() =>
 Reproduis `FamilyMemberList.vue` **de mémoire, en 25 minutes**, avec les modifications suivantes :
 
 1. Ajoute un champ de **recherche par prénom** — `ref<string>` + `computed` qui filtre sur `member.name.toLowerCase().includes(...)`. Les deux filtres (inactifs + recherche) s'appliquent cumulativement.
-2. Affiche le **nombre de membres visibles** en temps réel : `{{ visibleMembers.length }} membre(s)`.
+2. Affiche le **nombre de membres visibles** en temps réel : <code v-pre>{{ visibleMembers.length }} membre(s)</code>.
 3. **Sans ouvrir ce corrigé** ni le module 02.
 
 **Critère de réussite :** le composant fonctionne dans le navigateur et les deux filtres sont indépendants (activer l'un n'efface pas l'autre).

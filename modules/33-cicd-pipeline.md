@@ -304,7 +304,7 @@ Dans les branch protection rules : ajouter `quality` dans "Status checks that ar
 
 **`github.sha`** — variable d'environnement GitHub Actions contenant le SHA du commit courant. Utile pour nommer des artefacts de façon unique.
 
-**`${{ github.event_name }}`** — permet de conditionner un step selon le déclencheur :
+**<code v-pre>${{ github.event_name }}</code>** — permet de conditionner un step selon le déclencheur :
 
 ```yaml
 - name: Deploy (main only)
@@ -623,7 +623,7 @@ tribuzen/
 
 1. **Lint** — ESLint avec `eslint-plugin-vue` + `@vue/eslint-config-typescript`. La règle `vue/multi-word-component-names` est off (composants page comme `LoginPage.vue` sont acceptés), `@typescript-eslint/no-explicit-any` est en erreur.
 
-2. **Typecheck** — `vue-tsc --noEmit`. Vérifie les types dans tous les SFC, y compris les expressions de template comme `{{ family.memberCount.toFixed(0) }}` (erreur si `memberCount` est `string`).
+2. **Typecheck** — `vue-tsc --noEmit`. Vérifie les types dans tous les SFC, y compris les expressions de template comme <code v-pre>{{ family.memberCount.toFixed(0) }}</code> (erreur si `memberCount` est `string`).
 
 3. **Tests Vitest** — tous les composables (`useAuth`, `useFamily`, `useEvent`) et composants critiques sont testés. Seuil de couverture : 80% lignes/fonctions, 75% branches.
 

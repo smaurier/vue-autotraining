@@ -470,7 +470,7 @@ que sa saisie a échoué.
   v-if="emailError"
   id="invite-email-error"
   role="alert"
->{{ emailError }}</p>
+><span v-pre>{{ emailError }}</span></p>
 <!-- + sur l'input : :aria-invalid="hasError" :aria-describedby="errorId" -->
 ```
 
@@ -492,7 +492,7 @@ que sa saisie a échoué.
   :aria-busy="submitting"
   :aria-label="submitting ? 'Envoi en cours, veuillez patienter' : undefined"
 >
-  {{ submitting ? 'Envoi en cours…' : "Envoyer l'invitation" }}
+  <span v-pre>{{ submitting ? 'Envoi en cours…' : "Envoyer l'invitation" }}</span>
 </button>
 ```
 

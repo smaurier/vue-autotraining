@@ -85,7 +85,7 @@ pnpm audit
 1. **Installe DOMPurify** — `pnpm add dompurify && pnpm add -D @types/dompurify`.
 2. **Définis les props** — `defineProps<{ content: string; authorName: string }>()`.
 3. **Crée `safeContent`** — `computed(() => DOMPurify.sanitize(props.content))`. Importe `computed` depuis `vue` et `DOMPurify` depuis `dompurify`.
-4. **Template** — `{{ props.authorName }}` pour le nom (interpolation, pas `v-html`), `v-html="safeContent"` pour le corps du post.
+4. **Template** — <code v-pre>{{ props.authorName }}</code> pour le nom (interpolation, pas `v-html`), `v-html="safeContent"` pour le corps du post.
 5. **Teste le payload XSS** — colle les données de test, inspecte le DOM dans DevTools. Vérifie que `onerror`, le `href="javascript:..."` et le `<script>` ont disparu.
 
 ### Tâche B

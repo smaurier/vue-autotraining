@@ -80,7 +80,7 @@ count.value++                  // déclenche la réactivité
 console.log(count.value)       // 1
 ```
 
-Dans le `<template>`, Vue **auto-unwrap** les refs de premier niveau : écrire `{{ count }}`, pas `{{ count.value }}`.
+Dans le `<template>`, Vue **auto-unwrap** les refs de premier niveau : écrire <code v-pre>{{ count }}</code>, pas <code v-pre>{{ count.value }}</code>.
 
 ### 2.2 `reactive` — Proxy profond sur un objet
 

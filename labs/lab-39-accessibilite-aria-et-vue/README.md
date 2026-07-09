@@ -88,7 +88,7 @@ Lance le dev server (`pnpm dev`) et intègre la modale dans `App.vue` pour teste
 
 6. **Message d'erreur** — `<p v-if="error" id="..." role="alert">` — `role="alert"` suffit, pas besoin de `aria-live` supplémentaire.
 
-7. **Message de succès** — `<div aria-live="polite" aria-atomic="true" class="sr-only">{{ announcement }}</div>` — toujours présent dans le DOM, jamais sous `v-if`. Vider puis remplir au `nextTick` dans `sendInvite()`.
+7. **Message de succès** — <code v-pre>&lt;div aria-live="polite" aria-atomic="true" class="sr-only"&gt;{{ announcement }}&lt;/div&gt;</code> — toujours présent dans le DOM, jamais sous `v-if`. Vider puis remplir au `nextTick` dans `sendInvite()`.
 
 8. **Valide avec la navigation clavier seule** :
    - Tab depuis la page : atterrir sur "Inviter un membre", Enter ouvre la modale

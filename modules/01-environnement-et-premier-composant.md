@@ -6,7 +6,7 @@ outcomes:
   - sait créer un projet Vue 3 + TypeScript avec pnpm create vue@latest
   - comprend le rôle de chaque fichier clé (main.ts, App.vue, index.html, vite.config.ts)
   - sait lire et écrire un SFC complet (script setup lang ts, template, style scoped)
-  - sait afficher des données avec l'interpolation {{ }}
+  - sait afficher des données avec l'interpolation <span v-pre>{{ }}</span>
   - sait lancer et exploiter le serveur de développement Vite (HMR, Vue DevTools)
 prerequis:
   - 00-typer-vue3
@@ -189,11 +189,11 @@ Le bloc `<template>` contient du HTML standard augmenté de la syntaxe Vue. En V
 </template>
 ```
 
-Les directives (`v-if`, `v-for`, `v-bind`, `v-on`) qui augmentent le HTML sont le sujet du **module 02 (template-et-directives)**. Dans ce module, on se limite à l'interpolation `{{ }}`.
+Les directives (`v-if`, `v-for`, `v-bind`, `v-on`) qui augmentent le HTML sont le sujet du **module 02 (template-et-directives)**. Dans ce module, on se limite à l'interpolation <code v-pre>{{ }}</code>.
 
-### 2.7 Interpolation `{{ }}` — afficher des données
+### 2.7 Interpolation <code v-pre>{{ }}</code> — afficher des données
 
-Les doubles accolades `{{ }}` évaluent une **expression JavaScript** et insèrent le résultat dans le HTML. C'est le mécanisme d'affichage de base.
+Les doubles accolades <code v-pre>{{ }}</code> évaluent une **expression JavaScript** et insèrent le résultat dans le HTML. C'est le mécanisme d'affichage de base.
 
 ```vue
 <script setup lang="ts">
@@ -210,7 +210,7 @@ const year = new Date().getFullYear()
 </template>
 ```
 
-**Règle :** entre `{{ }}`, une **expression** (produit une valeur) — pas une **instruction** (déclare ou contrôle le flux). Voir Piège #3.
+**Règle :** entre <code v-pre>{{ }}</code>, une **expression** (produit une valeur) — pas une **instruction** (déclare ou contrôle le flux). Voir Piège #3.
 
 ### 2.8 `<style scoped>` — CSS isolé
 
@@ -419,7 +419,7 @@ p { margin-bottom: 0; }
 
 Symptôme classique : "j'ai modifié le style d'un composant et ça a cassé une autre page". Cause systématique : `scoped` absent. Ajouter `scoped` en premier réflexe à chaque nouveau `<style>`.
 
-### PIÈGE #3 — instruction dans `{{ }}` au lieu d'une expression
+### PIÈGE #3 — instruction dans <code v-pre>{{ }}</code> au lieu d'une expression
 
 ```vue
 <template>
@@ -440,7 +440,7 @@ Symptôme classique : "j'ai modifié le style d'un composant et ça a cassé une
 </template>
 ```
 
-**Règle mémo :** si tu peux l'écrire à droite d'un `=` dans une assignation, c'est une expression. `let x = **ici**`. Les mots-clés `if`, `for`, `let`, `const`, `return` ne produisent pas de valeur et ne fonctionnent pas dans `{{ }}`.
+**Règle mémo :** si tu peux l'écrire à droite d'un `=` dans une assignation, c'est une expression. `let x = **ici**`. Les mots-clés `if`, `for`, `let`, `const`, `return` ne produisent pas de valeur et ne fonctionnent pas dans <code v-pre>{{ }}</code>.
 
 ### PIÈGE #4 — `ref` non importé → `ReferenceError` au runtime
 
@@ -530,7 +530,7 @@ tribuzen/
 3. `.mount('#app')` cible `<div id="app">` dans `index.html` — si l'id ne correspond pas, page blanche silencieuse sans erreur JS.
 4. Un SFC (`.vue`) contient trois blocs : `<script setup lang="ts">`, `<template>`, `<style scoped>`.
 5. `<script setup>` : tout ce qui est déclaré racine est auto-exposé au template — pas de `return {}` à écrire.
-6. `{{ expression }}` = interpolation — évalue une expression JS et l'insère dans le HTML (expressions uniquement, pas d'instructions).
+6. <code v-pre>{{ expression }}</code> = interpolation — évalue une expression JS et l'insère dans le HTML (expressions uniquement, pas d'instructions).
 7. `<style scoped>` = CSS isolé au composant — sans `scoped`, le style pollue toute l'application.
 8. HMR Vite : toute sauvegarde met à jour le navigateur instantanément, sans rechargement complet de la page.
 

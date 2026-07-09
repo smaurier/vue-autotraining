@@ -120,9 +120,9 @@ Lance `pnpm dev` et branche les composants dans `App.vue` pour voir le résultat
 
 5. **Écris `PostCard.vue`** :
    - `const { t, d } = useI18n()` dans `<script setup lang="ts">`
-   - `{{ t('post.publishedBy', { author: post.authorName }) }}` pour l'auteur
-   - `{{ d(post.publishedAt, 'short') }}` pour la date
-   - `{{ t('post.comment', post.commentCount) }}` pour la pluralisation
+   - <code v-pre>{{ t('post.publishedBy', { author: post.authorName }) }}</code> pour l'auteur
+   - <code v-pre>{{ d(post.publishedAt, 'short') }}</code> pour la date
+   - <code v-pre>{{ t('post.comment', post.commentCount) }}</code> pour la pluralisation
    - Deux boutons avec `t('post.react')` et `t('post.comment_action')`
 
 6. **Écris `LocaleSwitcher.vue`** avec un `<select>` lié à `locale` (`:value="locale"`) et un `@change` qui appelle `locale.value = event.target.value`.
