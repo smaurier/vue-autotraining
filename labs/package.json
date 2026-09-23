@@ -1,0 +1,26 @@
+{
+  "name": "vue-labs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Oracles exécutables des labs Vue (règle : un lab = un geste métier complet). Solution GREEN / starter RED, vérifié en exécutant les tests.",
+  "type": "module",
+  "scripts": {
+    "lab:01": "vitest run --root lab-01-feature-de-zero",
+    "solution:01": "vitest run --root lab-01-feature-de-zero --config vitest.solution.config.ts"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/test-utils": "^2.4.6",
+    "happy-dom": "^15.11.7",
+    "pinia": "^2.2.6",
+    "typescript": "^5.8.2",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.8",
+    "vue": "^3.5.13",
+    "vue-tsc": "^2.2.8"
+  }
+}
