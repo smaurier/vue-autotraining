@@ -16,6 +16,13 @@ last-reviewed: 2026-07
 
 # Accessibilité — fondamentaux WCAG et RGAA
 
+> 📐 **Les fondamentaux d'accessibilité sont désormais dans le cours 25 HTML & CSS**, qui en est
+> la source unique du curriculum. Ce module garde ce que **Vue** change : la sémantique dans un
+> template, les exemples TribuZen en composants, et les pièges propres à `@click` et aux
+> directives. Les principes, le contraste, le clavier et les alternatives sont traités une seule
+> fois, là-bas.
+
+
 > **Outcomes — tu sauras FAIRE :** expliquer le modèle POUR et les niveaux A/AA/AAA, écrire du HTML sémantique accessible dans un composant Vue, garantir contraste et navigation clavier, distinguer avec précision WCAG, EN 301 549 et RGAA.
 > **Difficulté :** :star::star::star:
 >
@@ -55,64 +62,10 @@ Ce module te donne les bases pour auditer et corriger chacun de ces défauts ave
 
 ## 2. Théorie complète, concise
 
-### 2.1 Le modèle POUR — quatre principes WCAG
+### 2.1 Le modèle POUR, et 2.2 les niveaux de conformité
 
-WCAG (Web Content Accessibility Guidelines) structure **tous ses critères** autour de quatre principes mnémotechniques : **P**erceptible, **O**pérable, **U**tilisable (compréhensible), **R**obuste — abrégé POUR en français (POUR = Perceivable, Operable, Understandable, Robust).
-
-**P — Perceptible**
-Toute information et tout composant d'interface doit être présentable à l'utilisateur de manière qu'il puisse le percevoir. Cela exclut un canal sensoriel unique.
-
-Exemples de critères :
-- Images avec alternatives textuelles (1.1.1 A)
-- Contenu audio/vidéo avec sous-titres et transcriptions
-- Contraste texte/fond suffisant (1.4.3 AA, 1.4.6 AAA)
-- Pas d'information transmise par la couleur seule (1.4.1 A)
-- Contenu redimensionnable sans perte d'information jusqu'à 200 % (1.4.4 AA)
-
-**O — Opérable**
-Tout composant d'interface et toute navigation doit être opérable. L'utilisateur doit pouvoir interagir, quelle que soit sa modalité d'entrée.
-
-Exemples de critères :
-- Tout contenu navigable au clavier, sans piège (2.1.1 A, 2.1.2 A)
-- Délais suffisants et ajustables (2.2.1 A)
-- Aucune animation qui clignote plus de 3 fois/seconde (2.3.1 A)
-- Mécanisme pour sauter les blocs répétitifs — skip link (2.4.1 A)
-- Focus visible sur les éléments interactifs (2.4.7 AA → 2.4.11 AA en WCAG 2.2)
-
-**U — Compréhensible (Understandable)**
-L'information et le fonctionnement de l'interface doivent être compréhensibles.
-
-Exemples de critères :
-- Langue de la page déclarée (3.1.1 A : `<html lang="fr">`)
-- Comportement prévisible : pas de changement de contexte automatique au focus (3.2.1 A)
-- Labels visibles associés aux champs (3.3.2 A)
-- Messages d'erreur identifiant le champ et suggérant une correction (3.3.1 A, 3.3.3 AA)
-
-**R — Robuste (Robust)**
-Le contenu doit être suffisamment robuste pour être interprété de façon fiable par les agents utilisateurs, y compris les technologies d'assistance actuelles et futures.
-
-Exemples de critères :
-- HTML valide, avec début/fin de balises correctes (4.1.1 A — **supprimé dans WCAG 2.2**, intégré implicitement)
-- Rôle, nom, valeur programmable pour tous les composants d'interface (4.1.2 A)
-- Messages de statut rendus aux AT sans prise de focus (4.1.3 AA)
-
----
-
-### 2.2 Niveaux de conformité A, AA, AAA
-
-WCAG définit **trois niveaux** de conformité. Chaque critère appartient à un et un seul niveau.
-
-| Niveau | Signification | Obligation légale (France) |
-|--------|--------------|---------------------------|
-| **A** | Plancher minimal — le contenu reste inutilisable sans conformité A | Oui — tous les acteurs |
-| **AA** | Cible standard — bonne expérience pour la majorité des utilisateurs en situation de handicap | Oui — obligatoire RGAA (services publics, EAA secteur privé depuis 06/2025) |
-| **AAA** | Excellence — souvent impossible pour des contenus diversifiés | Non requis ; viser quand le contexte le permet |
-
-**Règle cardinale :** un service dit "conforme AA" est conforme à **tous les critères A ET tous les critères AA**. Le niveau AA n'efface pas le niveau A.
-
-WCAG 2.1 (2018) est la base de RGAA 4.1. WCAG 2.2 (octobre 2023) ajoute neuf nouveaux critères (dont 2.4.11 Focus Appearance, 2.5.8 Target Size Minimum AA) et supprime 4.1.1 Parsing. La mise à jour de RGAA pour refléter WCAG 2.2 est en cours à la date de ce module (DINUM).
-
----
+> 📐 **Traité dans le cours 25 HTML & CSS**, module 00, § 4 bis « Le référentiel en bref ».
+> Le cadre légal détaillé est au cours 23 `23-droit-numerique`.
 
 ### 2.3 HTML sémantique
 
@@ -219,310 +172,17 @@ Les landmarks (éléments de structure HTML5) permettent aux utilisateurs de lec
 
 ---
 
-### 2.4 Contraste des couleurs
+### 2.4 Contraste, 2.5 clavier et focus, 2.6 alternatives textuelles
 
-WCAG 1.4.3 (AA) et 1.4.6 (AAA) définissent des **ratios de contraste minimaux** entre la couleur du texte et celle de l'arrière-plan direct.
+> 📐 **Traité dans le cours 25 HTML & CSS**, module 10 pour la couleur et le calcul du ratio, module 01 pour les alternatives, modules 16 et 20 pour le focus visible et le protocole clavier.
 
-**Ratios WCAG 2.1 AA (1.4.3)**
+Ce qui change en Vue, et c'est tout : un `@click` sur un élément non interactif ne crée ni rôle,
+ni focus, ni activation au clavier. Le piège n°1 ci-dessous le détaille.
 
-| Type de texte | Ratio minimal AA | Ratio minimal AAA (1.4.6) |
-|--------------|-----------------|--------------------------|
-| Texte normal (< 18pt / < 14pt gras) | **4.5:1** | 7:1 |
-| Grand texte (≥ 18pt normal OU ≥ 14pt gras) | **3:1** | 4.5:1 |
-| Texte dans les logotypes | Aucun | Aucun |
-| Texte décoratif (invisible fonctionnellement) | Aucun | Aucun |
+### 2.7 Chaîne normative, et 2.8 préférence de mouvement
 
-> **Précision taille :** 18pt = 24px en CSS (1pt = 1.333px). 14pt = ~18.67px. Vérifier avec la taille calculée dans DevTools, pas la valeur de la règle CSS qui peut être héritée ou modifiée.
-
-**WCAG 1.4.11 (AA, ajouté en 2.1) — Non-text contrast**
-Les composants d'interface (bordures de champs de formulaire, icônes informatives, indicateurs d'état) doivent avoir un ratio ≥ 3:1 par rapport au fond adjacent.
-
-```vue
-<style scoped>
-/* Exemples de ratios — vérifier avec un outil (Colour Contrast Analyser, WebAIM) */
-
-/* ✅ #1a1a1a sur #fff ≈ 19.4:1 — conforme A, AA, AAA */
-.text-primary { color: #1a1a1a; background: #fff; }
-
-/* ✅ #595959 sur #fff ≈ 7.0:1 — conforme AA et AAA pour texte normal */
-.text-secondary { color: #595959; background: #fff; }
-
-/* ✅ #767676 sur #fff ≈ 4.5:1 — conforme AA texte normal (limite exacte) */
-.text-muted { color: #767676; background: #fff; }
-
-/* ❌ #aaa (#aaaaaa) sur #fff ≈ 2.3:1 — non conforme (utilisé dans le cas concret) */
-/* .text-light { color: #aaa; background: #fff; } */
-
-/* ✅ Grand texte (≥ 24px) : #959595 sur #fff ≈ 3.0:1 — AA suffit pour grand texte */
-.heading-large { color: #959595; background: #fff; font-size: 1.5rem; }
-</style>
-```
-
----
-
-### 2.5 Navigation au clavier et focus visible
-
-**Navigation au clavier**
-
-Tout élément interactif doit être accessible et activable au clavier. L'ordre de tabulation doit être logique (correspond à l'ordre visuel et au DOM).
-
-```vue
-<script setup lang="ts">
-import { ref } from 'vue'
-
-const isOpen = ref(false)
-
-// ✅ Gestion clavier pour un pattern custom nécessitant @keydown
-// (pour un <button> natif, Enter et Space fonctionnent sans cela)
-function handleToggleKeydown(event: KeyboardEvent): void {
-  if (event.key === 'Enter' || event.key === ' ') {
-    event.preventDefault() // empêche le scroll sur Space
-    isOpen.value = !isOpen.value
-  }
-  if (event.key === 'Escape' && isOpen.value) {
-    isOpen.value = false
-  }
-}
-</script>
-
-<template>
-  <!-- ✅ <button> natif : Enter et Space gérés automatiquement par le navigateur -->
-  <button
-    @click="isOpen = !isOpen"
-    :aria-expanded="isOpen"
-  >
-    {{ isOpen ? 'Fermer' : 'Ouvrir' }} les paramètres
-  </button>
-
-  <!-- tabindex="-1" : retire l'élément du flux de tabulation tout en
-       permettant de le focus programmatiquement -->
-  <div v-if="isOpen" tabindex="-1">
-    <!-- contenu -->
-  </div>
-</template>
-```
-
-**`tabindex` — règles d'usage**
-
-| Valeur | Effet | Quand l'utiliser |
-|--------|-------|-----------------|
-| `tabindex="0"` | Ajoute l'élément dans le flux naturel de Tab | Rendre focusable un élément non interactif (rare) |
-| `tabindex="-1"` | Exclut du Tab mais permet `element.focus()` | Focus programmatique (après changement de route, modales) |
-| `tabindex="n"` (n ≥ 1) | **Ne jamais utiliser** — crée un ordre de tab imprévisible | Jamais |
-
-**Focus visible**
-
-WCAG 2.4.7 (AA) exige un indicateur de focus visible. WCAG 2.2 ajoute 2.4.11 (AA) : l'indicateur de focus doit avoir un ratio de contraste ≥ 3:1 entre l'état avec focus et sans focus, et une surface minimale.
-
-```vue
-<style scoped>
-/*
-  ❌ JAMAIS supprimer le focus sans le remplacer
-  button:focus { outline: none; }
-*/
-
-/*
-  ✅ Personnaliser l'outline sans le supprimer
-  :focus-visible est préférable à :focus pour éviter l'outline
-  sur les clics souris tout en le gardant pour le clavier
-*/
-button:focus-visible {
-  outline: 3px solid #0066cc;
-  outline-offset: 2px;
-}
-
-/*
-  ✅ Pour des tokens de design system : utiliser une variable CSS
-*/
-:root {
-  --focus-ring: 3px solid #0066cc;
-  --focus-ring-offset: 2px;
-}
-
-.interactive:focus-visible {
-  outline: var(--focus-ring);
-  outline-offset: var(--focus-ring-offset);
-}
-</style>
-```
-
----
-
-### 2.6 Images et alternatives textuelles
-
-La règle est simple en apparence mais cache plusieurs cas distincts. Se tromper de cas est une non-conformité fréquente.
-
-**Cas 1 — Image informative**
-L'image apporte une information non présente ailleurs dans le contexte immédiat.
-
-```vue
-<template>
-  <!-- ✅ alt = description concise de l'information véhiculée -->
-  <!-- Pas "photo de" ou "image de" — les AT annoncent déjà "image" -->
-  <img src="/photos/famille-martin.jpg" alt="La famille Martin, quatre personnes souriantes en extérieur" />
-</template>
-```
-
-**Cas 2 — Image décorative**
-L'image ne véhicule aucune information ; sa suppression ne causerait aucune perte d'information.
-
-```vue
-<template>
-  <!--
-    ✅ alt="" vide — le lecteur d'écran ignore l'image
-    role="presentation" ou role="none" : redondant avec alt="" mais
-    parfois ajouté pour clarté ou compatibilité AT anciens.
-    alt="" est obligatoire — l'attribut absent déclencherait une
-    non-conformité WCAG 1.1.1 A : les AT liraient le nom de fichier.
-  -->
-  <img src="/decorations/wave.svg" alt="" role="presentation" />
-</template>
-```
-
-**Cas 3 — Image fonctionnelle (bouton/lien iconique)**
-L'image remplit une fonction — alt décrit la **fonction**, pas l'image.
-
-```vue
-<template>
-  <!-- ✅ alt = ce que fait le bouton, pas ce que représente l'icône -->
-  <button>
-    <img src="/icons/close.svg" alt="Fermer le panneau" />
-  </button>
-
-  <!-- Avec SVG inline : aria-label sur le bouton, aria-hidden sur le SVG -->
-  <button aria-label="Fermer le panneau">
-    <svg aria-hidden="true" focusable="false"><!-- ... --></svg>
-  </button>
-</template>
-```
-
-**Cas 4 — Image complexe (graphique, diagramme, carte)**
-Un alt court ne suffit pas — nécessite une description longue.
-
-```vue
-<template>
-  <!-- ✅ alt court + description longue accessible -->
-  <figure>
-    <img
-      src="/charts/activite-groupes.png"
-      alt="Graphique d'activité des groupes TribuZen"
-      aria-describedby="chart-desc"
-    />
-    <figcaption id="chart-desc">
-      Évolution du nombre de messages par groupe sur 6 mois.
-      Le groupe "Famille Dupont" affiche la plus forte croissance avec 340 messages en juin.
-    </figcaption>
-  </figure>
-</template>
-```
-
----
-
-### 2.7 WCAG, EN 301 549 et RGAA — la chaîne normative exacte
-
-C'est le point le plus souvent mal compris. Voici la chaîne complète.
-
-**WCAG — Web Content Accessibility Guidelines**
-
-Produit par le W3C (World Wide Web Consortium), groupe de travail AGWG. Document technique international, pas un texte légal.
-- WCAG 2.0 (2008) — première version stable, référence historique
-- WCAG 2.1 (juin 2018) — 17 nouveaux critères, notamment mobile et cognitif
-- WCAG 2.2 (octobre 2023) — 9 nouveaux critères, suppression 4.1.1
-
-WCAG définit des **critères de succès** (success criteria) organisés selon POUR, par niveau A/AA/AAA. Ce n'est pas une méthode de test — les tests sont à la charge des implémenteurs.
-
-**EN 301 549 — Norme européenne harmonisée**
-
-Produite par l'ETSI (European Telecommunications Standards Institute), co-produite avec CEN et CENELEC. C'est la norme technique qui sert de base à la **directive WebAW** (UE 2016/2102, services publics) et à la **directive EAA** (European Accessibility Act, UE 2019/882, secteur privé, applicable depuis juin 2025 en France).
-
-La version 3.x d'EN 301 549 intègre WCAG 2.1 AA par référence (chapitre 9 pour le web). Elle ajoute des exigences pour les logiciels non-web, la documentation, les services d'assistance.
-
-**RGAA — Référentiel Général d'Amélioration de l'Accessibilité**
-
-Produit par la DINUM (Direction Interministérielle du Numérique). Transposition française d'EN 301 549 en méthode de test opérationnelle.
-
-RGAA 4.1 (2021, actuel) :
-- Base normative : WCAG 2.1 niveau AA (via EN 301 549 v3.1.1)
-- Structure : **13 thématiques**, **106 critères**, chaque critère avec 1 à N **tests numérotés** (ex. critère 1.1, test 1.1.1)
-- Méthode de test prescriptive : chaque test décrit exactement la procédure de vérification
-- Périmètre légal : services de communication publique en ligne (LCEN art. 47) → organismes publics et délégataires de service public ; pénalités jusqu'à 20 000 € / an
-- Obligations associées : déclaration d'accessibilité publiée, schéma pluriannuel, plan annuel
-
-**Résumé des distinctions — tableau**
-
-| | WCAG 2.1/2.2 | EN 301 549 | RGAA 4.1 |
-|---|---|---|---|
-| Auteur | W3C | ETSI/CEN/CENELEC | DINUM |
-| Nature | Standard technique international | Norme européenne harmonisée | Référentiel national français |
-| Base légale directe | Non | Directive UE (WebAW + EAA) | LCEN art. 47 + décret 2019-768 |
-| Tests définis | Non (critères sans procédure) | Non | Oui (tests numérotés précis) |
-| Périmètre | Contenu web | Web + non-web + doc + services | Services publics FR principalement |
-| WCAG intégré | — | Chapitre 9 = WCAG 2.1 AA | Via EN 301 549 |
-
-**ARIA n'est pas WCAG, n'est pas RGAA**
-
-ARIA (Accessible Rich Internet Applications, W3C WAI) est une **spécification technique** de sémantique supplémentaire. WCAG référence ARIA dans certains critères (notamment 4.1.2), mais ARIA est indépendant de WCAG. RGAA teste les critères WCAG et peut prescrire l'usage d'ARIA pour satisfaire un test — mais ARIA n'est pas le référentiel.
-
----
-
-### 2.8 `prefers-reduced-motion`
-
-La media query `prefers-reduced-motion` reflète la préférence système de l'utilisateur (réglage OS "Réduire les animations").
-
-**Cadrage normatif :** `prefers-reduced-motion` est une bonne pratique alignée sur **WCAG 2.3.3 — Animation from Interactions (niveau AAA, hors périmètre RGAA 4.1)**. Elle n'est pas une obligation RGAA, mais reste **fortement recommandée**. À ne pas confondre avec **RGAA 13.8**, qui porte sur le **contrôle utilisateur des contenus animés autolancés** (lecture automatique — bouton play/pause/stop, correspondant à WCAG 2.2.2 Pause, Stop, Hide, niveau AA). Ces deux notions sont distinctes : RGAA 13.8 impose qu'une animation démarrant automatiquement puisse être stoppée par l'utilisateur ; `prefers-reduced-motion` permet de respecter la préférence OS pour réduire globalement toutes les animations, indépendamment du caractère autolancé.
-
-```vue
-<!-- AnimatedCard.vue -->
-<script setup lang="ts">
-import { ref, onMounted } from 'vue'
-
-const prefersReducedMotion = ref(false)
-
-onMounted(() => {
-  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-  prefersReducedMotion.value = mediaQuery.matches
-
-  // Réagir aux changements en cours de session (l'utilisateur change le réglage OS)
-  mediaQuery.addEventListener('change', (e) => {
-    prefersReducedMotion.value = e.matches
-  })
-})
-</script>
-
-<template>
-  <!--
-    :class conditionnel — supprime la classe d'animation si la préférence est active.
-    Vue applique le changement réactif sans rechargement.
-  -->
-  <div :class="['card', { 'card--animated': !prefersReducedMotion }]">
-    <slot />
-  </div>
-</template>
-
-<style scoped>
-.card--animated {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card--animated:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
-}
-
-/*
-  Approche alternative purement CSS — plus simple et immédiate.
-  Les deux approches (CSS + Vue réactif) sont complémentaires.
-  La version CSS couvre les cas où JS n'est pas encore hydraté.
-*/
-@media (prefers-reduced-motion: reduce) {
-  .card--animated {
-    transition: none;
-  }
-}
-</style>
-```
-
----
+> 📐 **Traité dans le cours 25 HTML & CSS**, module 00 § 4 bis pour la chaîne WCAG, RGAA et European Accessibility Act, et module 12 § 4 pour `prefers-reduced-motion`.
+> Le détail juridique, dont EN 301 549, est au cours 23.
 
 ## 3. Worked examples
 
@@ -777,78 +437,9 @@ input[aria-invalid="true"] {
 
 **Subtilité :** un `<div>` avec `tabindex="0"` et `role="button"` et `@keydown` manuel peut être rendu accessible, mais c'est plus de code, plus de surface de bug, et moins robuste qu'un `<button>` natif. Le HTML sémantique d'abord, ARIA en dernier recours.
 
-### PIÈGE #2 — `alt` non vide sur image décorative
+### PIÈGE #2 — alternatives, focus, confusion WCAG/RGAA/ARIA, contraste mal calculé
 
-```vue
-<template>
-  <!-- ❌ alt="icône" ou alt="décoratif" sur une image décorative :
-       le lecteur d'écran annonce "icône, image" — bruit informatif inutile.
-       Même "décoratif" est lu et interrompt le flux. -->
-  <img src="/icons/star.svg" alt="icône étoile décorative" />
-
-  <!--
-    ❌ alt absent (attribut non présent) :
-    Les AT lisent le nom de fichier : "star point svg, image"
-    Non-conformité WCAG 1.1.1 A
-  -->
-  <img src="/icons/star.svg" />
-
-  <!-- ✅ alt="" vide : l'image est ignorée par les AT -->
-  <img src="/icons/star.svg" alt="" />
-</template>
-```
-
-### PIÈGE #3 — `outline: none` sans remplacement
-
-```css
-/* ❌ Suppression globale du focus — non-conformité WCAG 2.4.7 AA -->
-* { outline: none; }
-button:focus { outline: none; }
-
-/* ✅ Personnalisation sans suppression */
-button:focus-visible {
-  outline: 3px solid #3182ce;
-  outline-offset: 2px;
-}
-
-/*
-  :focus-visible vs :focus :
-  :focus s'applique à tous les événements focus (clic souris inclus)
-  :focus-visible ne s'applique qu'aux focus "clavier" selon l'heuristique du navigateur
-  Pour l'accessibilité : toujours conserver le style sur :focus-visible au minimum.
-  Si le design system utilise :focus, c'est aussi valide — l'important est la visibilité.
-*/
-```
-
-### PIÈGE #4 — Confondre WCAG, RGAA et ARIA
-
-Confusion fréquente en entretien et en audit :
-
-| Confusion | Réalité |
-|-----------|---------|
-| "RGAA = WCAG en français" | RGAA est une **transposition opérationnelle** de WCAG via EN 301 549, avec 106 critères et des tests précis — pas une simple traduction |
-| "ARIA remplace le HTML sémantique" | ARIA **complète** HTML quand le HTML natif est insuffisant. Règle W3C : **No ARIA is better than bad ARIA** |
-| "Conforme RGAA = conforme WCAG" | RGAA 4.1 cible WCAG 2.1 AA. Un service peut être conforme RGAA et non conforme WCAG 2.2 si de nouveaux critères ne sont pas couverts |
-| "Niveau AAA requis en France" | Non — le niveau légal est AA. AAA est optionnel et parfois contradictoire entre contenus diversifiés |
-
-### PIÈGE #5 — Ratio de contraste calculé sur la mauvaise couleur
-
-Le ratio de contraste se calcule entre la couleur **effective** du texte et la couleur **effective** de l'arrière-plan **direct** (pas un arrière-plan parent éloigné ou un dégradé sous-jacent).
-
-```css
-/* ❌ Erreur : calculer sur les variables déclarées sans vérifier la couleur calculée */
-:root { --color-text: #555; }
-.card { background: linear-gradient(135deg, #f0f4f8, #e2e8f0); }
-.card p { color: var(--color-text); } /* ratio #555 sur quoi exactement ? */
-
-/*
-  ✅ Utiliser les DevTools (Computed → color + background-color)
-  ou un outil dédié (axe DevTools, Colour Contrast Analyser)
-  sur la couleur calculée — jamais sur la valeur de variable CSS seule.
-*/
-```
-
----
+> 📐 **Traité dans le cours 25 HTML & CSS**, module 01 pour les alternatives, module 16 pour le focus, module 00 pour la distinction WCAG, RGAA et ARIA, module 10 § 4.1 pour le calcul du ratio sur les couleurs réellement appliquées.
 
 ## 5. Ancrage TribuZen
 
