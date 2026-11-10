@@ -16,6 +16,12 @@ last-reviewed: 2026-07
 
 # ARIA et Vue
 
+> 📐 **Les contrats des patterns ARIA (rôles, états, clavier touche par touche) sont dans le
+> cours 25 HTML & CSS**, module 17, et la règle de fond « ARIA n'ajoute aucun comportement » est
+> au module 01 § 1.2. Ce module garde ce que Vue change : les directives, `ref`, `nextTick` pour
+> déplacer le focus après un rendu, et `Teleport` pour les couches.
+
+
 > **Outcomes — tu sauras FAIRE :** identifier quand ARIA est nécessaire (1re règle), annoncer un changement dynamique avec `aria-live`, construire une modale avec focus trap, lier dynamiquement les attributs ARIA dans des composants Vue 3.
 > **Difficulté :** :star::star::star:
 

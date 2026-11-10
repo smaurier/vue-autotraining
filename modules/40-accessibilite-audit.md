@@ -16,6 +16,11 @@ last-reviewed: 2026-07
 
 # Audit d'accessibilité
 
+> 📐 **La méthode d'audit est désormais dans le cours 25 HTML & CSS**, module 20, qui en est la
+> source unique du curriculum. Ce module garde ce qui est propre à cet écosystème : `vitest-axe`,
+> l'extension Storybook, et l'intégration dans la chaîne d'intégration continue.
+
+
 > **Outcomes — tu sauras FAIRE :** mener un audit a11y complet (auto + manuel + lecteur d'écran), intégrer vitest-axe en CI, conduire un audit RGAA 4.1 avec grille de critères et restituer un rapport exploitable.
 > **Difficulté :** :star::star::star::star:
 >
@@ -95,70 +100,18 @@ export default [
 
 Ce plugin complète axe-core : l'un agit dans l'IDE (écriture), l'autre dans le navigateur ou les tests (exécution).
 
-### 2.2 Limites structurelles de l'automatique (~30-40 %)
+### 2.2 Limites de l'automatique, et 2.3 tests manuels
 
-Le chiffre de 30-40 % n'est pas arbitraire : il correspond à la proportion de critères WCAG/RGAA dont la conformité est vérifiable sans interaction ni interprétation humaine. Les critères résiduels (~60-70 %) exigent l'un ou plusieurs de ces facteurs :
-
-| Facteur bloquant pour l'automatique | Exemples de critères |
-|---|---|
-| Interaction requise (focus, hover, saisie) | Focus visible, piège au clavier, gestion d'erreur ARIA |
-| Jugement sémantique | Pertinence du texte alternatif, lisibilité du nom accessible |
-| Contexte de navigation | Ordre logique du focus, cohérence des labels entre pages |
-| État dynamique (SPA) | Annonces après navigation, focus après modal, live regions |
-
-**Conséquence pratique :** un score Lighthouse vert ne prouve rien sur l'accessibilité réelle. L'automatique sert à bloquer les régressions évidentes en CI — pas à remplacer l'audit.
-
-### 2.3 Tests manuels — clavier et lecteur d'écran
-
-**Protocole clavier (par page, ~10 min)**
-
-Dépose la souris. Navigue uniquement au clavier depuis le haut de la page.
-
-| Vérification | Commande | Attendu |
-|---|---|---|
-| Ordre de focus | Tab | Suit l'ordre visuel/logique |
-| Focus visible | Tab (observer) | Contour visible sur chaque élément actif |
-| Activation bouton | Enter ou Space | Les deux touches déclenchent l'action |
-| Fermeture overlay | Escape | Ferme la modale, focus retourne sur le déclencheur |
-| Pas de piège | Tab répété | Jamais bloqué dans un composant |
-| Skip link | Premier Tab | Apparaît, skip vers le contenu principal |
-| Navigation modale | Tab dans `[role="dialog"]` | Focus confiné dans la modale |
-
-**NVDA (Windows, gratuit — référence Windows)**
-
-NVDA est le lecteur d'écran le plus utilisé avec Chrome en France. Il simule l'expérience réelle des utilisateurs non-voyants.
-
-| Action | Raccourci |
-|---|---|
-| Activer/quitter | Ctrl + Alt + N |
-| Lire page entière | NVDA + Flèche bas |
-| Titre suivant | H (mode navigation) |
-| Région suivante | D |
-| Formulaire — champ suivant | Tab |
-| Liste des titres/regions | NVDA + F7 |
-| Mode interaction (formulaire) | Enter |
-| Quitter mode interaction | Escape |
-
-**VoiceOver (macOS, intégré)**
-
-| Action | Raccourci |
-|---|---|
-| Activer/quitter | Cmd + F5 |
-| Élément suivant | VO + Flèche droite (VO = Ctrl + Option) |
-| Activer | VO + Space |
-| Lire la page | VO + A |
-| Rotor (titres, liens…) | VO + U |
-
-**Ce qu'on vérifie avec le lecteur d'écran :**
-
-- Chaque image informative est lue avec un alternatif pertinent (pas juste "image" ou le nom de fichier)
-- Les boutons ont un nom accessible qui décrit l'action (pas "Cliquer ici")
-- Les labels sont annoncés avec leur champ de formulaire
-- Les erreurs de validation sont annoncées automatiquement (`role="alert"` ou `aria-live`)
-- Les modales sont annoncées comme "dialogue", le focus y est confiné
-- Après une navigation SPA (`router.push`), le titre de la nouvelle page est annoncé
+> 📐 **Traité dans le cours 25 HTML & CSS**, module 20, § 1 pour ce qu'un outil peut décider et ce qu'il ne peut pas, § 3 pour le protocole clavier en huit étapes, § 4 pour le protocole lecteur d'écran.
+> ⚠️ **Divergence assumée à connaître :** ce module citait « 30 à 40 % » de détection
+> automatique. Le cours 25 ne cite volontairement **aucun pourcentage** : les chiffres qui
+> circulent varient selon la méthode de comptage et ne disent rien d'un site donné. Ce qui est
+> utile, et ce que le module 20 donne, c'est la liste de ce qui **n'est pas** automatisable.
 
 ### 2.4 jest-axe et vitest-axe en tests automatisés
+
+> Ce qui suit reste ici : c'est de l'outillage de test Vue, pas de la méthode d'audit.
+
 
 `jest-axe` est la bibliothèque d'intégration axe-core pour Jest. Elle fonctionne nativement avec **Vitest** (qui est jest-compatible pour les matchers).
 
@@ -358,140 +311,10 @@ jobs:
 
 **Stratégie de blocage :** les tests unitaires (vitest-axe) bloquent la PR. Les tests E2E a11y peuvent démarrer en `continue-on-error: false` dès que la baseline est établie — commencer en mode observation uniquement pour ne pas bloquer les premières itérations.
 
-### 2.7 Méthodologie RGAA 4.1 — grille des critères et taux de conformité
+### 2.7 Méthodologie RGAA et 2.8 restitution d'un rapport
 
-Le **Référentiel Général d'Amélioration de l'Accessibilité (RGAA) 4.1** est la transposition française du standard WCAG 2.1. **Deux textes distincts à ne pas confondre** : (1) l'obligation historique du **secteur public** découle de la **directive 2016/2102** (accessibilité des sites publics), transposée en droit français via **LCEN art. 47 + décret 2019-768** ; (2) la **directive EAA (European Accessibility Act, 2019/882 UE)** étend l'obligation à de nombreux **services privés** (e-commerce, banque, transport…), transposée en France par l'**ordonnance 2023-859** (applicable depuis le 28/06/2025). Le RGAA sert de référentiel de contrôle dans les deux cas, et il est de plus en plus exigé dans les appels d'offres privés.
-
-**Structure RGAA 4.1**
-
-- 13 thèmes
-- 106 critères
-- Chaque critère contient des tests, détaillant les conditions de conformité
-
-| # | Thème | Critères |
-|---|---|---|
-| 1 | Images | 9 |
-| 2 | Cadres | 2 |
-| 3 | Couleurs | 3 |
-| 4 | Multimédia | 13 |
-| 5 | Tableaux | 5 |
-| 6 | Liens | 6 |
-| 7 | Scripts | 5 |
-| 8 | Éléments obligatoires | 11 |
-| 9 | Structuration de l'information | 5 |
-| 10 | Présentation de l'information | 14 |
-| 11 | Formulaires | 13 |
-| 12 | Navigation | 8 |
-| 13 | Consultation | 12 |
-
-**Les trois états d'un critère par page :**
-
-- **Conforme (C)** — tous les tests du critère passent
-- **Non conforme (NC)** — au moins un test échoue
-- **Non applicable (NA)** — la page ne contient pas d'élément concerné par ce critère (ex: critère Tableaux sur une page sans tableau)
-
-**Calcul du taux de conformité**
-
-Le taux se calcule page par page, puis on fait la moyenne :
-
-```
-Taux par page = (nb critères C sur cette page) / (nb critères C + NC sur cette page) × 100
-
-Taux global = moyenne arithmétique des taux par page
-```
-
-Les critères NA sont exclus du calcul. Le **seuil de 75 %** est communément retenu pour la conformité substantielle des organismes publics — c'est une **interprétation pratique**, pas un seuil numérique fixé par un texte légal (le décret 2019-768 n'énonce pas ce chiffre).
-
-**Échantillon de pages**
-
-Un audit RGAA nécessite un échantillon représentatif. Pour une application comme TribuZen, l'échantillon minimal recommandé est :
-
-| Type | Page TribuZen |
-|---|---|
-| Page d'accueil | `/` |
-| Page de contact / aide | `/help` |
-| Mentions légales + déclaration d'accessibilité | `/legal/accessibility` |
-| Page de connexion (formulaire) | `/login` |
-| Parcours d'inscription (multi-étapes) | `/signup` |
-| Parcours d'invitation (action clé) | `/invite/:groupId` |
-| Feed (contenu dynamique) | `/feed` |
-| Gestion de profil | `/profile` |
-
-Pour un site de taille moyenne, l'échantillon recommandé est de 15 pages minimum incluant toutes les pages de navigation globale et au moins un exemple de chaque type de contenu.
-
-**Conduite de l'audit**
-
-1. Définir l'échantillon et le documenter
-2. Pour chaque page × chaque critère applicable : évaluer C / NC / NA
-3. Documenter chaque NC avec la méthode de test, les éléments concernés, la recommandation
-4. Calculer le taux par page et le taux global
-5. Rédiger la déclaration d'accessibilité (document légal obligatoire)
-
-### 2.8 Restitution d'un rapport d'audit
-
-Un rapport d'audit inutilisable est un audit gaspillé. La qualité du rapport détermine si les corrections seront faites.
-
-**Structure d'un rapport RGAA exploitable**
-
-```
-1. Contexte
-   - URL auditée, date, version testée
-   - Navigateur + lecteur d'écran utilisés
-   - Auditeur
-
-2. Périmètre de l'audit
-   - Liste des pages de l'échantillon avec leur URL
-   - Critères exclus et justification (si applicable)
-
-3. Synthèse des résultats
-   - Taux de conformité global
-   - Taux par page (tableau)
-   - Top 5 des critères NC les plus fréquents
-
-4. Résultats détaillés
-   - Par critère NC : description, pages concernées,
-     exemples de code défaillant, recommandation priorisée
-
-5. Recommandations priorisées
-   - P0 (bloquant) : empêche l'accès à une fonctionnalité clé
-   - P1 (critique) : détectée par les lecteurs d'écran fréquemment
-   - P2 (modéré) : amélioration sensible avec effort faible
-   - P3 (mineur) : best practice non bloquante
-
-6. Déclaration d'accessibilité
-   - Document légal RGAA (modèle DINUM)
-   - Taux déclaré, date, engagements de correction
-```
-
-**Format des NC dans le rapport**
-
-Chaque non-conformité doit contenir :
-
-```markdown
-## Critère 11.1 — Chaque champ de formulaire a-t-il une étiquette ?
-
-**Statut :** Non conforme
-**Pages concernées :** /login, /signup, /invite/:groupId
-**Impact :** Critique — les utilisateurs de lecteurs d'écran ne peuvent
-             pas identifier les champs sans étiquette.
-
-**Élément défaillant :**
-`<input type="email" placeholder="Votre email" />`
-
-**Pourquoi c'est non conforme :**
-Le `placeholder` n'est pas un label RGAA. Il disparaît à la saisie,
-n'est pas systématiquement restitué par tous les lecteurs d'écran,
-et ne satisfait pas le critère 11.1.
-
-**Recommandation :**
-Associer un `<label>` via `for`/`id` ou `aria-label` :
-`<label for="email">Adresse e-mail</label>`
-`<input id="email" type="email" />`
-
-**Effort estimé :** 30 min — correction systématique
-```
-
----
+> 📐 **Traité dans le cours 25 HTML & CSS**, module 20, § 5 pour l'échantillonnage et § 6 pour les critères qui ne se testent qu'à la main.
+> La méthode d'audit qui fait foi reste celle de la formation Access42, et le référentiel officiel pour les protocoles de test critère par critère.
 
 ## 3. Worked examples
 
